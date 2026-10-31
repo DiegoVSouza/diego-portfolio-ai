@@ -1,0 +1,53 @@
+catalog: PASS
+
+ RUN  v5.0.5 C:/estudo/Golpe/lab/projects/p07
+
+
+ Test Files  1 passed (1)
+      Tests  17 passed (17)
+   Start at  13:01:29
+   Duration  3.18s (environment 48%, tests 35%, setup 8%, import 7%, transform 2%)
+
+lint: exit 0
+typecheck: exit 0
+catalog:check: exit 0
+test: exit 0
+check-fast: OK
+[36mvite v8.3.5 [32mbuilding client environment for production...[36m[39m
+transforming...
+✓ 24 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/index.html                                                  0.87 kB │ gzip:  0.47 kB
+dist/assets/anton-vietnamese-400-normal-2FfR1wHA.woff            6.82 kB
+dist/assets/anton-vietnamese-400-normal-CkBxLiRJ.woff2           8.68 kB
+dist/assets/courier-prime-latin-ext-400-normal-CKOCNFvK.woff     9.04 kB
+dist/assets/courier-prime-latin-ext-700-normal-BIFoAzHx.woff     9.28 kB
+dist/assets/courier-prime-latin-ext-400-normal-B-EsvyE4.woff2   12.73 kB
+dist/assets/courier-prime-latin-ext-700-normal-ByMJlNdM.woff2   12.92 kB
+dist/assets/courier-prime-latin-400-normal-BAlbUm6l.woff        14.38 kB
+dist/assets/courier-prime-latin-700-normal-CVvp4Sof.woff        14.67 kB
+dist/assets/anton-latin-400-normal-AUNGEG_V.woff                15.63 kB
+dist/assets/anton-latin-400-normal-Byf51wtH.woff2               18.61 kB
+dist/assets/courier-prime-latin-400-normal-BbyBr73r.woff2       18.64 kB
+dist/assets/courier-prime-latin-700-normal-D1YCjmaD.woff2       19.34 kB
+dist/assets/anton-latin-ext-400-normal-BMODBQc6.woff            28.07 kB
+dist/assets/anton-latin-ext-400-normal-SyiqE2Jt.woff2           31.35 kB
+dist/assets/index-C_e-9q-B.css                                   6.53 kB │ gzip:  2.06 kB
+dist/assets/index-CYOJPcSX.js                                  251.86 kB │ gzip: 78.81 kB
+
+[32m✓ built in 179ms[39m
+budget: PASS (76.2 KB gzip of 100 KB)
+
+Running 3 tests using 1 worker
+
+  ✓  1 e2e\site.spec.ts:8:3 › home and every project page pass axe at 1280px (4.1s)
+  ✓  2 e2e\site.spec.ts:8:3 › home and every project page pass axe at 360px (3.8s)
+  ✓  3 e2e\site.spec.ts:24:1 › keyboard reaches a project and back (298ms)
+
+  3 passed (13.4s)
+fast: exit 0
+build: exit 0
+budget: exit 0
+e2e: exit 0
+check-full: PASS

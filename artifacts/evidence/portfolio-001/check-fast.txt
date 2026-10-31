@@ -1,0 +1,15 @@
+catalog: PASS
+
+ RUN  v5.0.5 C:/estudo/Golpe/lab/projects/p07
+
+
+ Test Files  1 passed (1)
+      Tests  17 passed (17)
+   Start at  12:59:56
+   Duration  3.11s (environment 48%, tests 35%, setup 8%, import 7%, transform 1%)
+
+lint: exit 0
+typecheck: exit 0
+catalog:check: exit 0
+test: exit 0
+check-fast: OK

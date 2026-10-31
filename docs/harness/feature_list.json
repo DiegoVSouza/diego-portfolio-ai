@@ -1,3 +1,8 @@
 {
-  "features": []
+  "features": [
+    {"id": "portfolio-catalog", "description": "Generated catalog from sibling feature lists, with drift check", "requirement_ids": ["DATA-001", "DATA-002"], "status": "PASS_LOCAL", "evidence": ".planning/phases/001-portfolio/VERIFY.md; artifacts/evidence/portfolio-001/check-fast.txt"},
+    {"id": "portfolio-pages", "description": "Home, project pages, method section and language toggle", "requirement_ids": ["DATA-001"], "status": "PASS_LOCAL", "evidence": "artifacts/evidence/portfolio-001/check-full.txt"},
+    {"id": "portfolio-quality", "description": "axe, bundle budget and CSP gates", "requirement_ids": ["A11Y-001", "PERF-001", "SEC-001"], "status": "PASS_LOCAL; SCREEN_READER_AND_DEPLOY_PENDING", "evidence": "artifacts/evidence/portfolio-001/check-full.txt"},
+    {"id": "portfolio-deploy", "description": "Hosting and public URL", "requirement_ids": [], "status": "PENDING", "evidence": "Needs explicit authorization (lab rule 9)"}
+  ]
 }

@@ -1,0 +1,18 @@
+:root {
+  --ink: #050505;
+  --card: #0c0c0c;
+  --ink-2: #111111;
+  --paper: #f2ede4;
+  --mut: #cfc9be;
+  --red: #e5121f;
+  --red-text: #ff4a52;
+  --dred: #6d0a12;
+  --on-red: #ffffff;
+  --ok: #7fd48a;
+  --warn: #f0c36a;
+  --f-display: "Anton", Impact, sans-serif;
+  --f-body: "Courier Prime", ui-monospace, monospace;
+  --cut-card: polygon(0 3%, 6% 0, 34% 2%, 66% 0, 100% 3%, 99% 50%, 100% 97%, 68% 100%, 36% 98%, 4% 100%, 0 55%);
+  --hit: 44px;
+  --gutter: clamp(14px, 4vw, 36px);
+}

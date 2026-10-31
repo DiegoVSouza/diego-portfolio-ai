@@ -1,0 +1,538 @@
+{
+  "meta": {
+    "p00": {
+      "version": "1.0.1",
+      "repo": "https://github.com/DiegoVSouza/supportops-foundation"
+    },
+    "p01": {
+      "version": "0.1.1",
+      "repo": "https://github.com/DiegoVSouza/supportops-agents"
+    },
+    "p02": {
+      "version": "0.2.0",
+      "repo": "https://github.com/DiegoVSouza/supportops-ai-toolkit"
+    },
+    "p03": {
+      "version": "0.3.1",
+      "repo": "https://github.com/DiegoVSouza/supportops-observability"
+    },
+    "p04": {
+      "version": "0.1.4",
+      "repo": "https://github.com/DiegoVSouza/supportops-async"
+    },
+    "p05": {
+      "version": "0.4.5",
+      "repo": "https://github.com/DiegoVSouza/supportops-platform"
+    },
+    "p06": {
+      "version": "0.1.0",
+      "repo": ""
+    }
+  },
+  "projects": {
+    "p00": [
+      {
+        "id": "funded-replacement-development",
+        "description": "148-test offline gate passes. Frozen candidate completed 36 live development trials with 27 passes and nine semantic failures. 84 holdout and 60 confirmation calls remain protected; no correction budget or human approval is inferred.",
+        "status": "FAIL_PROVISIONAL; LOCAL_CONTROLS_PASS; REVIEW_AND_PROMOTION_PENDING",
+        "evidence": ".planning/phases/028-funded-replacement/VERIFY.md; artifacts/evidence/funded-replacement-028/final-analysis.md",
+        "state": "open"
+      },
+      {
+        "id": "domain-contracts",
+        "description": "",
+        "status": "complete",
+        "evidence": "tests/domain/test_models.py and artifacts/evidence/phase-001-contract-coverage.txt",
+        "state": "verified"
+      },
+      {
+        "id": "seeded-dataset-and-golden-decisions",
+        "description": "",
+        "status": "complete",
+        "evidence": "tests/testkit/test_dataset.py and artifacts/evidence/phase-001-contract-coverage.txt",
+        "state": "verified"
+      },
+      {
+        "id": "fake-replay-live-budget-ledger",
+        "description": "",
+        "status": "complete-with-live-provider-limit",
+        "evidence": "tests/llm/test_clients.py and artifacts/evidence/phase-002-budget-reconciliation.txt",
+        "state": "verified"
+      },
+      {
+        "id": "local-services-and-hosted-ci",
+        "description": "",
+        "status": "incomplete",
+        "evidence": "artifacts/evidence/doctor.md and artifacts/evidence/phase-003-environment.md",
+        "state": "open"
+      }
+    ],
+    "p01": [
+      {
+        "id": "core-supervisor",
+        "description": "Bounded supervisor-worker runner with shared state",
+        "status": "passes: true",
+        "evidence": "",
+        "state": "claimed"
+      },
+      {
+        "id": "core-stop-conditions",
+        "description": "Approval, escalation, max steps, and malformed worker outputs",
+        "status": "passes: true",
+        "evidence": "",
+        "state": "claimed"
+      },
+      {
+        "id": "runner-registry",
+        "description": "Stable names and explicit unavailable adapters",
+        "status": "passes: true",
+        "evidence": "",
+        "state": "claimed"
+      },
+      {
+        "id": "framework-adapters",
+        "description": "Five real framework adapters conforming to TriageRunner",
+        "status": "passes: true",
+        "evidence": "",
+        "state": "claimed"
+      },
+      {
+        "id": "langgraph-recovery-hitl",
+        "description": "SQLite checkpoint recovery and HITL pause/resume",
+        "status": "passes: true",
+        "evidence": "",
+        "state": "claimed"
+      },
+      {
+        "id": "run-checkpoint-identity",
+        "description": "Fresh checkpoint identity per execution; explicit resume key supports cross-process recovery",
+        "status": "passes: true",
+        "evidence": "",
+        "state": "claimed"
+      },
+      {
+        "id": "comparison-and-docs",
+        "description": "Comparison documentation and P00 60-case adapter coverage",
+        "status": "PASS",
+        "evidence": "artifacts/evidence/check-full.txt; all six adapters exercised 60 versioned P00 cases; unsupported P00 semantics are listed per case.",
+        "state": "verified"
+      }
+    ],
+    "p02": [
+      {
+        "id": "safe-tool-retries",
+        "description": "Ambiguous timeout and generic transport failures are not retried; explicit retryable ToolError is bounded.",
+        "status": "PASS_UNIT",
+        "evidence": "artifacts/evidence/phase-002-regression-green.txt",
+        "state": "verified"
+      },
+      {
+        "id": "tool-step-and-time-limits",
+        "description": "Tool calls consume a step and are bounded by the remaining elapsed-time budget.",
+        "status": "PASS_UNIT",
+        "evidence": "artifacts/evidence/phase-002-regression-green.txt",
+        "state": "verified"
+      },
+      {
+        "id": "token-limit-in-agent-path",
+        "description": "",
+        "status": "INCOMPLETE",
+        "evidence": "P02 does not own an LLM/agent runtime; callers must report usage via ExecutionLimits.consume(tokens=...).",
+        "state": "open"
+      },
+      {
+        "id": "schema-validation-subset",
+        "description": "Documented subset rejects unknown keywords, bool-as-number, and non-finite inputs/outputs.",
+        "status": "PASS_UNIT",
+        "evidence": "artifacts/evidence/phase-002-regression-green.txt",
+        "state": "verified"
+      },
+      {
+        "id": "fake-evals-and-adversarial-suite",
+        "description": "",
+        "status": "PASS_FAKE_FIXTURES",
+        "evidence": "artifacts/evidence/phase-002-check-full.txt",
+        "state": "verified"
+      },
+      {
+        "id": "cost-latency-model-quality",
+        "description": "",
+        "status": "PENDING",
+        "evidence": "No comparable authorized model runs are recorded.",
+        "state": "open"
+      },
+      {
+        "id": "local-retrieval-provenance-and-indirect-injection-screen",
+        "description": "Local search returns only positive-overlap documents with stable untrusted source IDs; retrieved text can be screened by the shared heuristic guard. Citation-ID membership is checked only; external RAG, tenant isolation, model refusal, entailment, and live quality remain INCOMPLETE.",
+        "status": "PASS_LOCAL_CONTRACT; EXTERNAL_RAG_AND_MODEL_REFUSAL_INCOMPLETE",
+        "evidence": "artifacts/evidence/retrieval-provenance-injection/; artifacts/evidence/retrieval-misses-and-interrupts-011/",
+        "state": "partial"
+      },
+      {
+        "id": "tool-process-interruptions-no-retry",
+        "description": "KeyboardInterrupt and SystemExit propagate without wrapping or retrying the tool handler; timeout outcomes remain indeterminate and are not retried automatically.",
+        "status": "PASS_UNIT",
+        "evidence": "artifacts/evidence/retrieval-misses-and-interrupts-011/focused-tests.txt",
+        "state": "verified"
+      }
+    ],
+    "p03": [
+      {
+        "id": "setup-first-call-wins",
+        "description": "Later telemetry setup calls cannot mutate provider identity or content capture configuration",
+        "status": "PASS",
+        "evidence": "tests/test_instrumentation.py::test_setup_does_not_mutate_active_capture_configuration",
+        "state": "verified"
+      },
+      {
+        "id": "provider-flush-shutdown",
+        "description": "Explicit provider flush and idempotent shutdown API",
+        "status": "PASS",
+        "evidence": "tests/test_instrumentation.py::test_provider_flush_and_shutdown_are_exposed",
+        "state": "verified"
+      },
+      {
+        "id": "fake-instrumentation-regression",
+        "description": "Unit and in-memory exporter instrumentation behavior",
+        "status": "PASS",
+        "evidence": "artifacts/evidence/phase-002-regression-green.txt",
+        "state": "verified"
+      },
+      {
+        "id": "required-gate-fail-closed",
+        "description": "Missing required validator or service E2E returns INCOMPLETE and nonzero from full check",
+        "status": "PASS",
+        "evidence": "tests/test_gate_status.py; artifacts/evidence/check-full.txt",
+        "state": "verified"
+      },
+      {
+        "id": "promtool-rules",
+        "description": "Prometheus rule validation with promtool",
+        "status": "PASS",
+        "evidence": "artifacts/evidence/phase-009-full-gate-detail.txt; artifacts/evidence/phase-009-jaeger-export.json; artifacts/evidence/phase-009-live-alerts.json",
+        "state": "verified"
+      },
+      {
+        "id": "dashboard-service-e2e",
+        "description": "Provisioned dashboard, all four synthetic alert rules, and service telemetry exercised against the isolated local stack",
+        "status": "PASS",
+        "evidence": "artifacts/evidence/phase-009-full-gate-detail.txt; artifacts/evidence/phase-009-jaeger-export.json; artifacts/evidence/phase-009-live-alerts.json",
+        "state": "verified"
+      },
+      {
+        "id": "production-metrics",
+        "description": "Production traces, cost, latency, and model-quality measurements",
+        "status": "PENDING",
+        "evidence": "No authorized production run",
+        "state": "open"
+      },
+      {
+        "id": "p01-runner-integration",
+        "description": "Integration with an approved P01 package artifact",
+        "status": "PASS",
+        "evidence": "artifacts/evidence/phase-009-full-gate-detail.txt; artifacts/evidence/phase-009-jaeger-export.json; artifacts/evidence/phase-009-live-alerts.json",
+        "state": "verified"
+      },
+      {
+        "id": "synthetic-integrated-trace",
+        "description": "Deterministic correlated in-memory trace across local API/queue/worker/agent/fake-LLM/tool/database doubles",
+        "status": "PASS",
+        "evidence": "artifacts/evidence/integrated-trace-synthetic.json; tests/test_integrated_trace.py",
+        "state": "verified"
+      },
+      {
+        "id": "task-type-and-cost-metrics",
+        "description": "Bounded task-type outcomes, per-task cost, retries and error metrics",
+        "status": "PASS",
+        "evidence": "tests/test_integrated_trace.py; metrics/README.md",
+        "state": "verified"
+      },
+      {
+        "id": "service-integrated-trace",
+        "description": "Network API, durable broker/worker and database service trace",
+        "status": "PASS_LOCAL_CURRENT_CANDIDATE",
+        "evidence": "artifacts/evidence/phase-009-full-gate-detail.txt; artifacts/evidence/phase-009-jaeger-export.json; artifacts/evidence/span-status-service-018/; artifacts/evidence/current-service-recheck-021/run/check-full.txt",
+        "state": "verified"
+      },
+      {
+        "id": "non-recording-span-metrics",
+        "description": "Database/HTTP operation metrics work when tracing is disabled or provider is non-recording",
+        "status": "PASS",
+        "evidence": "tests/test_instrumentation.py::test_operation_metrics_work_with_non_recording_span; artifacts/evidence/phase-003-nonrecording-green.txt",
+        "state": "verified"
+      },
+      {
+        "id": "content-safe-telemetry-failures",
+        "description": "Sync/async spans omit exception events and status descriptions and record fixed error categories; setup/flush/shutdown failures are observable through bounded counters and boolean status. Production exporter delivery and service integration remain INCOMPLETE.",
+        "status": "PASS_LOCAL_SPAN_PRIVACY; SERVICE_INTEGRATION_INCOMPLETE",
+        "evidence": "artifacts/evidence/content-safe-exporter-failures/; artifacts/evidence/span-status-privacy-017/",
+        "state": "partial"
+      },
+      {
+        "id": "exception-status-description-content-free",
+        "description": "OpenTelemetry context manager does not copy exception text into sync or async span status descriptions",
+        "status": "PASS_UNIT",
+        "evidence": "artifacts/evidence/span-status-privacy-017/focused-tests.txt",
+        "state": "verified"
+      }
+    ],
+    "p04": [
+      {
+        "id": "P04-API-STORE",
+        "description": "Idempotent task API, status, cancellation, SQLite/PostgreSQL stores and transactional outbox",
+        "status": "PASS_UNIT",
+        "evidence": "artifacts/evidence/check-full.txt",
+        "state": "verified"
+      },
+      {
+        "id": "P04-BROKER-WORKER",
+        "description": "SQS adapter, retry bounds, visibility heartbeat, DLQ and fake broker worker behavior",
+        "status": "PASS_UNIT",
+        "evidence": "artifacts/evidence/check-full.txt",
+        "state": "verified"
+      },
+      {
+        "id": "P04-REDIS-STREAMS",
+        "description": "Redis Streams consumer-group recovery, delayed retry, attempt tracking and dead-letter delivery",
+        "status": "PASS_SERVICE",
+        "evidence": "artifacts/evidence/phase-012-full-gate.txt",
+        "state": "verified"
+      },
+      {
+        "id": "P04-LONG-STEP-LEASE",
+        "description": "PostgreSQL lease and SQS visibility are renewed during a worker step longer than 30 seconds",
+        "status": "PASS_SERVICE_LONG_STEP",
+        "evidence": "artifacts/evidence/phase-008-service-scenarios.txt",
+        "state": "verified"
+      },
+      {
+        "id": "P04-EVENT-CONSUMER",
+        "description": "SNS event parsing, event ID deduplication contract and handler retry behavior",
+        "status": "PASS_UNIT",
+        "evidence": "artifacts/evidence/phase-002-events.txt",
+        "state": "verified"
+      },
+      {
+        "id": "P04-RECOVERY",
+        "description": "Subprocess crash recovery with SQLite lease and effect ledger; service crash after committed effect",
+        "status": "PASS_SERVICE",
+        "evidence": "artifacts/evidence/phase-010-full-gate.txt; phase-010-early-redelivery-green.txt",
+        "state": "verified"
+      },
+      {
+        "id": "P04-INTEGRATION",
+        "description": "PostgreSQL idempotency and LocalStack SQS publish/consume/visibility/ack against Docker services",
+        "status": "PASS_SERVICE",
+        "evidence": "artifacts/evidence/phase-008-service-tests.txt",
+        "state": "verified"
+      },
+      {
+        "id": "P04-SQS-RETRY-DLQ",
+        "description": "Service-backed retry exhaustion routes one message to the configured SQS dead-letter queue",
+        "status": "PASS_SERVICE",
+        "evidence": "artifacts/evidence/phase-008-service-scenarios.txt",
+        "state": "verified"
+      },
+      {
+        "id": "P04-INFRA",
+        "description": "Compose runtime, image build, and Terraform init/validate/plan against local LocalStack",
+        "status": "PASS_LOCAL_DOCKER",
+        "evidence": "artifacts/evidence/phase-008-full-gate-rerun-summary.txt; artifacts/evidence/phase-008-full-gate-rerun.txt",
+        "state": "verified"
+      },
+      {
+        "id": "P04-LOCAL-PACKAGE",
+        "description": "Versioned P04 0.1.4 wheel with Redis Streams dependency, provenance and isolated consumer install smoke",
+        "status": "PASS_WHEEL_SMOKE; PASS_OFFLINE_LOCKED_RECREATION_FROM_LOCAL_CACHE",
+        "evidence": "artifacts/evidence/phase-012-wheel-build.txt; phase-012-wheel-install.txt; phase-012-wheel-consumer.txt; phase-011-offline-dependencies.txt",
+        "state": "verified"
+      },
+      {
+        "id": "P04-MODEL-METRICS",
+        "description": "Real model quality and cost metrics",
+        "status": "PENDING",
+        "evidence": "No live model run is authorized or required",
+        "state": "open"
+      },
+      {
+        "id": "P04-TRACE-CONTEXT",
+        "description": "W3C traceparent propagation across the actual HTTP API, broker retries and worker thread with fixed safe failure categories",
+        "status": "PASS_UNIT",
+        "evidence": "artifacts/evidence/api-worker-trace-propagation/focused-tests.txt",
+        "state": "verified"
+      },
+      {
+        "id": "P04-TRACE-EXPORT",
+        "description": "Export traces to a configured private backend or collector",
+        "status": "PASS_LOCAL_CONFIGURED_EXPORT; PRODUCTION_ACCEPTANCE_PENDING",
+        "evidence": ".planning/phases/020-existing-tracer-provider/VERIFY.md; .planning/phases/027-current-full-privacy-gate/VERIFY.md",
+        "state": "partial"
+      },
+      {
+        "id": "P04-API-WORKER-SPAN-PRIVACY",
+        "description": "Sync API middleware and worker exception spans omit exception messages, status descriptions, events and attributes",
+        "status": "PASS_LOCAL_OTLP_WIRE_AND_FULL_FAKE_GATE; PRODUCTION_PENDING",
+        "evidence": "artifacts/evidence/api-worker-span-privacy-021/focused-tests.txt; artifacts/evidence/current-full-privacy-027/full-attempt2-run4.txt",
+        "state": "partial"
+      },
+      {
+        "id": "P04-RAG",
+        "description": "Retrieve attributable, authorized knowledge from a P04-owned source",
+        "status": "INCOMPLETE",
+        "evidence": "No P04-owned retrieval source, corpus or tenant protocol exists",
+        "state": "open"
+      }
+    ],
+    "p05": [
+      {
+        "id": "auth-tenant-scope",
+        "description": "Locally verified JWT or introspected principal scopes API and repository access by tenant",
+        "status": "PASS_LOCAL_HS256_AND_KEYCLOAK_OIDC; INCOMPLETE_EXTERNAL_IDP_ACCEPTANCE",
+        "evidence": "artifacts/evidence/phase-009-full-gate-final.txt; artifacts/evidence/phase-015-keycloak-api.txt",
+        "state": "partial"
+      },
+      {
+        "id": "mcp-trusted-principal",
+        "description": "In-memory MCP tools use injected principal and fail closed without it",
+        "status": "PASS_LOCAL_TCP; INCOMPLETE_EXTERNAL_IDENTITY",
+        "evidence": "artifacts/evidence/phase-009-full-gate-final.txt",
+        "state": "partial"
+      },
+      {
+        "id": "refund-dual-control",
+        "description": "Approval records requester and prevent self-approval",
+        "status": "PASS_LOCAL_SERVICE",
+        "evidence": "artifacts/evidence/phase-009-full-gate-final.txt",
+        "state": "verified"
+      },
+      {
+        "id": "tenant-rag-agent",
+        "description": "Fake local hybrid retrieval returns tenant-scoped citations; semantic quality is unmeasured",
+        "status": "PASS_LOCAL_FAKE; SEMANTIC_QUALITY_PENDING",
+        "evidence": "artifacts/evidence/phase-009-full-gate-final.txt",
+        "state": "partial"
+      },
+      {
+        "id": "approved-packages",
+        "description": "Approved P00-P04 local wheels have exact provenance, locked installs, and P05 consumer checks",
+        "status": "PASS",
+        "evidence": "artifacts/evidence/phase-009-full-gate-final.txt",
+        "state": "verified"
+      },
+      {
+        "id": "service-backed-async",
+        "description": "PostgreSQL and Redis Streams integration against real services",
+        "status": "PASS_LOCAL_REDIS_STREAMS",
+        "evidence": "artifacts/evidence/phase-017-full-gate.txt; artifacts/evidence/phase-017-service-summary.json",
+        "state": "verified"
+      },
+      {
+        "id": "network-mcp-auth",
+        "description": "Verified bearer creates a tenant principal through authenticated Streamable HTTP over loopback TCP",
+        "status": "PASS_LOCAL_HS256_AND_RFC7662_CONTRACT; INCOMPLETE_EXTERNAL_IDP_ACCEPTANCE",
+        "evidence": "artifacts/evidence/phase-010-full-gate.txt; artifacts/evidence/phase-011-introspection-green.txt; artifacts/evidence/phase-014-service-summary.json",
+        "state": "partial"
+      },
+      {
+        "id": "pgvector-hybrid-contract",
+        "description": "Tenant-scoped pgvector cosine and PostgreSQL full-text hybrid adapter contract",
+        "status": "PASS",
+        "evidence": "artifacts/evidence/phase-009-full-gate-final.txt",
+        "state": "verified"
+      },
+      {
+        "id": "pgvector-service",
+        "description": "PostgreSQL pgvector migration, HNSW index, and hybrid query against a real service",
+        "status": "PASS_NATIVE_ASYNCPG",
+        "evidence": "artifacts/evidence/phase-010-full-gate.txt; artifacts/evidence/phase-010-service-summary.json; artifacts/evidence/phase-014-full-gate.txt; artifacts/evidence/phase-014-service-summary.json",
+        "state": "verified"
+      },
+      {
+        "id": "real-model-evaluation",
+        "description": "Replay/live model quality evaluation",
+        "status": "PENDING",
+        "evidence": "Fake control fixtures are not model quality; user selected to keep evaluation pending until a traceable cassette or separately authorized live run is available",
+        "state": "open"
+      },
+      {
+        "id": "product-end-to-end-orchestration",
+        "description": "Durable authenticated API to P04 worker to P01 agent to PostgreSQL RAG/MCP flow",
+        "status": "PASS_LOCAL_SERVICE; INCOMPLETE_EXTERNAL_IDENTITY",
+        "evidence": "artifacts/evidence/phase-010-full-gate.txt; artifacts/evidence/phase-010-service-summary.json; artifacts/evidence/phase-014-full-gate.txt; artifacts/evidence/phase-014-service-summary.json",
+        "state": "partial"
+      },
+      {
+        "id": "p05-release-wheel",
+        "description": "Versioned P05 wheel with packaged migrations, SHA-256 provenance and isolated real PostgreSQL consumer smoke",
+        "status": "PASS_LOCAL_WHEEL_0.4.3",
+        "evidence": "docs/harness/sources.lock.json; artifacts/evidence/phase-017-wheel-build.txt; artifacts/evidence/phase-017-wheel-consumer.txt",
+        "state": "verified"
+      },
+      {
+        "id": "mcp-transport-retry",
+        "description": "Real MCP connection refusal is translated into P04 retry; only fully transient exception groups retry",
+        "status": "PASS_LOCAL_P04_RETRY",
+        "evidence": "artifacts/evidence/phase-010-retry-green.txt; artifacts/evidence/phase-010-full-gate.txt",
+        "state": "verified"
+      },
+      {
+        "id": "sqs-transport-loop-recovery",
+        "description": "Standalone worker loop backs off and retries botocore endpoint/read transport errors; permanent client/auth errors surface",
+        "status": "PASS_UNIT_POLICY",
+        "evidence": "artifacts/evidence/phase-010-retry-green.txt",
+        "state": "verified"
+      },
+      {
+        "id": "durable-authorization-snapshot",
+        "description": "Verified subject, tenant, roles, and scopes remain unchanged; durable job authorization expires 15 minutes after acceptance and expired HITL resumes are denied",
+        "status": "PASS_LOCAL_15_MINUTE_LEASE; INCOMPLETE_EXTERNAL_IDENTITY",
+        "evidence": "artifacts/evidence/phase-016-full-gate.txt; artifacts/evidence/phase-016-final-service-summary.json",
+        "state": "partial"
+      },
+      {
+        "id": "mcp-external-token-introspection",
+        "description": "Optional RFC 7662 verifier checks direct MCP token activity on every request and denies the same token after revocation; local worker delegation remains compatible",
+        "status": "PASS_LOCAL_MCP_TCP_AND_KEYCLOAK_26_8_1; INCOMPLETE_EXTERNAL_IDP_AND_QUEUED_JOB_REVOCATION",
+        "evidence": "artifacts/evidence/phase-011-introspection-green.txt; artifacts/evidence/phase-011-keycloak-oidc.txt",
+        "state": "partial"
+      },
+      {
+        "id": "worker-failure-privacy",
+        "description": "Local and durable task failure errors are limited to fixed codes before persistence or authenticated task-status responses",
+        "status": "PASS_PHASE_025_OFFLINE_AND_FAKE_SERVICE_PRIVACY; MODEL_QUALITY_AND_HUMAN_REVIEW_PENDING",
+        "evidence": "artifacts/evidence/span-status-privacy-025/focused-tests.txt; artifacts/evidence/span-status-privacy-025/offline-tests.txt; artifacts/evidence/span-status-privacy-025/full-gate.txt; artifacts/evidence/span-status-privacy-025/phase-025-product-trace.json",
+        "state": "partial"
+      }
+    ],
+    "p06": [
+      {
+        "id": "console-auth",
+        "description": "Authorization Code with PKCE through Keycloak, sign out and token renewal",
+        "status": "PASS_LOCAL_AND_FLY_DEMO",
+        "evidence": ".planning/phases/002-blockers/VERIFY.md",
+        "state": "verified"
+      },
+      {
+        "id": "console-tickets",
+        "description": "List, create and open tickets, run triage as a durable task",
+        "status": "PASS_LOCAL_AND_FLY_DEMO",
+        "evidence": ".planning/phases/002-blockers/VERIFY.md",
+        "state": "verified"
+      },
+      {
+        "id": "console-approvals",
+        "description": "Approver sees amount and requester and decides a refund",
+        "status": "PASS_LOCAL_AND_FLY_DEMO",
+        "evidence": ".planning/phases/002-blockers/VERIFY.md",
+        "state": "verified"
+      },
+      {
+        "id": "console-quality",
+        "description": "axe, bundle budget and contract drift gates",
+        "status": "PASS_LOCAL_AND_FLY_DEMO",
+        "evidence": ".planning/phases/002-blockers/VERIFY.md",
+        "state": "verified"
+      }
+    ]
+  }
+}
