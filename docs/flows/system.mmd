@@ -1,0 +1,18 @@
+flowchart LR
+  ticket["Ticket"]
+  api["API and auth"]
+  screen["Guard screen"]
+  queue["Durable job"]
+  agents["Four agents"]
+  model["Real model"]
+  gate["Refund gate"]
+  approver["Second person"]
+  trace["Content-free trace"]
+  ticket --> api
+  api --> screen
+  screen --> queue
+  queue --> agents
+  agents --> model
+  model -->|proposal| gate
+  gate --> approver
+  agents -->|spans| trace

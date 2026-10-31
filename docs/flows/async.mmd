@@ -1,0 +1,13 @@
+stateDiagram-v2
+  queued --> leased
+  leased --> running
+  running --> done
+  running --> retry: transient failure
+  retry --> queued
+  running --> dead: permanent failure
+  queued: Queued
+  leased: Leased
+  running: Running
+  retry: Retry
+  dead: Dead letter
+  done: Done

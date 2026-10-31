@@ -1,0 +1,10 @@
+flowchart LR
+  request["API request"]
+  worker["worker.run span"]
+  triage["agent.triage span"]
+  llm["Model call"]
+  loop["Loop detector"]
+  request --> worker
+  worker --> triage
+  triage --> llm
+  llm --> loop

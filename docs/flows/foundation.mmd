@@ -1,0 +1,14 @@
+flowchart LR
+  dataset["Seeded dataset"]
+  factory["One client factory"]
+  fake["Fake"]
+  replay["Replay"]
+  live["Live with budget"]
+  campaign["Campaign"]
+  verdict["Verdict"]
+  dataset --> factory
+  factory --> fake
+  factory --> replay
+  factory --> live
+  live --> campaign
+  campaign --> verdict

@@ -1,0 +1,14 @@
+flowchart LR
+  contract["TriageRunner contract"]
+  supervisor["Supervisor"]
+  classifier["Classifier"]
+  researcher["Researcher"]
+  billing["Billing agent"]
+  responder["Responder"]
+  stop["Stop condition"]
+  contract --> supervisor
+  supervisor --> classifier
+  classifier --> researcher
+  researcher --> billing
+  billing --> responder
+  responder --> stop

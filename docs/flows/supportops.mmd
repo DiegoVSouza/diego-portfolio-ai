@@ -1,0 +1,16 @@
+flowchart LR
+  ticket["Ticket"]
+  auth["Tenant from token"]
+  rag["Tenant-scoped search"]
+  agents["Four agents"]
+  ledger["Budget ledger"]
+  gate["Refund gate"]
+  approver["Second person"]
+  refund["Simulated refund"]
+  ticket --> auth
+  auth --> rag
+  rag --> agents
+  agents --> ledger
+  ledger -->|proposal| gate
+  gate --> approver
+  approver -->|approved| refund

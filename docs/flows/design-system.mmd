@@ -1,0 +1,10 @@
+flowchart LR
+  file["Evidence file"]
+  gen["Evidence generator"]
+  record["Evidence record"]
+  rule["Number rule"]
+  page["Number on the page"]
+  file --> gen
+  gen --> record
+  record --> rule
+  rule --> page

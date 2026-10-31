@@ -11,6 +11,25 @@
 - **Docs.** [Architecture](docs/architecture.md), [phase 003](.planning/phases/003-real-portfolio/SPEC.md).
 <!-- case:end -->
 
+<!-- flow:start -->
+## How it works
+
+Generated from the same data as the diagram on the portfolio site (`projects/design-system/`), so the two cannot drift.
+
+```mermaid
+flowchart LR
+  file["Evidence file"]
+  gen["Evidence generator"]
+  record["Evidence record"]
+  rule["Number rule"]
+  page["Number on the page"]
+  file --> gen
+  gen --> record
+  record --> rule
+  rule --> page
+```
+<!-- flow:end -->
+
 Static React site for [Diego Vieira Gonçalves de Souza](https://www.linkedin.com/in/diegovsouza99), AI Engineer. The English CV text in `src/content/profile.ts` is a draft until the owner reviews it; the CV file itself and the phone number are never in Git.
 
 ## Develop

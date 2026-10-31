@@ -1,0 +1,12 @@
+flowchart LR
+  intake["Intake"]
+  spec["Spec"]
+  plan["Plan"]
+  execute["Execute"]
+  verify["Verify"]
+  gate["Gate"]
+  intake --> spec
+  spec --> plan
+  plan --> execute
+  execute --> verify
+  verify --> gate
