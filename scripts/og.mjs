@@ -22,7 +22,10 @@ p { position: absolute; left: 88px; bottom: 70px; margin: 0; font-size: 36px; le
 const browser = await chromium.launch({ channel: "chrome" });
 const page = await browser.newPage({ viewport: { width: 1200, height: 630 } });
 await page.setContent(html);
-await page.evaluate(() => document.fonts.ready);
+await page.evaluate(async () => {
+  // eslint-disable-next-line no-undef
+  await document.fonts.ready;
+});
 writeFileSync(join(root, "public/og.png"), await page.screenshot({ type: "png" }));
 await browser.close();
 console.log("og: public/og.png written");
