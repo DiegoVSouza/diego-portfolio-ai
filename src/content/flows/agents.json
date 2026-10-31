@@ -1,0 +1,191 @@
+{
+  "id": "agents",
+  "kind": "pipeline",
+  "title": {
+    "en": "A bounded supervisor loop",
+    "pt": "Um laço de supervisor limitado"
+  },
+  "nodes": [
+    {
+      "id": "contract",
+      "label": {
+        "en": "TriageRunner contract",
+        "pt": "Contrato TriageRunner"
+      },
+      "detail": {
+        "en": "Every framework adapter implements the same contract.",
+        "pt": "Todo adaptador de framework implementa o mesmo contrato."
+      },
+      "project": "P01",
+      "code": "src/supportops_agents/contracts.py",
+      "docs": "docs/architecture.md",
+      "repo": "p01"
+    },
+    {
+      "id": "supervisor",
+      "label": {
+        "en": "Supervisor",
+        "pt": "Supervisor"
+      },
+      "detail": {
+        "en": "Delegates one step at a time and owns the stop conditions.",
+        "pt": "Delega um passo por vez e é dono das condições de parada."
+      },
+      "project": "P01",
+      "code": "src/supportops_agents/core.py",
+      "docs": "docs/architecture.md",
+      "repo": "p01"
+    },
+    {
+      "id": "classifier",
+      "label": {
+        "en": "Classifier",
+        "pt": "Classificador"
+      },
+      "detail": {
+        "en": "Sets the category and whether to escalate.",
+        "pt": "Define a categoria e se deve escalar."
+      },
+      "project": "P01",
+      "code": "src/supportops_agents/core.py",
+      "repo": "p01"
+    },
+    {
+      "id": "researcher",
+      "label": {
+        "en": "Researcher",
+        "pt": "Pesquisador"
+      },
+      "detail": {
+        "en": "Reads the supplied sources.",
+        "pt": "Lê as fontes fornecidas."
+      },
+      "project": "P01",
+      "code": "src/supportops_agents/core.py",
+      "repo": "p01"
+    },
+    {
+      "id": "billing",
+      "label": {
+        "en": "Billing agent",
+        "pt": "Agente de billing"
+      },
+      "detail": {
+        "en": "Checks the money side.",
+        "pt": "Confere o lado financeiro."
+      },
+      "project": "P01",
+      "code": "src/supportops_agents/core.py",
+      "repo": "p01"
+    },
+    {
+      "id": "responder",
+      "label": {
+        "en": "Responder",
+        "pt": "Responder"
+      },
+      "detail": {
+        "en": "Writes the answer and cites a source.",
+        "pt": "Escreve a resposta e cita uma fonte."
+      },
+      "project": "P01",
+      "code": "src/supportops_agents/core.py",
+      "repo": "p01"
+    },
+    {
+      "id": "stop",
+      "label": {
+        "en": "Stop condition",
+        "pt": "Condição de parada"
+      },
+      "detail": {
+        "en": "A hard step limit ends the run, whatever the model says.",
+        "pt": "Um limite rígido de passos encerra a execução, diga o que disser o modelo."
+      },
+      "project": "P01",
+      "code": "src/supportops_agents/core.py",
+      "repo": "p01"
+    }
+  ],
+  "edges": [
+    {
+      "from": "contract",
+      "to": "supervisor"
+    },
+    {
+      "from": "supervisor",
+      "to": "classifier"
+    },
+    {
+      "from": "classifier",
+      "to": "researcher"
+    },
+    {
+      "from": "researcher",
+      "to": "billing"
+    },
+    {
+      "from": "billing",
+      "to": "responder"
+    },
+    {
+      "from": "responder",
+      "to": "stop"
+    }
+  ],
+  "scenes": [
+    {
+      "id": "delegate",
+      "nodes": [
+        "contract",
+        "supervisor",
+        "classifier"
+      ],
+      "edges": [
+        "contract>supervisor",
+        "supervisor>classifier"
+      ],
+      "caption": {
+        "en": "The supervisor starts with the classifier.",
+        "pt": "O supervisor começa pelo classificador."
+      }
+    },
+    {
+      "id": "workers",
+      "nodes": [
+        "researcher",
+        "billing",
+        "responder"
+      ],
+      "edges": [
+        "classifier>researcher",
+        "researcher>billing",
+        "billing>responder"
+      ],
+      "caption": {
+        "en": "Each worker adds to a shared state.",
+        "pt": "Cada worker acrescenta ao estado compartilhado."
+      }
+    },
+    {
+      "id": "end",
+      "nodes": [
+        "responder",
+        "stop"
+      ],
+      "edges": [
+        "responder>stop"
+      ],
+      "caption": {
+        "en": "The run ends at a stop condition, never by running out of patience.",
+        "pt": "A execução termina em uma condição de parada, nunca por falta de paciência."
+      }
+    }
+  ],
+  "runStep": {
+    "classifier": "classifier",
+    "kb_researcher": "researcher",
+    "billing_agent": "billing",
+    "responder": "responder"
+  }
+}

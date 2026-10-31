@@ -1,0 +1,174 @@
+{
+  "id": "foundation",
+  "kind": "pipeline",
+  "title": {
+    "en": "From dataset to verdict",
+    "pt": "Do dataset ao veredito"
+  },
+  "nodes": [
+    {
+      "id": "dataset",
+      "label": {
+        "en": "Seeded dataset",
+        "pt": "Dataset com semente"
+      },
+      "detail": {
+        "en": "Deterministic data with a digest, so a change is visible.",
+        "pt": "Dados determinísticos com digest, então uma mudança fica visível."
+      },
+      "project": "P00",
+      "code": "supportops_foundation/testkit/dataset.py",
+      "docs": "docs/architecture.md",
+      "repo": "p00"
+    },
+    {
+      "id": "factory",
+      "label": {
+        "en": "One client factory",
+        "pt": "Uma fábrica de clientes"
+      },
+      "detail": {
+        "en": "One interface selects fake, replay or live.",
+        "pt": "Uma interface escolhe fake, replay ou live."
+      },
+      "project": "P00",
+      "code": "supportops_foundation/llm/factory.py",
+      "docs": "docs/architecture.md",
+      "repo": "p00"
+    },
+    {
+      "id": "fake",
+      "label": {
+        "en": "Fake",
+        "pt": "Fake"
+      },
+      "detail": {
+        "en": "Deterministic, the default in tests and CI.",
+        "pt": "Determinístico, o padrão em testes e CI."
+      },
+      "project": "P00",
+      "code": "supportops_foundation/llm/client.py",
+      "repo": "p00"
+    },
+    {
+      "id": "replay",
+      "label": {
+        "en": "Replay",
+        "pt": "Replay"
+      },
+      "detail": {
+        "en": "Reads recorded cassettes and fails on a mismatch.",
+        "pt": "Lê cassettes gravados e falha se algo divergir."
+      },
+      "project": "P00",
+      "code": "supportops_foundation/llm/cassette.py",
+      "repo": "p00"
+    },
+    {
+      "id": "live",
+      "label": {
+        "en": "Live with budget",
+        "pt": "Live com orçamento"
+      },
+      "detail": {
+        "en": "Budget is reserved before transport.",
+        "pt": "O orçamento é reservado antes do transporte."
+      },
+      "project": "P00",
+      "code": "supportops_foundation/llm/live.py",
+      "repo": "p00"
+    },
+    {
+      "id": "campaign",
+      "label": {
+        "en": "Campaign",
+        "pt": "Campanha"
+      },
+      "detail": {
+        "en": "Chunked trials that never replay a completed or uncertain one.",
+        "pt": "Trials em blocos que nunca repetem um concluído ou incerto."
+      },
+      "project": "P00",
+      "code": "scripts/run_live_campaign.py",
+      "repo": "p00"
+    },
+    {
+      "id": "verdict",
+      "label": {
+        "en": "Verdict",
+        "pt": "Veredito"
+      },
+      "detail": {
+        "en": "The report states the pass rate, the interval and the failing families.",
+        "pt": "O relatório traz a taxa, o intervalo e as famílias que falharam."
+      },
+      "project": "P00",
+      "code": "artifacts/evals/live/free-dev-c2r1/report.md",
+      "repo": "p00"
+    }
+  ],
+  "edges": [
+    {
+      "from": "dataset",
+      "to": "factory"
+    },
+    {
+      "from": "factory",
+      "to": "fake"
+    },
+    {
+      "from": "factory",
+      "to": "replay"
+    },
+    {
+      "from": "factory",
+      "to": "live"
+    },
+    {
+      "from": "live",
+      "to": "campaign"
+    },
+    {
+      "from": "campaign",
+      "to": "verdict"
+    }
+  ],
+  "scenes": [
+    {
+      "id": "modes",
+      "nodes": [
+        "dataset",
+        "factory",
+        "fake",
+        "replay",
+        "live"
+      ],
+      "edges": [
+        "dataset>factory",
+        "factory>fake",
+        "factory>replay",
+        "factory>live"
+      ],
+      "caption": {
+        "en": "Three modes behind one interface. Only live spends money.",
+        "pt": "Três modos atrás de uma interface. Só o live gasta dinheiro."
+      }
+    },
+    {
+      "id": "run",
+      "nodes": [
+        "live",
+        "campaign",
+        "verdict"
+      ],
+      "edges": [
+        "live>campaign",
+        "campaign>verdict"
+      ],
+      "caption": {
+        "en": "A real-model campaign ends in a verdict, pass or fail.",
+        "pt": "Uma campanha com modelo real termina em um veredito, passe ou falhe."
+      }
+    }
+  ]
+}

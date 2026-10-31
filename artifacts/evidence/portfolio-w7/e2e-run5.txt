@@ -1,0 +1,20 @@
+[WebServer] Each child in a list should have a unique "key" prop.
+[WebServer] 
+[WebServer] Check the render method of `J`. See https://react.dev/link/warning-keys for more information.
+[WebServer] Each child in a list should have a unique "key" prop.
+[WebServer] 
+[WebServer] Check the render method of `J`. See https://react.dev/link/warning-keys for more information.
+
+Running 8 tests using 1 worker
+
+  ✓  1 e2e\site.spec.ts:19:3 › every route passes axe with contrast, does not overflow, and logs no errors at 1000px (54.1s)
+  ✓  2 e2e\site.spec.ts:19:3 › every route passes axe with contrast, does not overflow, and logs no errors at 360px (48.8s)
+  ✓  3 e2e\site.spec.ts:44:1 › with JavaScript off, every route still shows its heading, and a case shows its diagram and its list (SEO-001, FLOW-005) (5.8s)
+  ✓  4 e2e\site.spec.ts:57:1 › English and Portuguese link to each other and set the document language (667ms)
+  ✓  5 e2e\site.spec.ts:66:1 › keyboard: skip link, then a project, then back (987ms)
+  ✓  6 e2e\site.spec.ts:79:1 › the diagram walks through scenes and a failure scenario by keyboard, at both widths (1.4s)
+  ✓  7 e2e\site.spec.ts:92:1 › the demo page requests nothing from a third party until a site key exists, and wakes nothing (LIVE-004, SEC-001) (1.1s)
+  ✓  8 e2e\site.spec.ts:102:1 › the home page has the role in the first screen, and a squint screenshot is saved for review (1.3s)
+
+  8 passed (2.3m)
+exit=0

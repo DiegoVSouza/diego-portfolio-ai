@@ -1,0 +1,179 @@
+{
+  "id": "async",
+  "kind": "states",
+  "title": {
+    "en": "A task that survives its worker",
+    "pt": "Uma tarefa que sobrevive ao worker"
+  },
+  "nodes": [
+    {
+      "id": "queued",
+      "label": {
+        "en": "Queued",
+        "pt": "Na fila"
+      },
+      "detail": {
+        "en": "The job is stored before the HTTP response returns.",
+        "pt": "O job é gravado antes de a resposta HTTP voltar."
+      },
+      "project": "P04",
+      "code": "supportops_async/queue/contracts.py",
+      "docs": "docs/architecture.md",
+      "repo": "p04"
+    },
+    {
+      "id": "leased",
+      "label": {
+        "en": "Leased",
+        "pt": "Com lease"
+      },
+      "detail": {
+        "en": "A worker holds a time-limited lease.",
+        "pt": "Um worker segura um lease com prazo."
+      },
+      "project": "P04",
+      "code": "supportops_async/queue/contracts.py",
+      "repo": "p04"
+    },
+    {
+      "id": "running",
+      "label": {
+        "en": "Running",
+        "pt": "Rodando"
+      },
+      "detail": {
+        "en": "The effect is recorded so a redelivery cannot repeat it.",
+        "pt": "O efeito é registrado para uma reentrega não repeti-lo."
+      },
+      "project": "P04",
+      "code": "supportops_async/queue/memory.py",
+      "repo": "p04"
+    },
+    {
+      "id": "retry",
+      "label": {
+        "en": "Retry",
+        "pt": "Retry"
+      },
+      "detail": {
+        "en": "A transient failure goes back with a delay.",
+        "pt": "Uma falha transitória volta com atraso."
+      },
+      "project": "P04",
+      "code": "supportops_async/queue/contracts.py",
+      "repo": "p04"
+    },
+    {
+      "id": "dead",
+      "label": {
+        "en": "Dead letter",
+        "pt": "Dead letter"
+      },
+      "detail": {
+        "en": "A permanent failure stops here, visible and replayable.",
+        "pt": "Uma falha permanente para aqui, visível e reprocessável."
+      },
+      "project": "P04",
+      "code": "supportops_async/queue/contracts.py",
+      "repo": "p04"
+    },
+    {
+      "id": "done",
+      "label": {
+        "en": "Done",
+        "pt": "Concluída"
+      },
+      "detail": {
+        "en": "The result is stored once.",
+        "pt": "O resultado é gravado uma vez."
+      },
+      "project": "P04",
+      "code": "supportops_async/queue/contracts.py",
+      "repo": "p04"
+    }
+  ],
+  "edges": [
+    {
+      "from": "queued",
+      "to": "leased"
+    },
+    {
+      "from": "leased",
+      "to": "running"
+    },
+    {
+      "from": "running",
+      "to": "done"
+    },
+    {
+      "from": "running",
+      "to": "retry",
+      "label": {
+        "en": "transient failure",
+        "pt": "falha transitória"
+      }
+    },
+    {
+      "from": "retry",
+      "to": "queued"
+    },
+    {
+      "from": "running",
+      "to": "dead",
+      "label": {
+        "en": "permanent failure",
+        "pt": "falha permanente"
+      }
+    }
+  ],
+  "scenes": [
+    {
+      "id": "happy",
+      "nodes": [
+        "queued",
+        "leased",
+        "running",
+        "done"
+      ],
+      "edges": [
+        "queued>leased",
+        "leased>running",
+        "running>done"
+      ],
+      "caption": {
+        "en": "The normal path from queue to done.",
+        "pt": "O caminho normal da fila até a conclusão."
+      }
+    },
+    {
+      "id": "fail",
+      "nodes": [
+        "running",
+        "retry",
+        "queued"
+      ],
+      "edges": [
+        "running>retry",
+        "retry>queued"
+      ],
+      "caption": {
+        "en": "A transient failure retries instead of failing the user.",
+        "pt": "Uma falha transitória tenta de novo em vez de falhar para o usuário."
+      }
+    },
+    {
+      "id": "dead",
+      "nodes": [
+        "running",
+        "dead"
+      ],
+      "edges": [
+        "running>dead"
+      ],
+      "caption": {
+        "en": "A permanent failure lands in the dead-letter path.",
+        "pt": "Uma falha permanente cai no caminho de dead-letter."
+      }
+    }
+  ]
+}

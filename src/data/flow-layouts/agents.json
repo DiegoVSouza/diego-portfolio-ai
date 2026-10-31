@@ -1,0 +1,272 @@
+{
+  "horizontal": {
+    "width": 368,
+    "height": 32,
+    "nodes": [
+      {
+        "id": "contract",
+        "x": 16,
+        "y": 16,
+        "w": 0,
+        "h": 0
+      },
+      {
+        "id": "supervisor",
+        "x": 72,
+        "y": 16,
+        "w": 0,
+        "h": 0
+      },
+      {
+        "id": "classifier",
+        "x": 128,
+        "y": 16,
+        "w": 0,
+        "h": 0
+      },
+      {
+        "id": "researcher",
+        "x": 184,
+        "y": 16,
+        "w": 0,
+        "h": 0
+      },
+      {
+        "id": "billing",
+        "x": 240,
+        "y": 16,
+        "w": 0,
+        "h": 0
+      },
+      {
+        "id": "responder",
+        "x": 296,
+        "y": 16,
+        "w": 0,
+        "h": 0
+      },
+      {
+        "id": "stop",
+        "x": 352,
+        "y": 16,
+        "w": 0,
+        "h": 0
+      }
+    ],
+    "edges": [
+      {
+        "key": "contract>supervisor",
+        "points": [
+          [
+            16,
+            16
+          ],
+          [
+            72,
+            16
+          ]
+        ]
+      },
+      {
+        "key": "supervisor>classifier",
+        "points": [
+          [
+            72,
+            16
+          ],
+          [
+            128,
+            16
+          ]
+        ]
+      },
+      {
+        "key": "classifier>researcher",
+        "points": [
+          [
+            128,
+            16
+          ],
+          [
+            184,
+            16
+          ]
+        ]
+      },
+      {
+        "key": "researcher>billing",
+        "points": [
+          [
+            184,
+            16
+          ],
+          [
+            240,
+            16
+          ]
+        ]
+      },
+      {
+        "key": "billing>responder",
+        "points": [
+          [
+            240,
+            16
+          ],
+          [
+            296,
+            16
+          ]
+        ]
+      },
+      {
+        "key": "responder>stop",
+        "points": [
+          [
+            296,
+            16
+          ],
+          [
+            352,
+            16
+          ]
+        ]
+      }
+    ]
+  },
+  "vertical": {
+    "width": 32,
+    "height": 296,
+    "nodes": [
+      {
+        "id": "contract",
+        "x": 16,
+        "y": 16,
+        "w": 0,
+        "h": 0
+      },
+      {
+        "id": "supervisor",
+        "x": 16,
+        "y": 60,
+        "w": 0,
+        "h": 0
+      },
+      {
+        "id": "classifier",
+        "x": 16,
+        "y": 104,
+        "w": 0,
+        "h": 0
+      },
+      {
+        "id": "researcher",
+        "x": 16,
+        "y": 148,
+        "w": 0,
+        "h": 0
+      },
+      {
+        "id": "billing",
+        "x": 16,
+        "y": 192,
+        "w": 0,
+        "h": 0
+      },
+      {
+        "id": "responder",
+        "x": 16,
+        "y": 236,
+        "w": 0,
+        "h": 0
+      },
+      {
+        "id": "stop",
+        "x": 16,
+        "y": 280,
+        "w": 0,
+        "h": 0
+      }
+    ],
+    "edges": [
+      {
+        "key": "contract>supervisor",
+        "points": [
+          [
+            16,
+            16
+          ],
+          [
+            16,
+            60
+          ]
+        ]
+      },
+      {
+        "key": "supervisor>classifier",
+        "points": [
+          [
+            16,
+            60
+          ],
+          [
+            16,
+            104
+          ]
+        ]
+      },
+      {
+        "key": "classifier>researcher",
+        "points": [
+          [
+            16,
+            104
+          ],
+          [
+            16,
+            148
+          ]
+        ]
+      },
+      {
+        "key": "researcher>billing",
+        "points": [
+          [
+            16,
+            148
+          ],
+          [
+            16,
+            192
+          ]
+        ]
+      },
+      {
+        "key": "billing>responder",
+        "points": [
+          [
+            16,
+            192
+          ],
+          [
+            16,
+            236
+          ]
+        ]
+      },
+      {
+        "key": "responder>stop",
+        "points": [
+          [
+            16,
+            236
+          ],
+          [
+            16,
+            280
+          ]
+        ]
+      }
+    ]
+  }
+}

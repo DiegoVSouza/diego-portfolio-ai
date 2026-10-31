@@ -1,0 +1,228 @@
+{
+  "records": [
+    {
+      "id": "p00-cases",
+      "project": "foundation",
+      "label": {
+        "en": "Unique cases that passed all three trials",
+        "pt": "Casos únicos aprovados nos três trials"
+      },
+      "value": "9 of 12",
+      "mode": "live",
+      "command": "run_live_campaign.py, campaign free-dev-c2r1, as recorded in the campaign report",
+      "exitCode": 1,
+      "commit": "09d8c1ec6c0efc9a57d65ca86e8c7c5fe4396d6a",
+      "path": "artifacts/evals/live/free-dev-c2r1/report.json",
+      "repo": "https://github.com/DiegoVSouza/supportops-foundation",
+      "recordedAt": "2026-10-28",
+      "caveat": {
+        "en": "Same campaign, same status.",
+        "pt": "Mesma campanha, mesmo status."
+      }
+    },
+    {
+      "id": "p00-errors",
+      "project": "foundation",
+      "label": {
+        "en": "Failures by family in the development campaign",
+        "pt": "Falhas por família na campanha de desenvolvimento"
+      },
+      "value": "classification 3, routing 6, tool selection 3",
+      "mode": "live",
+      "command": "run_live_campaign.py, campaign free-dev-c2r1, as recorded in the campaign report",
+      "exitCode": 1,
+      "commit": "09d8c1ec6c0efc9a57d65ca86e8c7c5fe4396d6a",
+      "path": "artifacts/evals/live/free-dev-c2r1/report.json",
+      "repo": "https://github.com/DiegoVSouza/supportops-foundation",
+      "recordedAt": "2026-10-28",
+      "caveat": {
+        "en": "Counts of errors, not of failed trials; one trial can carry more than one.",
+        "pt": "Contagem de erros, não de trials reprovados; um trial pode ter mais de um."
+      }
+    },
+    {
+      "id": "p00-protected",
+      "project": "foundation",
+      "label": {
+        "en": "Protected evaluation budget",
+        "pt": "Orçamento de avaliação protegido"
+      },
+      "value": "84 held-out calls and 60 confirmation calls stayed reserved",
+      "mode": "live",
+      "command": "recorded in the P00 progress log",
+      "exitCode": 0,
+      "commit": "6b84f9aeed126519671d5e5066bafc0b46ce95c4",
+      "path": "docs/harness/progress.md",
+      "repo": "https://github.com/DiegoVSouza/supportops-foundation",
+      "recordedAt": "2026-10-30"
+    },
+    {
+      "id": "p00-trials",
+      "project": "foundation",
+      "label": {
+        "en": "Real-model trials passed (development set)",
+        "pt": "Trials com modelo real aprovados (conjunto de desenvolvimento)"
+      },
+      "value": "27 of 36",
+      "mode": "live",
+      "command": "run_live_campaign.py, campaign free-dev-c2r1, as recorded in the campaign report",
+      "exitCode": 1,
+      "commit": "09d8c1ec6c0efc9a57d65ca86e8c7c5fe4396d6a",
+      "path": "artifacts/evals/live/free-dev-c2r1/report.json",
+      "repo": "https://github.com/DiegoVSouza/supportops-foundation",
+      "recordedAt": "2026-10-28",
+      "caveat": {
+        "en": "Development set, not held out. Status FAIL_PROVISIONAL; the exit code follows that status, as the P00 README defines it.",
+        "pt": "Conjunto de desenvolvimento, não holdout. Status FAIL_PROVISIONAL; o exit code segue esse status, como o README do P00 define."
+      }
+    },
+    {
+      "id": "p00-wilson",
+      "project": "foundation",
+      "label": {
+        "en": "Wilson 95% interval for the all-three pass rate",
+        "pt": "Intervalo de Wilson 95% da taxa de aprovação nos três trials"
+      },
+      "value": "0.47 to 0.91 (Wilson, 95%)",
+      "mode": "live",
+      "command": "run_live_campaign.py, campaign free-dev-c2r1, as recorded in the campaign report",
+      "exitCode": 1,
+      "commit": "09d8c1ec6c0efc9a57d65ca86e8c7c5fe4396d6a",
+      "path": "artifacts/evals/live/free-dev-c2r1/report.json",
+      "repo": "https://github.com/DiegoVSouza/supportops-foundation",
+      "recordedAt": "2026-10-28",
+      "caveat": {
+        "en": "Rounded to two decimals from the report.",
+        "pt": "Arredondado para duas casas a partir do relatório."
+      }
+    },
+    {
+      "id": "p01-tokens",
+      "project": "agents",
+      "label": {
+        "en": "One live synthetic workflow, four provider attempts (tokens)",
+        "pt": "Um workflow sintético live, quatro tentativas ao provedor (tokens)"
+      },
+      "value": "1274 in, 261 out",
+      "mode": "live",
+      "command": "accounted local operation, phase 027, as recorded in progress.md",
+      "exitCode": 0,
+      "commit": "6c8e06d885b80437ba4ebad293aa9659485adc16",
+      "path": "docs/harness/progress.md",
+      "repo": "https://github.com/DiegoVSouza/supportops-agents",
+      "recordedAt": "2026-10-30",
+      "caveat": {
+        "en": "Transport and accounting only. Says nothing about answer quality.",
+        "pt": "Só transporte e contabilidade. Nada sobre a qualidade da resposta."
+      }
+    },
+    {
+      "id": "p02-tests",
+      "project": "toolkit",
+      "label": {
+        "en": "Locked fake gate",
+        "pt": "Gate fake travado"
+      },
+      "value": "82 unit tests plus fixture and adversarial checks",
+      "mode": "fake",
+      "command": "python scripts/check_full.py",
+      "exitCode": 0,
+      "commit": "5b91e7349a22298a08b073644195f005e42a4a53",
+      "path": ".planning/phases/016-accounted-local-operation/VERIFY.md",
+      "repo": "https://github.com/DiegoVSouza/supportops-ai-toolkit",
+      "recordedAt": "2026-10-29",
+      "caveat": {
+        "en": "Fixtures test control logic, not model quality.",
+        "pt": "Fixtures testam lógica de controle, não qualidade de modelo."
+      }
+    },
+    {
+      "id": "p03-tests",
+      "project": "observability",
+      "label": {
+        "en": "Full fake service gate",
+        "pt": "Gate fake de serviços completo"
+      },
+      "value": "70 tests, service traces, a dashboard and four firing alerts",
+      "mode": "service",
+      "command": "python scripts/check_full.py with the compose services",
+      "exitCode": 0,
+      "commit": "83fe06752d4823c4af4843f66417542642e0f2c9",
+      "path": ".planning/phases/025-accounted-local-live/VERIFY.md",
+      "repo": "https://github.com/DiegoVSouza/supportops-observability",
+      "recordedAt": "2026-10-29"
+    },
+    {
+      "id": "p04-tests",
+      "project": "async",
+      "label": {
+        "en": "Isolated full fake gate",
+        "pt": "Gate fake completo e isolado"
+      },
+      "value": "127 tests, locked service scenarios, image build and Terraform plan",
+      "mode": "service",
+      "command": "uv run --locked python scripts/check_full.py",
+      "exitCode": 0,
+      "commit": "d3e694d64902d41d1409f6f79e4ef0687143a56b",
+      "path": ".planning/phases/043-root-snapshot-gate/VERIFY.md",
+      "repo": "https://github.com/DiegoVSouza/supportops-async",
+      "recordedAt": "2026-10-30",
+      "caveat": {
+        "en": "Terraform was planned, never applied.",
+        "pt": "O Terraform foi planejado, nunca aplicado."
+      }
+    },
+    {
+      "id": "p05-demo-live",
+      "project": "supportops",
+      "label": {
+        "en": "demo-live-v1 ledger and failover tests against PostgreSQL 16",
+        "pt": "Testes do ledger e do failover do demo-live-v1 contra PostgreSQL 16"
+      },
+      "value": "17 passed",
+      "mode": "service",
+      "command": "P05_TEST_PG_DSN=... uv run --locked pytest tests/test_demo_live.py -v",
+      "exitCode": 0,
+      "commit": "ffcdb81a301968a8fa0a6f68ed81d4c6fb651a4f",
+      "path": "artifacts/evidence/demo-live-v1/pytest-demo-live-postgres.txt",
+      "repo": "https://github.com/DiegoVSouza/supportops-platform",
+      "recordedAt": "2026-10-31",
+      "caveat": {
+        "en": "Fake provider transport. No model was contacted.",
+        "pt": "Transporte de provedor falso. Nenhum modelo foi chamado."
+      }
+    },
+    {
+      "id": "p05-dual-control",
+      "project": "supportops",
+      "label": {
+        "en": "Requester cannot approve their own refund; a tenant cannot read another tenant's ticket",
+        "pt": "Quem pediu não aprova o próprio reembolso; um tenant não lê o ticket de outro"
+      },
+      "value": "2 passed",
+      "mode": "fake",
+      "command": "uv run --locked pytest -v tests/test_api_security.py (two named tests)",
+      "exitCode": 0,
+      "commit": "6e51483b6b4c6f35e4b3f988e8d5e097a9a85383",
+      "path": "artifacts/evidence/portfolio-w7/dual-control-tests.txt",
+      "repo": "https://github.com/DiegoVSouza/supportops-platform",
+      "recordedAt": "2026-10-31"
+    },
+    {
+      "id": "p05-tests",
+      "project": "supportops",
+      "label": {
+        "en": "P05 test suite at phase 033",
+        "pt": "Suíte de testes do P05 na fase 033"
+      },
+      "value": "179 tests passed",
+      "mode": "fake",
+      "command": "uv run --locked pytest",
+      "exitCode": 0,
+      "commit": "d859a5058b27bbef469644429b5f934f38f87d28",
+      "path": ".planning/phases/033-console-blockers/VERIFY.md",
+      "repo": "https://github.com/DiegoVSouza/supportops-platform",
+      "recordedAt": "2026-10-31"
+    }
+  ]
+}

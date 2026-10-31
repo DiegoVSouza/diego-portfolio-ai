@@ -5,15 +5,20 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc --noEmit && vite build",
+    "build": "tsc --noEmit && vite build && vite build --ssr src/entry-server.tsx --outDir dist-ssr && node scripts/prerender.mjs",
     "preview": "vite preview --port 44173 --strictPort",
     "typecheck": "tsc --noEmit",
-    "lint": "eslint src e2e scripts",
+    "lint": "eslint src e2e scripts functions",
     "test": "vitest run",
     "catalog:gen": "node scripts/catalog.mjs gen",
     "catalog:check": "node scripts/catalog.mjs check",
     "budget": "node scripts/budget.mjs",
-    "e2e": "playwright test"
+    "e2e": "playwright test",
+    "evidence:gen": "node scripts/evidence.mjs gen",
+    "evidence:check": "node scripts/evidence.mjs check",
+    "flow:gen": "node scripts/flows.mjs gen",
+    "flow:check": "node scripts/flows.mjs check",
+    "flow:mermaid": "node scripts/flows.mjs mermaid"
   },
   "dependencies": {
     "colagem-ui": "file:vendor/colagem-ui-0.4.0.tgz",
@@ -31,6 +36,7 @@
     "@types/react-dom": "19.3.0",
     "@vitejs/plugin-react": "6.1.2",
     "axe-core": "4.14.0",
+    "elkjs": "0.12.1",
     "eslint": "10.14.0",
     "jsdom": "29.1.1",
     "typescript": "5.9.3",

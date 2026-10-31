@@ -1,0 +1,151 @@
+{
+  "id": "harness",
+  "kind": "pipeline",
+  "title": {
+    "en": "From intake to a gate",
+    "pt": "Do intake ao gate"
+  },
+  "nodes": [
+    {
+      "id": "intake",
+      "label": {
+        "en": "Intake",
+        "pt": "Intake"
+      },
+      "detail": {
+        "en": "Decisions and a profile before any code.",
+        "pt": "Decisões e um perfil antes de qualquer código."
+      },
+      "project": "Lab",
+      "code": "AGENTS.md",
+      "repo": "lab"
+    },
+    {
+      "id": "spec",
+      "label": {
+        "en": "Spec",
+        "pt": "Spec"
+      },
+      "detail": {
+        "en": "A written specification with requirement ids.",
+        "pt": "Uma especificação escrita com ids de requisito."
+      },
+      "project": "Lab",
+      "code": "harness/GSD-LITE-PLUS.md",
+      "repo": "lab"
+    },
+    {
+      "id": "plan",
+      "label": {
+        "en": "Plan",
+        "pt": "Plano"
+      },
+      "detail": {
+        "en": "Allowed write paths and forbidden changes are declared.",
+        "pt": "Caminhos de escrita permitidos e mudanças proibidas são declarados."
+      },
+      "project": "Lab",
+      "code": "harness/GSD-LITE-PLUS.md",
+      "repo": "lab"
+    },
+    {
+      "id": "execute",
+      "label": {
+        "en": "Execute",
+        "pt": "Executar"
+      },
+      "detail": {
+        "en": "Agents write the code inside those paths.",
+        "pt": "Agentes escrevem o código dentro desses caminhos."
+      },
+      "project": "Lab",
+      "code": "AGENTS.md",
+      "repo": "lab"
+    },
+    {
+      "id": "verify",
+      "label": {
+        "en": "Verify",
+        "pt": "Verificar"
+      },
+      "detail": {
+        "en": "Commands run, exit codes and output are saved.",
+        "pt": "Comandos rodam, exit codes e saída são salvos."
+      },
+      "project": "Lab",
+      "code": "AGENTS.md",
+      "repo": "lab"
+    },
+    {
+      "id": "gate",
+      "label": {
+        "en": "Gate",
+        "pt": "Gate"
+      },
+      "detail": {
+        "en": "No evidence means the result stays incomplete.",
+        "pt": "Sem evidência, o resultado continua incompleto."
+      },
+      "project": "Lab",
+      "code": "AGENTS.md",
+      "repo": "lab"
+    }
+  ],
+  "edges": [
+    {
+      "from": "intake",
+      "to": "spec"
+    },
+    {
+      "from": "spec",
+      "to": "plan"
+    },
+    {
+      "from": "plan",
+      "to": "execute"
+    },
+    {
+      "from": "execute",
+      "to": "verify"
+    },
+    {
+      "from": "verify",
+      "to": "gate"
+    }
+  ],
+  "scenes": [
+    {
+      "id": "before",
+      "nodes": [
+        "intake",
+        "spec",
+        "plan"
+      ],
+      "edges": [
+        "intake>spec",
+        "spec>plan"
+      ],
+      "caption": {
+        "en": "Nothing is written before the plan says where.",
+        "pt": "Nada é escrito antes de o plano dizer onde."
+      }
+    },
+    {
+      "id": "after",
+      "nodes": [
+        "execute",
+        "verify",
+        "gate"
+      ],
+      "edges": [
+        "plan>execute",
+        "execute>verify",
+        "verify>gate"
+      ],
+      "caption": {
+        "en": "Nothing is done without saved evidence.",
+        "pt": "Nada está pronto sem evidência salva."
+      }
+    }
+  ]
+}

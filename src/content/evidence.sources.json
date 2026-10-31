@@ -1,0 +1,246 @@
+[
+  {
+    "id": "p00-trials",
+    "project": "foundation",
+    "repo": "p00",
+    "path": "artifacts/evals/live/free-dev-c2r1/report.json",
+    "extract": {
+      "kind": "json",
+      "template": "{passed_trials} of {recorded_trials}"
+    },
+    "mode": "live",
+    "label": {
+      "en": "Real-model trials passed (development set)",
+      "pt": "Trials com modelo real aprovados (conjunto de desenvolvimento)"
+    },
+    "command": "run_live_campaign.py, campaign free-dev-c2r1, as recorded in the campaign report",
+    "exitCode": 1,
+    "caveat": {
+      "en": "Development set, not held out. Status FAIL_PROVISIONAL; the exit code follows that status, as the P00 README defines it.",
+      "pt": "Conjunto de desenvolvimento, não holdout. Status FAIL_PROVISIONAL; o exit code segue esse status, como o README do P00 define."
+    }
+  },
+  {
+    "id": "p00-cases",
+    "project": "foundation",
+    "repo": "p00",
+    "path": "artifacts/evals/live/free-dev-c2r1/report.json",
+    "extract": {
+      "kind": "json",
+      "template": "{unique_cases_all_three_pass} of {unique_cases_with_three_model_results}"
+    },
+    "mode": "live",
+    "label": {
+      "en": "Unique cases that passed all three trials",
+      "pt": "Casos únicos aprovados nos três trials"
+    },
+    "command": "run_live_campaign.py, campaign free-dev-c2r1, as recorded in the campaign report",
+    "exitCode": 1,
+    "caveat": {
+      "en": "Same campaign, same status.",
+      "pt": "Mesma campanha, mesmo status."
+    }
+  },
+  {
+    "id": "p00-wilson",
+    "project": "foundation",
+    "repo": "p00",
+    "path": "artifacts/evals/live/free-dev-c2r1/report.json",
+    "extract": {
+      "kind": "json",
+      "template": "{all_three_wilson95.0:2} to {all_three_wilson95.1:2} (Wilson, 95%)"
+    },
+    "mode": "live",
+    "label": {
+      "en": "Wilson 95% interval for the all-three pass rate",
+      "pt": "Intervalo de Wilson 95% da taxa de aprovação nos três trials"
+    },
+    "command": "run_live_campaign.py, campaign free-dev-c2r1, as recorded in the campaign report",
+    "exitCode": 1,
+    "caveat": {
+      "en": "Rounded to two decimals from the report.",
+      "pt": "Arredondado para duas casas a partir do relatório."
+    }
+  },
+  {
+    "id": "p00-errors",
+    "project": "foundation",
+    "repo": "p00",
+    "path": "artifacts/evals/live/free-dev-c2r1/report.json",
+    "extract": {
+      "kind": "json",
+      "template": "classification {errors.classification}, routing {errors.routing}, tool selection {errors.tool_selection}"
+    },
+    "mode": "live",
+    "label": {
+      "en": "Failures by family in the development campaign",
+      "pt": "Falhas por família na campanha de desenvolvimento"
+    },
+    "command": "run_live_campaign.py, campaign free-dev-c2r1, as recorded in the campaign report",
+    "exitCode": 1,
+    "caveat": {
+      "en": "Counts of errors, not of failed trials; one trial can carry more than one.",
+      "pt": "Contagem de erros, não de trials reprovados; um trial pode ter mais de um."
+    }
+  },
+  {
+    "id": "p00-protected",
+    "project": "foundation",
+    "repo": "p00",
+    "path": "docs/harness/progress.md",
+    "extract": {
+      "kind": "regex",
+      "pattern": "P00holdout(\\d+)/confirmation(\\d+) protected",
+      "template": "$1 held-out calls and $2 confirmation calls stayed reserved"
+    },
+    "mode": "live",
+    "label": {
+      "en": "Protected evaluation budget",
+      "pt": "Orçamento de avaliação protegido"
+    },
+    "command": "recorded in the P00 progress log",
+    "exitCode": 0
+  },
+  {
+    "id": "p01-tokens",
+    "project": "agents",
+    "repo": "p01",
+    "path": "docs/harness/progress.md",
+    "extract": {
+      "kind": "regex",
+      "pattern": "four provider attempts, (\\d+) input/(\\d+) output tokens",
+      "template": "$1 in, $2 out"
+    },
+    "mode": "live",
+    "label": {
+      "en": "One live synthetic workflow, four provider attempts (tokens)",
+      "pt": "Um workflow sintético live, quatro tentativas ao provedor (tokens)"
+    },
+    "command": "accounted local operation, phase 027, as recorded in progress.md",
+    "exitCode": 0,
+    "caveat": {
+      "en": "Transport and accounting only. Says nothing about answer quality.",
+      "pt": "Só transporte e contabilidade. Nada sobre a qualidade da resposta."
+    }
+  },
+  {
+    "id": "p02-tests",
+    "project": "toolkit",
+    "repo": "p02",
+    "path": ".planning/phases/016-accounted-local-operation/VERIFY.md",
+    "extract": {
+      "kind": "regex",
+      "pattern": "exit 0, (\\d+) unit tests plus fixture/adversarial checks",
+      "template": "$1 unit tests plus fixture and adversarial checks"
+    },
+    "mode": "fake",
+    "label": {
+      "en": "Locked fake gate",
+      "pt": "Gate fake travado"
+    },
+    "command": "python scripts/check_full.py",
+    "exitCode": 0,
+    "caveat": {
+      "en": "Fixtures test control logic, not model quality.",
+      "pt": "Fixtures testam lógica de controle, não qualidade de modelo."
+    }
+  },
+  {
+    "id": "p03-tests",
+    "project": "observability",
+    "repo": "p03",
+    "path": ".planning/phases/025-accounted-local-live/VERIFY.md",
+    "extract": {
+      "kind": "regex",
+      "pattern": "PASS full locked fake service gate[^:]*: (\\d+) tests, service traces, dashboard/four firing alerts",
+      "template": "$1 tests, service traces, a dashboard and four firing alerts"
+    },
+    "mode": "service",
+    "label": {
+      "en": "Full fake service gate",
+      "pt": "Gate fake de serviços completo"
+    },
+    "command": "python scripts/check_full.py with the compose services",
+    "exitCode": 0
+  },
+  {
+    "id": "p04-tests",
+    "project": "async",
+    "repo": "p04",
+    "path": ".planning/phases/043-root-snapshot-gate/VERIFY.md",
+    "extract": {
+      "kind": "regex",
+      "pattern": "PASS, (\\d+) tests passed, 1 warning",
+      "template": "$1 tests, locked service scenarios, image build and Terraform plan"
+    },
+    "mode": "service",
+    "label": {
+      "en": "Isolated full fake gate",
+      "pt": "Gate fake completo e isolado"
+    },
+    "command": "uv run --locked python scripts/check_full.py",
+    "exitCode": 0,
+    "caveat": {
+      "en": "Terraform was planned, never applied.",
+      "pt": "O Terraform foi planejado, nunca aplicado."
+    }
+  },
+  {
+    "id": "p05-tests",
+    "project": "supportops",
+    "repo": "p05",
+    "path": ".planning/phases/033-console-blockers/VERIFY.md",
+    "extract": {
+      "kind": "regex",
+      "pattern": "same, attempt 3 \\| 0, (\\d+) passed",
+      "template": "$1 tests passed"
+    },
+    "mode": "fake",
+    "label": {
+      "en": "P05 test suite at phase 033",
+      "pt": "Suíte de testes do P05 na fase 033"
+    },
+    "command": "uv run --locked pytest",
+    "exitCode": 0
+  },
+  {
+    "id": "p05-demo-live",
+    "project": "supportops",
+    "repo": "p05",
+    "path": "artifacts/evidence/demo-live-v1/pytest-demo-live-postgres.txt",
+    "extract": {
+      "kind": "regex",
+      "pattern": "(\\d+) passed",
+      "template": "$1 passed"
+    },
+    "mode": "service",
+    "label": {
+      "en": "demo-live-v1 ledger and failover tests against PostgreSQL 16",
+      "pt": "Testes do ledger e do failover do demo-live-v1 contra PostgreSQL 16"
+    },
+    "command": "P05_TEST_PG_DSN=... uv run --locked pytest tests/test_demo_live.py -v",
+    "exitCode": 0,
+    "caveat": {
+      "en": "Fake provider transport. No model was contacted.",
+      "pt": "Transporte de provedor falso. Nenhum modelo foi chamado."
+    }
+  },
+  {
+    "id": "p05-dual-control",
+    "project": "supportops",
+    "repo": "p05",
+    "path": "artifacts/evidence/portfolio-w7/dual-control-tests.txt",
+    "extract": {
+      "kind": "regex",
+      "pattern": "(\\d+) passed",
+      "template": "$1 passed"
+    },
+    "mode": "fake",
+    "label": {
+      "en": "Requester cannot approve their own refund; a tenant cannot read another tenant's ticket",
+      "pt": "Quem pediu não aprova o próprio reembolso; um tenant não lê o ticket de outro"
+    },
+    "command": "uv run --locked pytest -v tests/test_api_security.py (two named tests)",
+    "exitCode": 0
+  }
+]

@@ -1,0 +1,133 @@
+{
+  "id": "observability",
+  "kind": "waterfall",
+  "title": {
+    "en": "A trace with no visitor text",
+    "pt": "Um trace sem texto do visitante"
+  },
+  "nodes": [
+    {
+      "id": "request",
+      "label": {
+        "en": "API request",
+        "pt": "Requisição da API"
+      },
+      "detail": {
+        "en": "The request starts the trace.",
+        "pt": "A requisição inicia o trace."
+      },
+      "project": "P05",
+      "code": "supportops_platform/api/app.py",
+      "docs": "docs/architecture.md",
+      "repo": "p05"
+    },
+    {
+      "id": "worker",
+      "label": {
+        "en": "worker.run span",
+        "pt": "Span worker.run"
+      },
+      "detail": {
+        "en": "The worker continues the same trace from the job's context.",
+        "pt": "O worker continua o mesmo trace a partir do contexto do job."
+      },
+      "project": "P05",
+      "code": "supportops_platform/service_runtime.py",
+      "repo": "p05"
+    },
+    {
+      "id": "triage",
+      "label": {
+        "en": "agent.triage span",
+        "pt": "Span agent.triage"
+      },
+      "detail": {
+        "en": "One span around the four agents.",
+        "pt": "Um span em volta dos quatro agentes."
+      },
+      "project": "P05",
+      "code": "supportops_platform/service_runtime.py",
+      "repo": "p05"
+    },
+    {
+      "id": "llm",
+      "label": {
+        "en": "Model call",
+        "pt": "Chamada ao modelo"
+      },
+      "detail": {
+        "en": "Tokens, cost and latency are recorded. Content is not.",
+        "pt": "Tokens, custo e latência são registrados. O conteúdo não."
+      },
+      "project": "P03",
+      "code": "supportops_obs/instrumentation.py",
+      "docs": "docs/architecture.md",
+      "repo": "p03"
+    },
+    {
+      "id": "loop",
+      "label": {
+        "en": "Loop detector",
+        "pt": "Detector de loops"
+      },
+      "detail": {
+        "en": "A deterministic detector flags repeated actions.",
+        "pt": "Um detector determinístico sinaliza ações repetidas."
+      },
+      "project": "P03",
+      "code": "supportops_obs/loopdetect.py",
+      "repo": "p03"
+    }
+  ],
+  "edges": [
+    {
+      "from": "request",
+      "to": "worker"
+    },
+    {
+      "from": "worker",
+      "to": "triage"
+    },
+    {
+      "from": "triage",
+      "to": "llm"
+    },
+    {
+      "from": "llm",
+      "to": "loop"
+    }
+  ],
+  "scenes": [
+    {
+      "id": "spans",
+      "nodes": [
+        "request",
+        "worker",
+        "triage"
+      ],
+      "edges": [
+        "request>worker",
+        "worker>triage"
+      ],
+      "caption": {
+        "en": "One trace follows the ticket across the API and the worker.",
+        "pt": "Um trace segue o ticket pela API e pelo worker."
+      }
+    },
+    {
+      "id": "calls",
+      "nodes": [
+        "llm",
+        "loop"
+      ],
+      "edges": [
+        "triage>llm",
+        "llm>loop"
+      ],
+      "caption": {
+        "en": "Each model call adds numbers, never text.",
+        "pt": "Cada chamada ao modelo acrescenta números, nunca texto."
+      }
+    }
+  ]
+}

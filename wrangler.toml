@@ -1,0 +1,8 @@
+# Cloudflare Pages project: diego-portfolio-ai. Secrets are set in the dashboard or with `wrangler pages secret put`, never here.
+name = "diego-portfolio-ai"
+pages_build_output_dir = "dist"
+compatibility_date = "2026-10-01"
+
+# Bind a KV namespace named DEMO_KV in the dashboard (budget, kill switch, run cache, per-visitor counters).
+# Variables, set outside Git: STACK_APPS, TURNSTILE_SITE_KEY, CONSOLE_URL, DEMO_ACCOUNTS, P05_BASE
+# Secrets, set outside Git: FLY_READONLY_TOKEN, FLY_WAKE_TOKEN, TURNSTILE_SECRET

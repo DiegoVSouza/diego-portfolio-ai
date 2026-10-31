@@ -1,0 +1,132 @@
+{
+  "id": "design-system",
+  "kind": "pipeline",
+  "title": {
+    "en": "From a project's evidence to a number on this page",
+    "pt": "Da evidência de um projeto a um número nesta página"
+  },
+  "nodes": [
+    {
+      "id": "file",
+      "label": {
+        "en": "Evidence file",
+        "pt": "Arquivo de evidência"
+      },
+      "detail": {
+        "en": "A report or a test run saved in a project repository.",
+        "pt": "Um relatório ou execução de teste salvo no repositório de um projeto."
+      },
+      "project": "P07",
+      "code": "src/content/evidence.sources.json",
+      "docs": "docs/architecture.md",
+      "repo": "p07"
+    },
+    {
+      "id": "gen",
+      "label": {
+        "en": "Evidence generator",
+        "pt": "Gerador de evidência"
+      },
+      "detail": {
+        "en": "Reads the file at its last commit and copies the value exactly.",
+        "pt": "Lê o arquivo no último commit e copia o valor exatamente."
+      },
+      "project": "P07",
+      "code": "scripts/evidence.mjs",
+      "repo": "p07"
+    },
+    {
+      "id": "record",
+      "label": {
+        "en": "Evidence record",
+        "pt": "Registro de evidência"
+      },
+      "detail": {
+        "en": "Value, mode, command, exit code, commit and path.",
+        "pt": "Valor, modo, comando, exit code, commit e caminho."
+      },
+      "project": "P07",
+      "code": "src/data/evidence.generated.json",
+      "repo": "p07"
+    },
+    {
+      "id": "rule",
+      "label": {
+        "en": "Number rule",
+        "pt": "Regra dos números"
+      },
+      "detail": {
+        "en": "A test fails on a digit that has no record behind it.",
+        "pt": "Um teste falha com um dígito sem registro por trás."
+      },
+      "project": "P07",
+      "code": "src/rules.test.ts",
+      "repo": "p07"
+    },
+    {
+      "id": "page",
+      "label": {
+        "en": "Number on the page",
+        "pt": "Número na página"
+      },
+      "detail": {
+        "en": "The page shows the value with a link to the exact commit.",
+        "pt": "A página mostra o valor com um link para o commit exato."
+      },
+      "project": "P07",
+      "code": "src/pages/Case.tsx",
+      "repo": "p07"
+    }
+  ],
+  "edges": [
+    {
+      "from": "file",
+      "to": "gen"
+    },
+    {
+      "from": "gen",
+      "to": "record"
+    },
+    {
+      "from": "record",
+      "to": "rule"
+    },
+    {
+      "from": "rule",
+      "to": "page"
+    }
+  ],
+  "scenes": [
+    {
+      "id": "collect",
+      "nodes": [
+        "file",
+        "gen",
+        "record"
+      ],
+      "edges": [
+        "file>gen",
+        "gen>record"
+      ],
+      "caption": {
+        "en": "A value is copied from its source, not typed.",
+        "pt": "Um valor é copiado da fonte, não digitado."
+      }
+    },
+    {
+      "id": "publish",
+      "nodes": [
+        "rule",
+        "page"
+      ],
+      "edges": [
+        "record>rule",
+        "rule>page"
+      ],
+      "caption": {
+        "en": "Only a value with a record can reach the page.",
+        "pt": "Só um valor com registro chega à página."
+      }
+    }
+  ]
+}

@@ -1,0 +1,132 @@
+{
+  "id": "toolkit",
+  "kind": "pipeline",
+  "title": {
+    "en": "A tool call under control",
+    "pt": "Uma chamada de ferramenta sob controle"
+  },
+  "nodes": [
+    {
+      "id": "call",
+      "label": {
+        "en": "Tool call",
+        "pt": "Chamada de ferramenta"
+      },
+      "detail": {
+        "en": "A call arrives with arguments from a model.",
+        "pt": "Uma chamada chega com argumentos vindos de um modelo."
+      },
+      "project": "P02",
+      "code": "supportops_toolkit/__init__.py",
+      "docs": "docs/architecture.md",
+      "repo": "p02"
+    },
+    {
+      "id": "screen",
+      "label": {
+        "en": "Guardrails",
+        "pt": "Guardrails"
+      },
+      "detail": {
+        "en": "Input is screened before anything runs.",
+        "pt": "A entrada é filtrada antes de qualquer execução."
+      },
+      "project": "P02",
+      "code": "supportops_toolkit/guardrails.py",
+      "repo": "p02"
+    },
+    {
+      "id": "limits",
+      "label": {
+        "en": "Step and time limits",
+        "pt": "Limites de passos e tempo"
+      },
+      "detail": {
+        "en": "A budget of steps, tokens and seconds is consumed and enforced.",
+        "pt": "Um orçamento de passos, tokens e segundos é consumido e aplicado."
+      },
+      "project": "P02",
+      "code": "supportops_toolkit/guardrails.py",
+      "repo": "p02"
+    },
+    {
+      "id": "evals",
+      "label": {
+        "en": "Code-first evals",
+        "pt": "Evals code-first"
+      },
+      "detail": {
+        "en": "Checks run as code, against fixtures and an adversarial suite.",
+        "pt": "As checagens rodam como código, contra fixtures e uma suíte adversarial."
+      },
+      "project": "P02",
+      "code": "supportops_toolkit/evals/runner.py",
+      "repo": "p02"
+    },
+    {
+      "id": "cost",
+      "label": {
+        "en": "Cost helpers",
+        "pt": "Helpers de custo"
+      },
+      "detail": {
+        "en": "Routing, caching and streaming helpers for cost.",
+        "pt": "Helpers de roteamento, cache e streaming para custo."
+      },
+      "project": "P02",
+      "code": "supportops_toolkit/cost/routing.py",
+      "repo": "p02"
+    }
+  ],
+  "edges": [
+    {
+      "from": "call",
+      "to": "screen"
+    },
+    {
+      "from": "screen",
+      "to": "limits"
+    },
+    {
+      "from": "limits",
+      "to": "evals"
+    },
+    {
+      "from": "evals",
+      "to": "cost"
+    }
+  ],
+  "scenes": [
+    {
+      "id": "guard",
+      "nodes": [
+        "call",
+        "screen",
+        "limits"
+      ],
+      "edges": [
+        "call>screen",
+        "screen>limits"
+      ],
+      "caption": {
+        "en": "A call is screened and bounded before it runs.",
+        "pt": "Uma chamada é filtrada e limitada antes de rodar."
+      }
+    },
+    {
+      "id": "measure",
+      "nodes": [
+        "evals",
+        "cost"
+      ],
+      "edges": [
+        "limits>evals",
+        "evals>cost"
+      ],
+      "caption": {
+        "en": "Evals and cost helpers measure what ran.",
+        "pt": "Evals e helpers de custo medem o que rodou."
+      }
+    }
+  ]
+}

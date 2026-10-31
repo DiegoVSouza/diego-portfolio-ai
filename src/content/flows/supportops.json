@@ -1,0 +1,278 @@
+{
+  "id": "supportops",
+  "kind": "lanes",
+  "title": {
+    "en": "A refund that needs a second person",
+    "pt": "Um reembolso que precisa de uma segunda pessoa"
+  },
+  "nodes": [
+    {
+      "id": "ticket",
+      "label": {
+        "en": "Ticket",
+        "pt": "Ticket"
+      },
+      "detail": {
+        "en": "The console sends the ticket with the user's token.",
+        "pt": "O console envia o ticket com o token do usuário."
+      },
+      "project": "P06",
+      "code": "src/pages/TicketsPage.tsx",
+      "docs": "docs/architecture.md",
+      "repo": "p06"
+    },
+    {
+      "id": "auth",
+      "label": {
+        "en": "Tenant from token",
+        "pt": "Tenant do token"
+      },
+      "detail": {
+        "en": "Tenant and role are read from the token; the request cannot choose them.",
+        "pt": "Tenant e papel são lidos do token; a requisição não escolhe."
+      },
+      "project": "P05",
+      "code": "supportops_platform/auth/jwt.py",
+      "docs": "docs/decisions/ADR-002-jwt-local-auth.md",
+      "repo": "p05"
+    },
+    {
+      "id": "rag",
+      "label": {
+        "en": "Tenant-scoped search",
+        "pt": "Busca por tenant"
+      },
+      "detail": {
+        "en": "Retrieval only sees the ticket's tenant, and answers cite sources.",
+        "pt": "A busca só enxerga o tenant do ticket, e as respostas citam fontes."
+      },
+      "project": "P05",
+      "code": "supportops_platform/rag/retrieval.py",
+      "docs": "docs/decisions/ADR-004-triage-api-and-rag.md",
+      "repo": "p05"
+    },
+    {
+      "id": "agents",
+      "label": {
+        "en": "Four agents",
+        "pt": "Quatro agentes"
+      },
+      "detail": {
+        "en": "Classifier, researcher, billing and responder, with a step limit.",
+        "pt": "Classificador, pesquisador, billing e responder, com limite de passos."
+      },
+      "project": "P01",
+      "code": "src/supportops_agents/core.py",
+      "docs": "docs/architecture.md",
+      "repo": "p01"
+    },
+    {
+      "id": "ledger",
+      "label": {
+        "en": "Budget ledger",
+        "pt": "Ledger de orçamento"
+      },
+      "detail": {
+        "en": "The cost is reserved in Postgres before the call and fails closed at the ceiling.",
+        "pt": "O custo é reservado no Postgres antes da chamada e falha fechado no teto."
+      },
+      "project": "P05",
+      "code": "supportops_platform/agents/demo_live.py",
+      "docs": "docs/runbook.md",
+      "repo": "p05"
+    },
+    {
+      "id": "gate",
+      "label": {
+        "en": "Refund gate",
+        "pt": "Gate de reembolso"
+      },
+      "detail": {
+        "en": "The proposal becomes an approval request through a deterministic tool.",
+        "pt": "A proposta vira um pedido de aprovação por uma ferramenta determinística."
+      },
+      "project": "P05",
+      "code": "supportops_platform/service_runtime.py",
+      "docs": "docs/decisions/ADR-010-console-blockers.md",
+      "repo": "p05"
+    },
+    {
+      "id": "approver",
+      "label": {
+        "en": "Second person",
+        "pt": "Segunda pessoa"
+      },
+      "detail": {
+        "en": "An approver other than the requester decides.",
+        "pt": "Um aprovador diferente de quem pediu decide."
+      },
+      "project": "P06",
+      "code": "src/pages/ApprovalsPage.tsx",
+      "docs": "docs/architecture.md",
+      "repo": "p06"
+    },
+    {
+      "id": "refund",
+      "label": {
+        "en": "Simulated refund",
+        "pt": "Reembolso simulado"
+      },
+      "detail": {
+        "en": "An approved request creates a simulated refund. Nothing real moves.",
+        "pt": "Um pedido aprovado cria um reembolso simulado. Nada real se move."
+      },
+      "project": "P05",
+      "code": "supportops_platform/repositories.py",
+      "docs": "docs/architecture.md",
+      "repo": "p05"
+    }
+  ],
+  "edges": [
+    {
+      "from": "ticket",
+      "to": "auth"
+    },
+    {
+      "from": "auth",
+      "to": "rag"
+    },
+    {
+      "from": "rag",
+      "to": "agents"
+    },
+    {
+      "from": "agents",
+      "to": "ledger"
+    },
+    {
+      "from": "ledger",
+      "to": "gate",
+      "label": {
+        "en": "proposal",
+        "pt": "proposta"
+      }
+    },
+    {
+      "from": "gate",
+      "to": "approver"
+    },
+    {
+      "from": "approver",
+      "to": "refund",
+      "label": {
+        "en": "approved",
+        "pt": "aprovado"
+      }
+    }
+  ],
+  "scenes": [
+    {
+      "id": "intake",
+      "nodes": [
+        "ticket",
+        "auth",
+        "rag"
+      ],
+      "edges": [
+        "ticket>auth",
+        "auth>rag"
+      ],
+      "caption": {
+        "en": "The ticket is scoped to its tenant before anything is retrieved.",
+        "pt": "O ticket é isolado no tenant antes de qualquer busca."
+      }
+    },
+    {
+      "id": "triage",
+      "nodes": [
+        "agents",
+        "ledger"
+      ],
+      "edges": [
+        "rag>agents",
+        "agents>ledger"
+      ],
+      "caption": {
+        "en": "Four agents answer with cited sources, each call paid from the ledger.",
+        "pt": "Quatro agentes respondem com fontes citadas, cada chamada paga pelo ledger."
+      }
+    },
+    {
+      "id": "decide",
+      "nodes": [
+        "gate",
+        "approver",
+        "refund"
+      ],
+      "edges": [
+        "ledger>gate",
+        "gate>approver",
+        "approver>refund"
+      ],
+      "caption": {
+        "en": "The gate hands the proposal to a second person. Only then does a simulated refund exist.",
+        "pt": "O gate entrega a proposta a uma segunda pessoa. Só então existe um reembolso simulado."
+      }
+    },
+    {
+      "id": "own-refused",
+      "nodes": [
+        "gate",
+        "approver"
+      ],
+      "edges": [
+        "gate>approver"
+      ],
+      "caption": {
+        "en": "The requester tries to approve their own refund and is refused.",
+        "pt": "Quem pediu tenta aprovar o próprio reembolso e é recusado."
+      },
+      "scenarioOnly": true
+    },
+    {
+      "id": "cross-refused",
+      "nodes": [
+        "ticket",
+        "auth"
+      ],
+      "edges": [
+        "ticket>auth"
+      ],
+      "caption": {
+        "en": "A user from another tenant asks for this ticket and gets not found.",
+        "pt": "Um usuário de outro tenant pede este ticket e recebe não encontrado."
+      },
+      "scenarioOnly": true
+    }
+  ],
+  "scenarios": [
+    {
+      "id": "own",
+      "label": {
+        "en": "Approve your own refund",
+        "pt": "Aprovar o próprio reembolso"
+      },
+      "scenes": [
+        "own-refused"
+      ],
+      "evidence": "p05-dual-control"
+    },
+    {
+      "id": "cross",
+      "label": {
+        "en": "Read another tenant's ticket",
+        "pt": "Ler o ticket de outro tenant"
+      },
+      "scenes": [
+        "cross-refused"
+      ],
+      "evidence": "p05-dual-control"
+    }
+  ],
+  "runStep": {
+    "classifier": "agents",
+    "kb_researcher": "rag",
+    "billing_agent": "ledger",
+    "responder": "gate"
+  }
+}

@@ -1,0 +1,75 @@
+[WebServer] Each child in a list should have a unique "key" prop.
+[WebServer] 
+[WebServer] Check the render method of `J`. See https://react.dev/link/warning-keys for more information.
+[WebServer] Each child in a list should have a unique "key" prop.
+[WebServer] 
+[WebServer] Check the render method of `J`. See https://react.dev/link/warning-keys for more information.
+
+Running 8 tests using 1 worker
+
+  ✘  1 e2e\site.spec.ts:12:3 › every route passes axe with contrast, does not overflow, and logs no errors at 1000px (48.8s)
+  ✘  2 e2e\site.spec.ts:12:3 › every route passes axe with contrast, does not overflow, and logs no errors at 360px (13.2s)
+  ✓  3 e2e\site.spec.ts:37:1 › with JavaScript off, every route still shows its heading, and a case shows its diagram and its list (SEO-001, FLOW-005) (4.9s)
+  ✓  4 e2e\site.spec.ts:50:1 › English and Portuguese link to each other and set the document language (643ms)
+  ✓  5 e2e\site.spec.ts:59:1 › keyboard: skip link, then a project, then back (985ms)
+  ✓  6 e2e\site.spec.ts:72:1 › the diagram walks through scenes and a failure scenario by keyboard, at both widths (1.8s)
+  ✓  7 e2e\site.spec.ts:85:1 › the demo page requests nothing from a third party until a site key exists, and wakes nothing (LIVE-004, SEC-001) (1.4s)
+  ✓  8 e2e\site.spec.ts:95:1 › the home page has the role in the first screen, and a squint screenshot is saved for review (2.0s)
+
+
+  1) e2e\site.spec.ts:12:3 › every route passes axe with contrast, does not overflow, and logs no errors at 1000px 
+
+    Error: expect(received).toEqual(expected) // deep equality
+
+    - Expected  - 1
+    + Received  + 6
+
+    - Array []
+    + Array [
+    +   "http://localhost:44173/demo/ Failed to load resource: the server responded with a status of 404 (Not Found)",
+    +   "http://localhost:44173/demo/ Failed to load resource: the server responded with a status of 404 (Not Found)",
+    +   "http://localhost:44173/pt/demo/ Failed to load resource: the server responded with a status of 404 (Not Found)",
+    +   "http://localhost:44173/pt/demo/ Failed to load resource: the server responded with a status of 404 (Not Found)",
+    + ]
+
+      31 |       expect(wide, `${path} overflows horizontally`).toEqual([]);
+      32 |     }
+    > 33 |     expect(problems).toEqual([]);
+         |                      ^
+      34 |   });
+      35 | }
+      36 |
+        at C:\estudo\Golpe\lab\projects\p07\e2e\site.spec.ts:33:22
+
+    Error Context: test-results\site-every-route-passes-ax-d4b5c-nd-logs-no-errors-at-1000px\error-context.md
+
+  2) e2e\site.spec.ts:12:3 › every route passes axe with contrast, does not overflow, and logs no errors at 360px 
+
+    Error: /projects/supportops/
+
+    expect(received).toEqual(expected) // deep equality
+
+    - Expected  - 1
+    + Received  + 3
+
+    - Array []
+    + Array [
+    +   "/projects/supportops/ scrollable-region-focusable: pre",
+    + ]
+
+      21 |       await page.evaluate(() => document.fonts.ready);
+      22 |       const result = await new AxeBuilder({ page }).analyze();
+    > 23 |       expect(result.violations.map((v) => `${path} ${v.id}: ${v.nodes[0]?.target}`), path).toEqual([]);
+         |                                                                                            ^
+      24 |       const wide = await page.evaluate(() => {
+      25 |         if (document.documentElement.scrollWidth <= window.innerWidth) return [];
+      26 |         return [...document.querySelectorAll("body *:not(svg *)")]
+        at C:\estudo\Golpe\lab\projects\p07\e2e\site.spec.ts:23:92
+
+    Error Context: test-results\site-every-route-passes-ax-2ffdc-and-logs-no-errors-at-360px\error-context.md
+
+  2 failed
+    e2e\site.spec.ts:12:3 › every route passes axe with contrast, does not overflow, and logs no errors at 1000px 
+    e2e\site.spec.ts:12:3 › every route passes axe with contrast, does not overflow, and logs no errors at 360px 
+  6 passed (1.6m)
+exit=1

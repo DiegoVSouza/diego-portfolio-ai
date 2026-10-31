@@ -1,0 +1,122 @@
+import { render as mount, screen, waitFor } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { App } from "./App";
+import { allPaths } from "./site/router";
+import { preload } from "./site/pages";
+import { parsePath } from "./site/router";
+import { render as renderToHtml } from "./entry-server";
+
+const wait = async (url: string) => preload(parsePath(url));
+
+describe("prerendered HTML (SEO-001, SEC-001)", () => {
+  it("every route renders a heading, real links and nothing a strict CSP would drop", async () => {
+    for (const path of allPaths()) {
+      const html = await renderToHtml(path);
+      expect(html, path).toMatch(/<h1[ >]/);
+      // style-src 'self' drops inline style attributes that arrive in markup, so none may be rendered.
+      expect(/ style="/.test(html), `${path} has an inline style attribute`).toBe(false);
+      expect(/<script/.test(html), `${path} has an inline script`).toBe(false);
+      expect(/href="\/(pt\/)?(demo|evidence|method|experience)\/"/.test(html), path).toBe(true);
+    }
+  });
+
+  it("the phone number never appears in rendered pages", async () => {
+    for (const path of ["/", "/experience/", "/pt/experience/"]) expect(/99797|\(88\)/.test(await renderToHtml(path))).toBe(false);
+  });
+
+  it("a case page has the fixed sections in order, with a Rejected line per decision", async () => {
+    const html = await renderToHtml("/projects/supportops/");
+    const order = ["tldr-h", "run-h", "how-h", "dec-h", "res-h", "fail-h", "val-h", "diff-h", "next-h"].map((id) => html.indexOf(`id="${id}"`));
+    expect(order.every((i) => i > 0)).toBe(true);
+    expect([...order].sort((a, b) => a - b)).toEqual(order);
+    expect((html.match(/class="rejected"/g) ?? []).length).toBeGreaterThanOrEqual(3);
+    expect(html).toContain("Not measured, so not claimed");
+  });
+
+  it("the diagram and its text version are in the HTML without JavaScript (FLOW-005)", async () => {
+    const html = await renderToHtml("/projects/supportops/");
+    expect(html).toContain('class="flow-list"');
+    expect(html).toContain("Tenant from token");
+    expect(html).toContain("<svg");
+  });
+
+  it("Portuguese pages are in Portuguese and link back to English", async () => {
+    const html = await renderToHtml("/pt/projects/supportops/");
+    expect(html).toContain("Galeria de falhas");
+    expect(html).toContain('hrefLang="en"');
+    expect(html).toContain('href="/projects/supportops/"');
+  });
+});
+
+describe("the demo page", () => {
+  const fetchMock = vi.fn();
+  beforeEach(() => {
+    fetchMock.mockReset();
+    vi.stubGlobal("fetch", fetchMock);
+  });
+  afterEach(() => vi.unstubAllGlobals());
+
+  const reply = (body: unknown, ok = true) => Promise.resolve({ ok, json: () => Promise.resolve(body) });
+
+  it("opening the page reads the status and wakes nothing (LIVE-004)", async () => {
+    fetchMock.mockImplementation((url: string) => (url.includes("/api/status") ? reply({ state: "asleep", startAvailable: true, turnstileSiteKey: null }) : reply({ runs: [] })));
+    await wait("/demo/");
+    mount(<App url="/demo/" />);
+    await waitFor(() => expect(screen.getByText(/Asleep/)).toBeTruthy());
+    const calls = fetchMock.mock.calls as [string, RequestInit | undefined][];
+    expect(calls.every(([, init]) => !init || !init.method || init.method === "GET")).toBe(true);
+    expect(calls.some(([url]) => url.includes("/api/demo/start"))).toBe(false);
+  });
+
+  it("the start button stays disabled until the visitor passes the challenge, and says why", async () => {
+    fetchMock.mockImplementation((url: string) => (url.includes("/api/status") ? reply({ state: "asleep", startAvailable: true, turnstileSiteKey: "site-key" }) : reply({ runs: [] })));
+    await wait("/demo/");
+    mount(<App url="/demo/" />);
+    await waitFor(() => expect(screen.getByText(/Asleep/)).toBeTruthy());
+    const button = screen.getByRole("button", { name: "Start live demo" }) as HTMLButtonElement;
+    expect(button.disabled).toBe(true);
+    await userEvent.setup().click(button);
+    expect(fetchMock.mock.calls.some(([url]) => String(url).includes("/api/demo/start"))).toBe(false);
+  });
+
+  it("with no run recorded it says so and shows no invented steps", async () => {
+    fetchMock.mockImplementation((url: string) => (url.includes("/api/status") ? reply({ state: "unknown" }) : reply({ runs: [] })));
+    await wait("/demo/");
+    mount(<App url="/demo/" />);
+    await waitFor(() => expect(screen.getByText(/No live run is recorded yet/)).toBeTruthy());
+    expect(document.querySelector(".runlog")).toBeNull();
+    expect(document.querySelectorAll(".flow-node.live")).toHaveLength(0);
+  });
+
+  it("when the status is unavailable it states that, without substituting anything (LIVE-003)", async () => {
+    fetchMock.mockImplementation(() => Promise.reject(new Error("offline")));
+    await wait("/demo/");
+    mount(<App url="/demo/" />);
+    await waitFor(() => expect(screen.getByText(/Status unavailable/)).toBeTruthy());
+    expect(document.querySelector(".runlog")).toBeNull();
+  });
+
+  it("lights a diagram node only from a recorded run, and the log shows that run's numbers (FLOW-006)", async () => {
+    const run = { id: "r1", at: "2026-10-31", steps: [{ id: "s1", agent: "classifier", project: "P01", model: "openai/gpt-oss-20b", latencyMs: 412, tokens: 960, costUsd: 0.000086 }] };
+    fetchMock.mockImplementation((url: string) => (url.includes("/api/status") ? reply({ state: "awake" }) : reply({ runs: [run] })));
+    await wait("/demo/");
+    mount(<App url="/demo/" />);
+    await waitFor(() => expect(document.querySelector(".runlog")).toBeTruthy());
+    expect(screen.getAllByText("412 ms").length).toBeGreaterThan(0);
+    expect(document.querySelector('.flow-h [data-node="agents"]')?.classList.contains("live")).toBe(true);
+    expect(document.querySelector('.flow-h [data-node="queue"]')?.classList.contains("live")).toBe(false);
+  });
+});
+
+describe("navigation", () => {
+  it("a plain click on an internal link changes the page in place and keeps real hrefs", async () => {
+    await wait("/");
+    mount(<App url="/" />);
+    const link = screen.getAllByRole("link", { name: "Evidence" })[0] as HTMLAnchorElement;
+    expect(link.getAttribute("href")).toBe("/evidence/");
+    await userEvent.setup().click(link);
+    await waitFor(() => expect(screen.getByRole("heading", { level: 1 }).textContent).toBe("Evidence"));
+    expect(window.location.pathname).toBe("/evidence/");
+  });
+});

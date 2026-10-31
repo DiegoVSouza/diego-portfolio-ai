@@ -1,0 +1,257 @@
+{
+  "id": "system",
+  "kind": "pipeline",
+  "title": {
+    "en": "One ticket crossing the system",
+    "pt": "Um ticket atravessando o sistema"
+  },
+  "nodes": [
+    {
+      "id": "ticket",
+      "label": {
+        "en": "Ticket",
+        "pt": "Ticket"
+      },
+      "detail": {
+        "en": "A visitor opens a ticket in the console.",
+        "pt": "Um visitante abre um ticket no console."
+      },
+      "project": "P06",
+      "code": "src/pages/TicketPage.tsx",
+      "docs": "docs/architecture.md",
+      "repo": "p06"
+    },
+    {
+      "id": "api",
+      "label": {
+        "en": "API and auth",
+        "pt": "API e auth"
+      },
+      "detail": {
+        "en": "Tenant and role come from the signed token, not from the request.",
+        "pt": "Tenant e papel vêm do token assinado, não da requisição."
+      },
+      "project": "P05",
+      "code": "supportops_platform/api/app.py",
+      "docs": "docs/architecture.md",
+      "repo": "p05"
+    },
+    {
+      "id": "screen",
+      "label": {
+        "en": "Guard screen",
+        "pt": "Triagem de segurança"
+      },
+      "detail": {
+        "en": "Text is screened before any model sees it.",
+        "pt": "O texto é filtrado antes de qualquer modelo vê-lo."
+      },
+      "project": "P02",
+      "code": "supportops_toolkit/guardrails.py",
+      "docs": "docs/architecture.md",
+      "repo": "p02"
+    },
+    {
+      "id": "queue",
+      "label": {
+        "en": "Durable job",
+        "pt": "Job durável"
+      },
+      "detail": {
+        "en": "The work is a leased job with retries and a dead-letter path.",
+        "pt": "O trabalho é um job com lease, retries e dead-letter."
+      },
+      "project": "P04",
+      "code": "supportops_async/queue/contracts.py",
+      "docs": "docs/architecture.md",
+      "repo": "p04"
+    },
+    {
+      "id": "agents",
+      "label": {
+        "en": "Four agents",
+        "pt": "Quatro agentes"
+      },
+      "detail": {
+        "en": "A supervisor runs classifier, researcher, billing and responder, with a hard step limit.",
+        "pt": "Um supervisor roda classificador, pesquisador, billing e responder, com limite rígido de passos."
+      },
+      "project": "P01",
+      "code": "src/supportops_agents/core.py",
+      "docs": "docs/architecture.md",
+      "repo": "p01"
+    },
+    {
+      "id": "model",
+      "label": {
+        "en": "Real model",
+        "pt": "Modelo real"
+      },
+      "detail": {
+        "en": "Each call is reserved in a ledger before the provider is contacted.",
+        "pt": "Cada chamada é reservada em um ledger antes de o provedor ser contatado."
+      },
+      "project": "P00",
+      "code": "supportops_foundation/llm/live.py",
+      "docs": "docs/architecture.md",
+      "repo": "p00"
+    },
+    {
+      "id": "gate",
+      "label": {
+        "en": "Refund gate",
+        "pt": "Gate de reembolso"
+      },
+      "detail": {
+        "en": "A deterministic check turns a proposal into an approval request.",
+        "pt": "Uma checagem determinística transforma a proposta em um pedido de aprovação."
+      },
+      "project": "P05",
+      "code": "supportops_platform/service_runtime.py",
+      "docs": "docs/architecture.md",
+      "repo": "p05"
+    },
+    {
+      "id": "approver",
+      "label": {
+        "en": "Second person",
+        "pt": "Segunda pessoa"
+      },
+      "detail": {
+        "en": "Someone other than the requester approves or rejects.",
+        "pt": "Alguém que não pediu aprova ou rejeita."
+      },
+      "project": "P06",
+      "code": "src/pages/ApprovalsPage.tsx",
+      "docs": "docs/architecture.md",
+      "repo": "p06"
+    },
+    {
+      "id": "trace",
+      "label": {
+        "en": "Content-free trace",
+        "pt": "Trace sem conteúdo"
+      },
+      "detail": {
+        "en": "Spans carry timing and status, never the text.",
+        "pt": "Os spans carregam tempo e status, nunca o texto."
+      },
+      "project": "P03",
+      "code": "supportops_obs/instrumentation.py",
+      "docs": "docs/architecture.md",
+      "repo": "p03"
+    }
+  ],
+  "edges": [
+    {
+      "from": "ticket",
+      "to": "api"
+    },
+    {
+      "from": "api",
+      "to": "screen"
+    },
+    {
+      "from": "screen",
+      "to": "queue"
+    },
+    {
+      "from": "queue",
+      "to": "agents"
+    },
+    {
+      "from": "agents",
+      "to": "model"
+    },
+    {
+      "from": "model",
+      "to": "gate",
+      "label": {
+        "en": "proposal",
+        "pt": "proposta"
+      }
+    },
+    {
+      "from": "gate",
+      "to": "approver"
+    },
+    {
+      "from": "agents",
+      "to": "trace",
+      "label": {
+        "en": "spans",
+        "pt": "spans"
+      }
+    }
+  ],
+  "scenes": [
+    {
+      "id": "enter",
+      "nodes": [
+        "ticket",
+        "api",
+        "screen"
+      ],
+      "edges": [
+        "ticket>api",
+        "api>screen"
+      ],
+      "caption": {
+        "en": "The ticket is authenticated and screened.",
+        "pt": "O ticket é autenticado e filtrado."
+      }
+    },
+    {
+      "id": "work",
+      "nodes": [
+        "queue",
+        "agents",
+        "model"
+      ],
+      "edges": [
+        "screen>queue",
+        "queue>agents",
+        "agents>model"
+      ],
+      "caption": {
+        "en": "A durable job runs four agents against a real model.",
+        "pt": "Um job durável roda quatro agentes contra um modelo real."
+      }
+    },
+    {
+      "id": "decide",
+      "nodes": [
+        "gate",
+        "approver"
+      ],
+      "edges": [
+        "model>gate",
+        "gate>approver"
+      ],
+      "caption": {
+        "en": "Money stops at a gate and waits for a second person.",
+        "pt": "Dinheiro para em um gate e espera uma segunda pessoa."
+      }
+    },
+    {
+      "id": "watch",
+      "nodes": [
+        "agents",
+        "trace"
+      ],
+      "edges": [
+        "agents>trace"
+      ],
+      "caption": {
+        "en": "Every step leaves a trace with no visitor text in it.",
+        "pt": "Cada passo deixa um trace sem texto do visitante."
+      }
+    }
+  ],
+  "runStep": {
+    "classifier": "agents",
+    "kb_researcher": "agents",
+    "billing_agent": "agents",
+    "responder": "agents"
+  }
+}
