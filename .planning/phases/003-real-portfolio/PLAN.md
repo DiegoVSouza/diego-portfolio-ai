@@ -6,7 +6,7 @@ Revision 2. Execution is handed to another model: lab `docs/harness/portfolio/NE
 | --- | --- | --- | --- | --- |
 | W0 | lab, P07 | Research, ADRs, spec | Owner reviewed | done |
 | W1 | all repositories | Public-readiness audit | `docs/harness/public-readiness.md` | done |
-| W1b | lab | Verify in Fly and Groq: Machines API cost data, prepaid behavior, organization terms, real rate limits | Findings recorded | no |
+| W1b | lab | Verify in Fly and Groq: Machines API cost data, prepaid behavior, real rate limits | Findings recorded | no |
 | W2 | P00–P08 | Fix findings: clean-clone failures, READMEs as case studies, CI on fresh runners, personal paths at HEAD | Clean clone passes | no |
 | W3 | GitHub | Push, create repositories, change visibility, one at a time | Hosted CI green | **go, per repository** |
 | W4 | P05 | `demo-live-v1`, live refund flow, key failover, per-step usage, boundary tests | Fake gate plus a live smoke inside budget | smoke: **go** |
@@ -26,4 +26,4 @@ forbidden_changes: `harness-kit/`, Go, a number without evidence, a `fake` resul
 
 stop conditions: three failed attempts on one failure; a secret anywhere; projected spend over either ceiling; any step that publishes or restarts a Fly machine without go.
 
-Owner inputs still needed: review of the copy and of the English CV; which other public repositories to feature; whether `newsAR` goes public.
+Owner inputs still needed: review of the copy and of the English CV, after the site is up.

@@ -34,7 +34,6 @@ Everything below is used. Each has a source class: `evidence` (generated record)
 | 4 years of software engineering, 2+ in generative AI, 1+ in production | Hero | cv |
 | Yamaha Motor e-commerce platform, international team | Experience | cv |
 | Peer-reviewed paper at SBCAS 2024 with DOI; SEPEC 2024 | About | cv, link |
-| `newsAR`, MIT library on PyPI | Other work | cv, link |
 | Master's in risk modeling (in progress), BSc in Computational Mathematics | About | cv |
 | AWS Certified Cloud Practitioner, English C1, Spanish B1 | About | cv |
 | Remote from Crato, CE, Brazil | Hero, contact | cv |
@@ -49,6 +48,66 @@ Harness statement draft:
 > Built with coding agents under an engineering harness: specs before code, gated checks, evals, budget ledgers and saved evidence, following AI engineering best practices. Every number here links to the run that produced it.
 
 Contact shows email, LinkedIn and GitHub. **The phone number is not published.** The CV is rewritten in English from `Diego_Souza_AI_Engineer_EVT_PT.docx`, which stays out of Git.
+
+## Project copy
+
+Starting copy for every project. It is the source for the case header and the home card, and for the opening of the TL;DR. Case pages expand it, in the same voice, from each project's evidence. Claims here are true of the code at the time of writing; the executor checks each against the repository, and any figure added later must be an `Evidence` record. EN first, pt-BR parity required.
+
+### P05 + P06 — SupportOps, the flagship
+
+- **Outcome:** A support platform where AI can draft a refund, but only a second person can approve it.
+- **EN:** Tickets arrive, a team of agents triages them against tenant-scoped knowledge, and every answer cites its sources. Money is the line the model cannot cross: it proposes, a deterministic gate checks, and a human decides. The requester cannot approve their own refund. Open the console and try to.
+- **PT:** Tickets chegam, um time de agentes faz a triagem sobre conhecimento isolado por tenant, e cada resposta cita suas fontes. Dinheiro é a linha que o modelo não cruza: ele propõe, um gate determinístico confere e uma pessoa decide. Quem pediu o reembolso não pode aprová-lo. Abra o console e tente.
+- **Hook:** `Try to approve your own refund.`
+
+### P00 — Foundation and live evals
+
+- **Outcome:** The contracts every project shares, and the evaluation that told me my agent was not ready.
+- **EN:** Domain models, a seeded dataset, a testkit and one budget ledger across fake, replay and live. Then the honest part: a real-model campaign, reported with its pass rate, its confidence interval and the families that failed. The verdict was `FAIL_PROVISIONAL`, and I kept the held-out budget untouched instead of tuning until the number looked good.
+- **PT:** Modelos de domínio, dataset com semente, testkit e um só ledger de orçamento entre fake, replay e live. Depois vem a parte honesta: uma campanha com modelo real, publicada com taxa de acerto, intervalo de confiança e as famílias que falharam. O veredito foi `FAIL_PROVISIONAL`, e mantive o orçamento de holdout intacto em vez de ajustar até o número ficar bonito.
+- **Hook:** `The failure is the proof.`
+
+### P01 — Multi-agent orchestration
+
+- **Outcome:** Multi-agent triage with a bounded loop, compared across frameworks on the same contract.
+- **EN:** A supervisor delegates to specialist workers with shared state, hard step limits and explicit stop conditions. The same ticket runs through several framework adapters behind one `TriageRunner` contract, so the choice of framework is a measured decision, not a preference.
+- **PT:** Um supervisor delega para workers especialistas com estado compartilhado, limite rígido de passos e condições de parada explícitas. O mesmo ticket passa por vários adaptadores de framework atrás de um contrato `TriageRunner`, então a escolha de framework vira decisão medida, não preferência.
+- **Hook:** `Agents need a stop condition.`
+
+### P02 — Production AI toolkit
+
+- **Outcome:** The boring safety layer that keeps an agent from hurting production.
+- **EN:** Tool schemas, safe retries, step and time limits, code-first evals, an adversarial suite and cost helpers, in the Python standard library. It separates what is proven from what is not: fixtures test control logic, and they are never presented as model quality.
+- **PT:** Schemas de tools, retries seguros, limites de passos e tempo, evals code-first, suíte adversarial e helpers de custo, só com a biblioteca padrão do Python. Separa o que está provado do que não está: fixtures testam lógica de controle e nunca são apresentadas como qualidade de modelo.
+- **Hook:** `Retries are a safety decision.`
+
+### P03 — Agent observability
+
+- **Outcome:** See what an agent did without storing what users said.
+- **EN:** OpenTelemetry traces, correlated logs, Prometheus metrics and deterministic loop detection. Content capture is off by default, and tests prove that span status stays content-free. In the live demo, this is what you are looking at.
+- **PT:** Traces OpenTelemetry, logs correlacionados, métricas Prometheus e detecção determinística de loops. A captura de conteúdo vem desligada, e testes provam que o status dos spans não carrega conteúdo. No demo live, é isto que você está vendo.
+- **Hook:** `Observability without surveillance.`
+
+### P04 — Durable async workflows
+
+- **Outcome:** Agent work that survives a worker dying mid-task.
+- **EN:** An API and workers for long-running AI jobs, with leases, retries, a dead-letter path and crash recovery, tested against real Redis Streams and an SQS-compatible service. A stuck task is a state I designed for, not an incident.
+- **PT:** API e workers para tarefas longas de IA, com leases, retries, dead-letter e recuperação de crash, testados com Redis Streams real e um serviço compatível com SQS. Tarefa travada é um estado que eu projetei, não um incidente.
+- **Hook:** `Kill the worker. The task continues.`
+
+### P07 + P08 — This site and its design system
+
+- **Outcome:** A design system with contrast checked by tests, and a site that refuses unproven numbers.
+- **EN:** `colagem-ui` is my own React design system: tokens, components and a contrast table verified in code and in a real browser. This portfolio is built on it, and its build fails when a project number has no evidence behind it.
+- **PT:** `colagem-ui` é meu design system em React: tokens, componentes e uma tabela de contraste verificada em código e em navegador real. Este portfólio é construído sobre ele, e o build falha quando um número de projeto não tem evidência.
+- **Hook:** `This page has tests too.`
+
+### Lab harness
+
+- **Outcome:** The engineering system that built all of the above with coding agents.
+- **EN:** Specs before code, scoped write paths, gated checks, evals, budget ledgers, and saved evidence for every claim, following AI engineering best practices. Coding agents did the volume. The harness is why the result can be trusted, and every phase is in the repository to read.
+- **PT:** Spec antes de código, caminhos de escrita delimitados, gates, evals, ledgers de orçamento e evidência salva para cada afirmação, seguindo as melhores práticas de engenharia de AI. Agentes de código fizeram o volume. O harness é o motivo de o resultado ser confiável, e cada fase está no repositório para leitura.
+- **Hook:** `How I direct AI to build.`
 
 ## Information architecture
 
@@ -122,7 +181,7 @@ Live is not a flag. Today `run_configured_triage` refuses the live refund workfl
 
 When a limit is reached the demo says so plainly and offers recorded live runs, labelled with their date. **It never silently substitutes fake output.**
 
-Free organizations should cost nothing; the ledger is a safety net, not a bill. Before launch, confirm that no organization has a card attached, and that Groq's terms allow rotating between several organizations. Rate limits apply per organization.
+Free organizations should cost nothing; the ledger is a safety net, not a bill. The owner confirmed on 2026-10-31 that the Groq accounts and the rotation between them are fine. Rate limits apply per organization.
 
 ### Fly budget: USD 5
 
@@ -166,7 +225,7 @@ Public text reaches a real model. Controls:
 | Craft | P07 + P08 | `design-system` | Standard | new `diego-portfolio-ai`, new `colagem-ui` | This site, gallery |
 | Craft | Lab harness | `harness` | Standard | `ai-engineer-lab` | One phase, start to gate |
 
-Other work: `newsAR`, public repositories worth linking, chosen by the owner.
+No other repositories are featured. `newsAR` stays out, by the owner's decision.
 
 ## Case page template
 
