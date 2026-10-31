@@ -27,7 +27,7 @@ Status: W5, the cases of W7 and W9, and the offline part of the demo page are do
 | COST-001 | **NOT DONE**: the cost guard Worker is not written |
 | SEC-001 | PARTIAL. Strict CSP in the meta tag and `_headers`; the Turnstile origin is allowed on `/demo/` only, by construction and test. Not checked against the real widget |
 | SEC-002 | **NOT DONE** (needs the deployed stack) |
-| SEO-001 | PASS locally for title, description, canonical, hreflang and prerendered content. The Open Graph image `og.png` is **missing** |
+| SEO-001 | PASS locally for title, description, canonical, hreflang and prerendered content. The Open Graph image `public/og.png` is rendered by `npm run og` |
 | I18N-001 | PASS (test) |
 | A11Y-001 | PASS in Chrome with axe and contrast, 28 routes, 1000 and 360 px |
 | PERF-001 | PASS for initial JS (95.1 KB worst route). LCP with the scene: PENDING |
