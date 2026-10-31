@@ -9,7 +9,7 @@ export default defineConfig({
   webServer: {
     command: "npm run build && npm run preview",
     url: "http://localhost:44173",
-    reuseExistingServer: true,
+    reuseExistingServer: false,
     timeout: 120_000,
   },
   use: { baseURL: "http://localhost:44173", channel: "chrome", trace: "off" },

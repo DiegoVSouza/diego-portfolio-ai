@@ -20,7 +20,7 @@ Lab Portfolio: a static site that lets a reviewer understand the seven lab proje
 | A11Y-001 | axe reports zero violations on home and every project page, at 1280 px and 360 px. Keyboard-complete. `prefers-reduced-motion` respected. |
 | PERF-001 | Initial JS at most 100 KB gzip. |
 
-Theme: `DESIGN_SYSTEM_COLAGEM_URBANA_NOITE.md`, level 0, tema Breu, red preset.
+Theme: `DESIGN_SYSTEM_COLAGEM_URBANA_NOITE.md`, level 1, tema Breu, red preset, through the pinned `colagem-ui` package (lab phase `docs/harness/frontend-platform/`).
 
 ## Out of scope
 

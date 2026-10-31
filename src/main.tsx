@@ -1,7 +1,7 @@
-import "@fontsource/anton/400.css";
-import "@fontsource/courier-prime/400.css";
-import "@fontsource/courier-prime/700.css";
-import "./styles/tokens.css";
+import "colagem-ui/fonts.css";
+import "colagem-ui/plate-fonts.css";
+import "colagem-ui/tokens.css";
+import "colagem-ui/style.css";
 import "./styles/site.css";
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";

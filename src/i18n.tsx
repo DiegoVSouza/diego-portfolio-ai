@@ -4,6 +4,10 @@ import type { Lang, State } from "./data/projects";
 export const strings = {
   en: {
     skip: "Skip to content",
+    nav: "Main",
+    credits: "Fonts: Anton, Courier Prime, Playfair Display and Special Elite (SIL OFL). Design system: Colagem Urbana Noite.",
+    keys: "Keys",
+    tabHint: "Tab moves between cards; Enter opens a project.",
     brand: "AI Engineer Lab",
     thesis: "Seven independent AI projects, each shipped with its own evidence.",
     lead: "Every status below is copied from the project's own feature list. Nothing is rounded up: PENDING stays PENDING.",
@@ -37,6 +41,10 @@ export const strings = {
   },
   pt: {
     skip: "Pular para o conteúdo",
+    nav: "Principal",
+    credits: "Fontes: Anton, Courier Prime, Playfair Display e Special Elite (SIL OFL). Design system: Colagem Urbana Noite.",
+    keys: "Teclas",
+    tabHint: "Tab move entre os cartões; Enter abre um projeto.",
     brand: "AI Engineer Lab",
     thesis: "Sete projetos de IA independentes, cada um entregue com a sua evidência.",
     lead: "Cada status abaixo é copiado da lista de features do próprio projeto. Nada é arredondado para cima: PENDING continua PENDING.",

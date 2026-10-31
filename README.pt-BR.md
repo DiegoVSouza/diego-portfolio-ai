@@ -18,4 +18,4 @@ python scripts/check_full.py     # mais build, orçamento de bundle, Playwright 
 - `src/data/projects.ts` guarda só texto curado (EN e pt-BR) e limites declarados, cada um citando um arquivo do projeto.
 - Nenhum número é escrito à mão.
 
-Design: `DESIGN_SYSTEM_COLAGEM_URBANA_NOITE.md`, nível 0, tema Breu, preset vermelho. Orçamento: 100 KB gzip de JS inicial. Não publicado; hospedagem é decisão em aberto em `docs/harness/decisions.md`.
+Design: `DESIGN_SYSTEM_COLAGEM_URBANA_NOITE.md`, nível 1, tema Breu, preset vermelho, a partir do tarball `colagem-ui` em `vendor/` (fixado em `docs/harness/sources.lock.json`). Orçamento: 100 KB gzip de JS inicial. O destino é Cloudflare Pages (ADR-001); nada é publicado sem autorização do dono.

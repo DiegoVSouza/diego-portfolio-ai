@@ -1,8 +1,50 @@
 {
   "features": [
-    {"id": "portfolio-catalog", "description": "Generated catalog from sibling feature lists, with drift check", "requirement_ids": ["DATA-001", "DATA-002"], "status": "PASS_LOCAL", "evidence": ".planning/phases/001-portfolio/VERIFY.md; artifacts/evidence/portfolio-001/check-fast.txt"},
-    {"id": "portfolio-pages", "description": "Home, project pages, method section and language toggle", "requirement_ids": ["DATA-001"], "status": "PASS_LOCAL", "evidence": "artifacts/evidence/portfolio-001/check-full.txt"},
-    {"id": "portfolio-quality", "description": "axe, bundle budget and CSP gates", "requirement_ids": ["A11Y-001", "PERF-001", "SEC-001"], "status": "PASS_LOCAL; SCREEN_READER_AND_DEPLOY_PENDING", "evidence": "artifacts/evidence/portfolio-001/check-full.txt"},
-    {"id": "portfolio-deploy", "description": "Hosting and public URL", "requirement_ids": [], "status": "PENDING", "evidence": "Needs explicit authorization (lab rule 9)"}
+    {
+      "id": "portfolio-catalog",
+      "description": "Generated catalog from sibling feature lists, with drift check",
+      "requirement_ids": [
+        "DATA-001",
+        "DATA-002"
+      ],
+      "status": "PASS_LOCAL",
+      "evidence": ".planning/phases/001-portfolio/VERIFY.md; artifacts/evidence/portfolio-001/check-fast.txt"
+    },
+    {
+      "id": "portfolio-pages",
+      "description": "Home, project pages, method section and language toggle, on colagem-ui level 1",
+      "requirement_ids": [
+        "DATA-001"
+      ],
+      "status": "PASS_LOCAL",
+      "evidence": "artifacts/evidence/portfolio-001/check-full.txt"
+    },
+    {
+      "id": "portfolio-quality",
+      "description": "axe, bundle budget and CSP gates",
+      "requirement_ids": [
+        "A11Y-001",
+        "PERF-001",
+        "SEC-001"
+      ],
+      "status": "PASS_LOCAL; SCREEN_READER_AND_OWNER_SQUINT_REVIEW_PENDING",
+      "evidence": "artifacts/evidence/portfolio-001/check-full.txt"
+    },
+    {
+      "id": "portfolio-deploy",
+      "description": "Hosting and public URL",
+      "requirement_ids": [],
+      "status": "PENDING",
+      "evidence": "Needs explicit authorization (lab rule 9)"
+    },
+    {
+      "id": "portfolio-design-system",
+      "description": "colagem-ui adoption: no local color, pinned tarball",
+      "requirement_ids": [
+        "DS-001"
+      ],
+      "status": "PASS_LOCAL",
+      "evidence": "src/rules.test.ts; docs/harness/sources.lock.json"
+    }
   ]
 }

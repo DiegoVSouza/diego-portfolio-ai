@@ -18,4 +18,4 @@ python scripts/check_full.py     # plus build, bundle budget, Playwright + axe (
 - `src/data/projects.ts` holds only curated text (EN and pt-BR) and stated limits, each citing a project file.
 - No number is written by hand.
 
-Design: `DESIGN_SYSTEM_COLAGEM_URBANA_NOITE.md`, level 0, tema Breu, red preset. Budget: 100 KB gzip initial JS. Not deployed; hosting is an open decision in `docs/harness/decisions.md`.
+Design: `DESIGN_SYSTEM_COLAGEM_URBANA_NOITE.md`, level 1, tema Breu, red preset, from the vendored `colagem-ui` tarball (pinned in `docs/harness/sources.lock.json`). Budget: 100 KB gzip initial JS. Target host is Cloudflare Pages (ADR-001); nothing is deployed until the owner authorizes it.
