@@ -66,7 +66,22 @@ test("SCENE-001: without WebGL the level 1 background stays, with no error", asy
   await context.close();
 });
 
-test("the scene runs on the home only", async ({ page }) => {
+test("a case page holds the camera at its own project and does not scroll the scene", async ({ page }) => {
+  const problems = watch(page);
+  await page.goto("/projects/agents/");
+  const canvas = page.locator("canvas.scene");
+  await expect(canvas).toHaveAttribute("data-scene", "3d", { timeout: 20_000 });
+  await expect(canvas).toHaveAttribute("data-active", "2");
+  await page.waitForTimeout(300);
+  mkdirSync(evidence, { recursive: true });
+  await page.screenshot({ path: `${evidence}/case-agents-3d.png` });
+  await page.evaluate(() => window.scrollTo(0, document.documentElement.scrollHeight));
+  await expect(canvas).toHaveAttribute("data-active", "2");
+  await expect(page.getByRole("button", { name: /^Motion$/ })).toHaveCount(0);
+  expect(problems).toEqual([]);
+});
+
+test("the scene stays off pages that do not use it", async ({ page }) => {
   await page.goto("/evidence/");
   await expect(page.getByRole("heading", { level: 1 }).first()).toBeVisible();
   await expect(page.locator("canvas.scene")).toHaveCount(0);

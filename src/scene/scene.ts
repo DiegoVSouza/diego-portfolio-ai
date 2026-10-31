@@ -12,6 +12,8 @@ export interface SceneOptions {
   /** One entry per project, in scroll order. */
   slugs: string[];
   mode: SceneMode;
+  /** Case pages: hold the camera at this project's station. The page does not scroll the scene and nothing moves. */
+  focus?: number;
   onActive?: (index: number) => void;
   onQuality?: (scale: number) => void;
   /** Called when WebGL is lost or the loop throws. The host then falls back to level 1. */
@@ -89,6 +91,9 @@ export function start(canvas: HTMLCanvasElement, options: SceneOptions): SceneCo
   // The rail runs along -z with a slow diagonal drift in x and y.
   const railAt = (u: number) => new THREE.Vector3(u * 6, 3 + u * 2.5, 12 - u * length);
   const stationU = (i: number) => (i * STATION + 18) / length;
+  // The camera waits 16 units before a station, so its symbol object is ahead and to the right, not beside the lens.
+  const holdU = (i: number) => (i * STATION + 2) / length;
+  const flightU = (t: number) => (t * (count - 1) * STATION + 2) / length;
 
   // L2: skyline on both sides, with lit windows on the facade that faces the rail.
   const towers = 150;
@@ -250,7 +255,7 @@ export function start(canvas: HTMLCanvasElement, options: SceneOptions): SceneCo
   };
 
   // State.
-  let motion = options.mode === "3d";
+  let motion = options.mode === "3d" && options.focus === undefined;
   let quality: Quality = "auto";
   let level = 0;
   let target = 0;
@@ -288,10 +293,20 @@ export function start(canvas: HTMLCanvasElement, options: SceneOptions): SceneCo
     options.onQuality?.(scale);
   };
   const onScroll = () => {
+    if (options.focus !== undefined) {
+      if (active !== options.focus) {
+        active = Math.min(count - 1, Math.max(0, options.focus));
+        paintSymbols(active);
+        options.onActive?.(active);
+        current = holdU(active);
+        dirty = true;
+      }
+      return;
+    }
     target = Math.min(1, Math.max(0, window.scrollY / maxScroll));
     const index = Math.min(count - 1, Math.round(target * (count - 1)));
     if (!motion) {
-      current = stationU(index);
+      current = holdU(index);
       dirty = true;
     }
     if (index !== active) {
@@ -322,7 +337,7 @@ export function start(canvas: HTMLCanvasElement, options: SceneOptions): SceneCo
     last = now;
     if (motion) {
       // The scroll position maps to a point on the rail; the camera follows with a little smoothing.
-      const goal = target * (1 - 36 / length) + 0.02;
+      const goal = flightU(target);
       current += (goal - current) * 0.08;
       for (let i = 0; i < trailCount; i += 1) {
         const t = trailState[i]!;
@@ -438,7 +453,7 @@ export function start(canvas: HTMLCanvasElement, options: SceneOptions): SceneCo
 
   measure();
   onScroll();
-  current = motion ? target * (1 - 36 / length) + 0.02 : stationU(Math.max(0, active));
+  current = motion ? flightU(target) : holdU(Math.max(0, active));
   frame(performance.now());
 
   function dispose() {
@@ -470,10 +485,10 @@ export function start(canvas: HTMLCanvasElement, options: SceneOptions): SceneCo
       schedule();
     },
     setMotion(on) {
-      if (options.mode === "3d-static") return;
+      if (options.mode === "3d-static" || options.focus !== undefined) return;
       motion = on;
       if (!on) {
-        current = stationU(Math.max(0, active));
+        current = holdU(Math.max(0, active));
         for (const symbol of symbols) for (const p of symbol.pieces) {
           p.mesh.position.copy(p.home);
           p.mesh.rotation.copy(p.homeRot);

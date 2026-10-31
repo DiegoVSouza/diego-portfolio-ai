@@ -9,7 +9,7 @@
  *  4. at or above the ceiling sets `autostart_disabled` and stops every running machine with the write token.
  *
  * The number is an estimate from machine events at list prices, not the invoice. The Fly dashboard is the source
- * of truth. Prices below are conservative list prices and are PENDING a check against Fly's pricing page.
+ * of truth. Prices below are rounded up from the rates reported for October 2026 (256 MB about USD 2.19 a month, 512 MB 3.69, 1 GB 6.70). The sources were secondary (articles); the official pricing page was not confirmed, so the figures stay PENDING.
  */
 
 export interface KV {
@@ -45,9 +45,9 @@ const MACHINES_API = "https://api.machines.dev/v1";
 /** USD per machine-hour for shared-cpu-1x, by memory in MB. Rounded up on purpose: the guard should trip early, not late. */
 const PER_HOUR_USD: [number, number][] = [
   [256, 0.0030],
-  [512, 0.0046],
-  [1024, 0.0082],
-  [2048, 0.0150],
+  [512, 0.0052],
+  [1024, 0.0095],
+  [2048, 0.0180],
 ];
 
 export function pricePerHour(memoryMb: number, cpus = 1): number {

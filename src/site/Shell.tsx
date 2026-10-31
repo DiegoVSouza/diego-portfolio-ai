@@ -46,7 +46,7 @@ export function Shell({ children, hud, ghost }: { children: ReactNode; hud?: str
   return (
     <>
       <Layers ghost={ghost ?? "07"} />
-      {route.page === "home" && <SceneHost mode={mode} slugs={caseCards.map((c) => c.slug)} />}
+      {(route.page === "home" || route.page === "demo" || route.page === "case") && <SceneHost mode={mode} slugs={caseCards.map((c) => c.slug)} focusSlug={route.page === "case" ? route.slug : undefined} />}
       <SkipLink>{t.skip}</SkipLink>
       <Header />
       {route.page === "case" && (

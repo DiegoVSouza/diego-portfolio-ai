@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import type { BackgroundMode } from "colagem-ui";
 import { useLang } from "../site/Shell";
+import { onPulse } from "./pulse";
 import type { Quality, SceneController } from "./scene";
 
 /** Loads after first paint, on idle. If anything fails the level 1 background stays and the page never notices. */
@@ -18,7 +19,7 @@ const saveData = (): boolean => {
   return Boolean(connection?.saveData);
 };
 
-export function SceneHost({ mode, slugs, pulseKey }: { mode: BackgroundMode; slugs: string[]; pulseKey?: number }) {
+export function SceneHost({ mode, slugs, focusSlug, pulseKey }: { mode: BackgroundMode; slugs: string[]; focusSlug?: string; pulseKey?: number }) {
   const canvas = useRef<HTMLCanvasElement | null>(null);
   const controller = useRef<SceneController | null>(null);
   const { t } = useLang();
@@ -29,6 +30,7 @@ export function SceneHost({ mode, slugs, pulseKey }: { mode: BackgroundMode; slu
   const [quality, setQuality] = useState<Quality>("auto");
   const [motion, setMotion] = useState(true);
   const slugKey = slugs.join(",");
+  const focus = focusSlug === undefined ? undefined : slugs.indexOf(focusSlug);
 
   useEffect(() => {
     if (!mounted || mode === "2d" || saveData() || !canvas.current) return undefined;
@@ -42,6 +44,7 @@ export function SceneHost({ mode, slugs, pulseKey }: { mode: BackgroundMode; slu
             controller.current = start(element, {
               slugs: slugKey.split(","),
               mode,
+              focus: focus === undefined || focus < 0 ? undefined : focus,
               onActive: (index) => {
                 element.dataset.active = String(index);
               },
@@ -71,11 +74,12 @@ export function SceneHost({ mode, slugs, pulseKey }: { mode: BackgroundMode; slu
       controller.current = null;
       setRunning(false);
     };
-  }, [mounted, mode, slugKey]);
+  }, [mounted, mode, slugKey, focus]);
 
   useEffect(() => {
     if (pulseKey) controller.current?.pulse();
   }, [pulseKey]);
+  useEffect(() => onPulse(() => controller.current?.pulse()), []);
 
   const cycle = () => {
     const next: Quality = quality === "auto" ? "high" : quality === "high" ? "low" : "auto";
@@ -96,7 +100,7 @@ export function SceneHost({ mode, slugs, pulseKey }: { mode: BackgroundMode; slu
           <button type="button" className="tg" onClick={cycle}>
             {t.sceneQuality}: {quality === "auto" ? t.sceneQualityAuto : quality === "high" ? t.sceneQualityHigh : t.sceneQualityLow}
           </button>
-          {mode === "3d" && (
+          {mode === "3d" && focus === undefined && (
             <button type="button" className="tg" aria-pressed={motion} onClick={toggleMotion}>
               {t.sceneMotion}
             </button>

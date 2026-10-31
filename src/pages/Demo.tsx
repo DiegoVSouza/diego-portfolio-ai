@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
+import { emitPulse } from "../scene/pulse";
 import { Button, Command, FlowDiagram, Headline, Lead, Progress, RunLog, Stepper, StatusSeal, WakeNotice, useElapsed, type RunStep } from "colagem-ui";
 import { flowLabels, getFlow, getLayout, pinnedLink } from "../content/flows";
 import { useLang } from "../site/Shell";
@@ -79,6 +80,28 @@ export function DemoPage() {
     void getJson<RunsReply>("/api/runs/latest", controller.signal).then((r) => setRuns(r?.runs ?? []));
     return () => controller.abort();
   }, [refresh]);
+
+  // While the stack is awake the visitor may be running tickets in the console. Poll the run list, and send one
+  // scene event per step of a run that appears after the page opened. Runs already listed on arrival make none.
+  const seen = useRef<Set<string> | null>(null);
+  useEffect(() => {
+    const known = (list: RunsReply["runs"]) => new Set(list.map((r) => r.id));
+    if (seen.current === null && loaded) seen.current = known(runs);
+    if (status?.state !== "awake") return undefined;
+    const timer = window.setInterval(async () => {
+      if (document.hidden) return;
+      const reply = await getJson<RunsReply>("/api/runs/latest");
+      const list = reply?.runs ?? [];
+      const baseline = seen.current ?? new Set<string>();
+      for (const run of list.filter((r) => !baseline.has(r.id))) {
+        run.steps.forEach((_, i) => window.setTimeout(emitPulse, i * 450));
+        baseline.add(run.id);
+      }
+      seen.current = baseline;
+      setRuns(list);
+    }, 8000);
+    return () => window.clearInterval(timer);
+  }, [status?.state, loaded, runs]);
 
   // While waking, poll the status. Only the click on the start button can start the stack.
   useEffect(() => {
