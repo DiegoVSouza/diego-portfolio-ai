@@ -1,0 +1,47 @@
+[
+  {
+    "name": "mermaid",
+    "csp_violations": 98,
+    "first": "Applying inline style violates the following Content Security Policy d",
+    "nodes": 12,
+    "width": 1000,
+    "height": 85,
+    "kb_transferred": 199
+  },
+  {
+    "name": "xyflow",
+    "csp_violations": 0,
+    "first": "",
+    "nodes": 0,
+    "width": 0,
+    "height": 0,
+    "kb_transferred": 415
+  },
+  {
+    "name": "d2",
+    "csp_violations": 19,
+    "first": "Applying inline style violates the following Content Security Policy d",
+    "nodes": 6,
+    "width": 1000,
+    "height": 3029,
+    "kb_transferred": 0
+  },
+  {
+    "name": "d2img",
+    "csp_violations": 0,
+    "first": "",
+    "nodes": 0,
+    "width": 1000,
+    "height": 3029,
+    "kb_transferred": 14
+  },
+  {
+    "name": "elk",
+    "csp_violations": 0,
+    "first": "",
+    "nodes": 6,
+    "width": 1000,
+    "height": 70,
+    "kb_transferred": 0
+  }
+]

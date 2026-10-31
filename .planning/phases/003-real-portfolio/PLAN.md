@@ -7,14 +7,14 @@ Revision 2. Execution is handed to another model: lab `docs/harness/portfolio/NE
 | W0 | lab, P07 | Research, ADRs, spec | Owner reviewed | done |
 | W1 | all repositories | Public-readiness audit | `docs/harness/public-readiness.md` | done |
 | W1b | lab | Verify in Fly and Groq: Machines API cost data, prepaid behavior, real rate limits | Findings recorded | no |
-| W2 | P00–P08 | Fix findings: clean-clone failures, READMEs as case studies, CI on fresh runners, personal paths at HEAD | Clean clone passes | no |
+| W2 | P00–P08 | Fix findings: clean-clone failures, READMEs as case studies with a Mermaid diagram, CI on fresh runners, personal paths at HEAD | Clean clone passes | no |
 | W3 | GitHub | Push, create repositories, change visibility, one at a time | Hosted CI green | **go, per repository** |
 | W4 | P05 | `demo-live-v1`, live refund flow, key failover, per-step usage, boundary tests | Fake gate plus a live smoke inside budget | smoke: **go** |
 | W5 | P07 | Prerender, routes, `/pt/`, content model, evidence generator, Functions with mocks | `check_full.py` | no |
-| W6 | P08 | `colagem-ui` 0.4.0 | `check_full.py`, tarball pinned | no |
-| W7 | P07 | Home, flagship, demo page, run viewer, profile and experience in EN | Owner reads; squint review | no |
+| W6 | P08 | `colagem-ui` 0.4.0, including `FlowDiagram` and `layoutFlow` | `check_full.py`, tarball pinned | no |
+| W7 | P07 | Home with the system flow, flagship flow with scenarios, demo page, run viewer with live binding, profile and experience in EN | Owner reads; squint review | no |
 | W8 | lab, P05, P06, Cloudflare | Hardening, volume reduction, CORS release, Keycloak origins, cost guard, Pages console, Turnstile, Fly live deploy | Public e2e with a real model, rollback rehearsal | **go, per group** |
-| W9 | P07 | Other cases, evidence board, method, `llms.txt` | `check_full.py`, parity | no |
+| W9 | P07 | Other cases with their flows, evidence board, method, `llms.txt`; export Mermaid to every README | `check_full.py`, parity | no |
 | W10 | Cloudflare | Publish `diego-portfolio-ai` | Public axe, link check | **go** |
 | W11 | outside | Stranger verification, rubric, one month of real bills | Success criteria | no |
 

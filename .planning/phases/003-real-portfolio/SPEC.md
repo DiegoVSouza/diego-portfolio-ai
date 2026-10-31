@@ -227,6 +227,71 @@ Public text reaches a real model. Controls:
 
 No other repositories are featured. `newsAR` stays out, by the owner's decision.
 
+## Flow diagrams
+
+Every project shows how it works with a diagram a visitor can operate. Evaluation and measurements: lab `docs/knowledge/diagramas-no-portfolio.md`, evidence in `artifacts/evidence/diagram-eval/`.
+
+**Decision.** A `FlowDiagram` component in `colagem-ui`: layout by ELK at build time, SVG drawn by React with design tokens. No layout engine reaches the browser. Mermaid is kept for GitHub READMEs, exported from the same data.
+
+Measured under the site's CSP: Mermaid 98 violations and about 1.5 MB in all chunks; D2 inline 19 violations; React Flow passes at 59.9 KB but adds pan and zoom nobody needs; ELK at build time plus React SVG has 0 violations and 0 KB of layout code at runtime.
+
+`elkjs` is EPL-2.0 OR GPL-3.0: use it only as a build-time dev dependency, and never ship it in the bundle. Record this in the repository's license notes.
+
+### Data
+
+One typed source per project, `src/content/flows/<slug>.ts`, shared by site, text alternative and README export.
+
+```ts
+interface Flow {
+  id: string; kind: "pipeline" | "lanes" | "states" | "waterfall"; title: Text;
+  nodes: { id: string; label: Text; detail: Text; project: string; lane?: string; code?: string; docs?: string }[];
+  edges: { from: string; to: string; label?: Text }[];
+  scenes: { id: string; nodes: string[]; edges: string[]; caption: Text }[];   // guided walkthrough
+  scenarios?: { id: string; label: Text; scenes: string[]; evidence: string }[]; // failure paths
+  runStep?: Record<string, string>;                                             // live step name to node id
+}
+```
+
+### Build
+
+`flow:gen` runs ELK twice per flow, horizontal for wide screens and vertical for narrow ones, and writes positioned JSON. CSS picks the layout, so nothing is measured in the browser. Layout follows the design system: `layered`, orthogonal edges, one direction per diagram.
+
+### Interaction
+
+| Feature | Behavior |
+| --- | --- |
+| Walkthrough | `Play`, previous, next. One scene at a time: the focus node goes to paper, its edge to `--red`, the rest dims, a caption explains the step |
+| Node detail | Click, tap or Enter opens what it does, the owning project, and `Code` and `Docs` links at the pinned commit |
+| Failure scenarios | Named buttons replay a real failure path. Each cites its evidence, so a scenario with no test behind it does not ship |
+| Live binding | On `/demo/`, steps of the real run light up their nodes, with latency and tokens. No fake animation: if the run stops, the diagram stops |
+| No JavaScript | The final diagram and its text version are in the HTML |
+
+### Look
+
+Colagem Urbana Noite, not a chart library theme. Nodes use `--cut-card` with a hard offset shadow; one focus per scene; `--red` edges; status as glyph plus word; Anton labels; lanes as opaque strips; project color does not exist, because there is one accent. Text stays on opaque surfaces. Rough.js may generate slightly cut outlines at build time, as seeded, deterministic paths, if it passes the squint test; it is not shipped to the browser.
+
+Movement uses the Web Animations API on `transform` and `opacity` only: a token travels along points sampled from the edge at build time. Under `prefers-reduced-motion`, scenes change with no travel.
+
+### Accessibility
+
+- Generated nested-list version of every flow, in the HTML, so a reader follows it in order. Screen readers hear SVG diagrams as run-on text, so this is the primary alternative.
+- SVG has `title` and `desc`. Nodes are focusable in flow order with visible focus; arrow keys move along edges, `Esc` leaves.
+- Scene captions use a polite live region.
+
+### Diagram per project
+
+| Project | Kind | Shows | Scenario |
+| --- | --- | --- | --- |
+| Whole system (home) | pipeline | One ticket crossing all projects, each node linking to its case | |
+| P05 + P06 | lanes | Visitor, console, API, queue, agents, approver | `Approve your own refund`: refused. `Cross tenants`: refused |
+| P00 | pipeline | Dataset, runner, ledger, campaign, verdict, with fake, replay and live as parallel lanes | `Budget exhausted`: the call is refused before the provider |
+| P01 | pipeline | Supervisor, workers, shared state, stop conditions | `Loop detected`: stop condition fires |
+| P02 | pipeline | Tool call through schema, retry, limits and guard | `Prompt injection in a document`: screen blocks. `Timeout`: bounded retry |
+| P03 | waterfall | A real content-free trace, spans mapped to projects | `Loop in the trace`: detector fires |
+| P04 | states | Task lifecycle: queued, leased, running, retry, dead letter, done | `Kill the worker`: lease expires and the task recovers |
+| P07 + P08 | pipeline | From a project's evidence file to a number on this page | `Number without evidence`: the build fails |
+| Lab harness | pipeline | Intake, spec, plan, execute, verify, gate, knowledge | `Red gate`: phase cannot close |
+
 ## Case page template
 
 Order is fixed. A section with no honest content says why.
@@ -234,7 +299,7 @@ Order is fixed. A section with no honest content says why.
 1. **Header.** Number, name, one-line outcome, evidence seal, and `Live demo · Code · Docs` above the fold.
 2. **TL;DR.** Problem, my role, stack, result.
 3. **See it run.**
-4. **How it works.** One diagram, a short walkthrough.
+4. **How it works.** Its `FlowDiagram`, with walkthrough, failure scenarios and text version.
 5. **Decisions.** Three to seven, each with code permalink and a final `Rejected:` line.
 6. **Results.** `Measured`, then `Not measured, so not claimed`.
 7. **Failure gallery.** Three to five real failures: what, cause, change or why open.
@@ -279,7 +344,7 @@ Level 1, tema Breu, preset vermelho, `colagem-ui` only.
 | Cartão em foco | One per screen: flagship on the home, TL;DR on a case, current step on the demo |
 | Objeto-símbolo | Flat SVG per project; 3D in the later phase |
 
-New generic components for `colagem-ui` 0.4.0: `LinkTrio`, `MetricTable`, `RunLog`, `Stepper`, `Timeline`, `DecisionCard`, `FailureCard`, `SideIndex`, `Hud`, `Wipe`, `Tabs`. System map and run viewer stay in P07.
+New generic components for `colagem-ui` 0.4.0: `FlowDiagram`, `layoutFlow` (build-time entry), `LinkTrio`, `MetricTable`, `RunLog`, `Stepper`, `Timeline`, `DecisionCard`, `FailureCard`, `SideIndex`, `Hud`, `Wipe`, `Tabs`. The run viewer stays in P07 and uses `FlowDiagram`.
 
 ## Requirements
 
@@ -304,6 +369,12 @@ New generic components for `colagem-ui` 0.4.0: `LinkTrio`, `MetricTable`, `RunLo
 | PERF-001 | Initial JS at most 100 KB gzip per route. LCP target 2.5 s on 4G, measured. |
 | DS-001 | No local color, radius or blurred shadow. Design system section 16 checklist recorded. |
 | CUR-001 | Each case shows a generated last-verified date and commit. |
+| FLOW-001 | Every project has a `Flow`. Site, list version and README Mermaid come from it; `flow:check` fails on drift. |
+| FLOW-002 | A node's `code` and `docs` paths exist at the pinned commit, and a scenario's `evidence` resolves. Otherwise the build fails. |
+| FLOW-003 | No layout engine, `elkjs` included, in any browser bundle. Zero CSP violations in real Chrome. A test checks both. |
+| FLOW-004 | Diagrams pass axe, work by keyboard and touch at 360 px with no horizontal scroll, and have no pan or zoom. |
+| FLOW-005 | With JavaScript off, the diagram and its list render. Under reduced motion, nothing travels. |
+| FLOW-006 | Live binding is driven only by real run data. A test proves that a stalled run stalls the diagram. |
 
 ## Success criteria
 

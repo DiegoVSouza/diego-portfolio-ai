@@ -1,0 +1,65 @@
+[
+  {
+    "name": "mermaid",
+    "initial_kb": 12.2,
+    "all_js_kb": 1499.9,
+    "wasm_kb": 0,
+    "chunks": 106
+  },
+  {
+    "name": "xyflow",
+    "initial_kb": 59.9,
+    "all_js_kb": 59.9,
+    "wasm_kb": 0,
+    "chunks": 1
+  },
+  {
+    "name": "elkjs",
+    "initial_kb": 442.3,
+    "all_js_kb": 442.3,
+    "wasm_kb": 0,
+    "chunks": 1
+  },
+  {
+    "name": "dagre",
+    "initial_kb": 17,
+    "all_js_kb": 17,
+    "wasm_kb": 0,
+    "chunks": 1
+  },
+  {
+    "name": "roughjs",
+    "initial_kb": 9.1,
+    "all_js_kb": 9.1,
+    "wasm_kb": 0,
+    "chunks": 1
+  },
+  {
+    "name": "motion",
+    "initial_kb": 47.6,
+    "all_js_kb": 47.6,
+    "wasm_kb": 0,
+    "chunks": 1
+  },
+  {
+    "name": "cytoscape",
+    "initial_kb": 140.5,
+    "all_js_kb": 140.5,
+    "wasm_kb": 0,
+    "chunks": 1
+  },
+  {
+    "name": "viz",
+    "initial_kb": 479.6,
+    "all_js_kb": 479.6,
+    "wasm_kb": 0,
+    "chunks": 1
+  },
+  {
+    "name": "d2",
+    "initial_kb": 5849.6,
+    "all_js_kb": 5849.6,
+    "wasm_kb": 0,
+    "chunks": 1
+  }
+]

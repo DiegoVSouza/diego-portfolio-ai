@@ -1,0 +1,6 @@
+{
+  "nodes": 6,
+  "edges": 5,
+  "csp_violations": 0,
+  "note": "The xyflow row in csp.json is a test defect: a JSX runtime error left the page blank. This retest supersedes it."
+}
