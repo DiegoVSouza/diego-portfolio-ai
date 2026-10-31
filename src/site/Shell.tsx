@@ -1,3 +1,4 @@
+import { SceneHost } from "../scene/SceneHost";
 import { useEffect, type ReactNode } from "react";
 import { AppFooter, AppHeader, Hud, Layers, SideIndex, SkipLink, useBackgroundMode, type Lang } from "colagem-ui";
 import { caseCards } from "../content/caseIndex";
@@ -38,13 +39,14 @@ function Header() {
 export function Shell({ children, hud, ghost }: { children: ReactNode; hud?: string; ghost?: string }) {
   const { route } = useRoute();
   const { lang, t } = useLang();
-  useBackgroundMode();
+  const mode = useBackgroundMode();
   useEffect(() => {
     if (typeof window !== "undefined") window.scrollTo(0, 0);
   }, [route.page, route.slug]);
   return (
     <>
       <Layers ghost={ghost ?? "07"} />
+      {route.page === "home" && <SceneHost mode={mode} slugs={caseCards.map((c) => c.slug)} />}
       <SkipLink>{t.skip}</SkipLink>
       <Header />
       {route.page === "case" && (

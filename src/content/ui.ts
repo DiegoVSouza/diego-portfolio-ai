@@ -89,6 +89,12 @@ export interface Strings {
   demoStartWhy: string;
   demoNoWake: string;
   demoAccounts: string;
+  sceneLabel: string;
+  sceneQuality: string;
+  sceneQualityAuto: string;
+  sceneQualityHigh: string;
+  sceneQualityLow: string;
+  sceneMotion: string;
   demoAccountsBody: string;
   demoTour: string;
   demoSteps: [string, string][];
@@ -215,6 +221,12 @@ const en: Strings = {
   demoStartWhy: "Starting wakes the services in order and takes a short while.",
   demoNoWake: "Waking is available once the demo is deployed.",
   demoAccounts: "Demo accounts",
+  sceneLabel: "Background scene",
+  sceneQuality: "Quality",
+  sceneQualityAuto: "auto",
+  sceneQualityHigh: "high",
+  sceneQualityLow: "low",
+  sceneMotion: "Motion",
   demoAccountsBody: "Accounts are shown here once the demo is deployed. Entries you create are public and temporary.",
   demoTour: "Guided tour",
   demoSteps: [
@@ -348,6 +360,12 @@ const pt: Strings = {
   demoStartWhy: "Iniciar acorda os serviços em ordem e leva um tempo curto.",
   demoNoWake: "Acordar fica disponível quando o demo estiver publicado.",
   demoAccounts: "Contas de demo",
+  sceneLabel: "Cena de fundo",
+  sceneQuality: "Qualidade",
+  sceneQualityAuto: "auto",
+  sceneQualityHigh: "alta",
+  sceneQualityLow: "baixa",
+  sceneMotion: "Movimento",
   demoAccountsBody: "As contas aparecem aqui quando o demo estiver publicado. O que você criar é público e temporário.",
   demoTour: "Tour guiado",
   demoSteps: [
