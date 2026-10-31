@@ -14,3 +14,10 @@
 - Language: UI in English with a pt-BR toggle; `README.md` English, `README.pt-BR.md` Portuguese.
 - No deploy, publish or push without explicit authorization (lab rule 9).
 - Kit: no `web-saas` profile here. P06 and P07 are now two real web projects, so a proposal can be opened as its own kit phase, not in this one.
+
+## Phase 003 (2026-10-31)
+
+- The portfolio becomes a product: see lab `docs/decisions/ADR-002-portfolio-as-product.md` and `.planning/phases/003-real-portfolio/SPEC.md`. These supersede the "seven project cards" scope of phase 001.
+- Pages project: `diego-portifolio-ai`, the owner's choice. Spelling is an open item, because `*.pages.dev` names cannot be renamed.
+- Hash routes will be replaced by prerendered paths, so "Pages needs no rewrite" stops being the reason for routing.
+- Backend stays Python. No Go.

@@ -45,6 +45,48 @@
       ],
       "status": "PASS_LOCAL",
       "evidence": "src/rules.test.ts; docs/harness/sources.lock.json"
+    },
+    {
+      "id": "portfolio-public-readiness",
+      "description": "Secrets, license, clean clone and hosted CI across repositories",
+      "requirement_ids": [
+        "LINK-001"
+      ],
+      "status": "PENDING",
+      "evidence": ".planning/phases/003-real-portfolio/SPEC.md"
+    },
+    {
+      "id": "portfolio-evidence-model",
+      "description": "Every number as a verified evidence record with mode and permalink",
+      "requirement_ids": [
+        "EV-001",
+        "EV-002",
+        "EV-003",
+        "EV-004"
+      ],
+      "status": "PENDING",
+      "evidence": ".planning/phases/003-real-portfolio/SPEC.md"
+    },
+    {
+      "id": "portfolio-case-pages",
+      "description": "Prerendered home, cases, evidence board and method, EN and pt-BR",
+      "requirement_ids": [
+        "SEO-001",
+        "I18N-001",
+        "CUR-001"
+      ],
+      "status": "PENDING",
+      "evidence": ".planning/phases/003-real-portfolio/SPEC.md"
+    },
+    {
+      "id": "portfolio-demo-tiers",
+      "description": "Tier 0 replay and Tier 1 real stack with wake state",
+      "requirement_ids": [
+        "DEMO-001",
+        "DEMO-002"
+      ],
+      "status": "PENDING",
+      "evidence": ".planning/phases/003-real-portfolio/SPEC.md"
     }
   ]
 }
