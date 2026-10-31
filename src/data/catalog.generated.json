@@ -532,6 +532,13 @@
         "status": "PASS_LOCAL_AND_FLY_DEMO",
         "evidence": ".planning/phases/002-blockers/VERIFY.md",
         "state": "verified"
+      },
+      {
+        "id": "console-design-system",
+        "description": "UI on colagem-ui level 0, cross-origin API base, wake notice, Pages output",
+        "status": "PASS_LOCAL_OFFLINE_BROWSER; REAL_STACK_E2E_PENDING; PAGES_DEPLOY_PENDING",
+        "evidence": ".planning/phases/003-colagem-ui/VERIFY.md",
+        "state": "partial"
       }
     ]
   }
