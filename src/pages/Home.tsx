@@ -121,7 +121,9 @@ export function Home() {
       <section aria-labelledby="contact-h">
         <h2 id="contact-h" className="section-h">{t.contactTitle}</h2>
         <p className="surface-text">{t.contactLead}</p>
+        <p className="cta"><a className="btn" href={profile.whatsapp} rel="noopener noreferrer">{t.contactWhatsapp}</a></p>
         <ul className="contact">
+          <li>{t.contactPhone}: <a href={`tel:${profile.phone.split(" ").join("")}`}>{profile.phone}</a></li>
           <li><a href={`mailto:${profile.email}`}>{profile.email}</a></li>
           <li><a href={profile.linkedin} rel="noopener noreferrer">LinkedIn</a></li>
           <li><a href={profile.github} rel="noopener noreferrer">GitHub</a></li>

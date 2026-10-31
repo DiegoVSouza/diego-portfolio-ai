@@ -11,7 +11,7 @@
 - **Docs.** [Arquitetura](docs/architecture.md), [fase 003](.planning/phases/003-real-portfolio/SPEC.md).
 <!-- case:end -->
 
-Site React estático de Diego Vieira Gonçalves de Souza, AI Engineer. O texto do CV em inglês em `src/content/profile.ts` é rascunho até o dono revisar; o arquivo do CV e o telefone nunca entram no Git.
+Site React estático de Diego Vieira Gonçalves de Souza, AI Engineer. O texto do CV em inglês em `src/content/profile.ts` é rascunho até o dono revisar; o arquivo do CV nunca entra no Git. O telefone de contato e o link de WhatsApp são publicados de propósito, por instrução explícita do dono em 2026-10-31.
 
 ## Desenvolvimento
 

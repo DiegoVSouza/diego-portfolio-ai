@@ -3,13 +3,16 @@ import type { Text } from "colagem-ui";
 /**
  * Career facts from the owner's CV, rewritten in English as a DRAFT until the owner reviews it.
  * Everything here is career history, the owner's own statement. None of it is a measured result,
- * and no number elsewhere on the site may come from this file. The phone number is never published.
+ * and no number elsewhere on the site may come from this file. The contact phone and WhatsApp link are published on purpose.
  */
 export const profile = {
   name: "Diego Vieira Gonçalves de Souza",
   title: "AI Engineer",
   location: "Crato, CE, Brazil · Remote",
   email: "dvsdiegovieira@gmail.com",
+  // Published on the owner's explicit instruction (2026-10-31), reversing the earlier rule that the phone is never published.
+  phone: "+55 88 99797-4229",
+  whatsapp: "https://wa.me/5588997974229",
   linkedin: "https://www.linkedin.com/in/diegovsouza99",
   github: "https://github.com/DiegoVSouza",
   summary: {

@@ -30,7 +30,7 @@ flowchart LR
 ```
 <!-- flow:end -->
 
-Static React site for [Diego Vieira Gonçalves de Souza](https://www.linkedin.com/in/diegovsouza99), AI Engineer. The English CV text in `src/content/profile.ts` is a draft until the owner reviews it; the CV file itself and the phone number are never in Git.
+Static React site for [Diego Vieira Gonçalves de Souza](https://www.linkedin.com/in/diegovsouza99), AI Engineer. The English CV text in `src/content/profile.ts` is a draft until the owner reviews it; the CV file itself is never in Git. The contact phone and WhatsApp link are published on purpose, on the owner's explicit instruction of 2026-10-31.
 
 ## Develop
 

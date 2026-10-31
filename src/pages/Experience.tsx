@@ -40,6 +40,7 @@ export function ExperiencePage() {
       <ul className="plain">{profile.languages.map((l) => <li key={l.id}>{l.name[lang]}: {l.level[lang]}</li>)}</ul>
       <h2 className="section-h">{t.skills}</h2>
       <dl className="rules">{profile.skills.map((s) => <div key={s.group.en}><dt>{s.group[lang]}</dt><dd>{s.items}</dd></div>)}</dl>
+      <p className="cta"><a className="btn" href={profile.whatsapp} rel="noopener noreferrer">{t.contactWhatsapp}</a></p>
       <p><a href="/resume.md">{t.resume}</a></p>
     </>
   );

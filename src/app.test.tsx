@@ -21,8 +21,13 @@ describe("prerendered HTML (SEO-001, SEC-001)", () => {
     }
   });
 
-  it("the phone number never appears in rendered pages", async () => {
-    for (const path of ["/", "/experience/", "/pt/experience/"]) expect(/\+?\d{2}\s*\(?\d{2}\)?\s*9?\d{4}-?\d{4}/.test(await renderToHtml(path))).toBe(false);
+  it("the contact section has a WhatsApp button and a phone link, in both languages", async () => {
+    for (const [path, label] of [["/", "Message me on WhatsApp"], ["/pt/", "Fale comigo no WhatsApp"]] as [string, string][]) {
+      const html = await renderToHtml(path);
+      expect(html, path).toContain("https://wa.me/");
+      expect(html, path).toContain(label);
+      expect(html, path).toContain("href=\"tel:+");
+    }
   });
 
   it("a case page has the fixed sections in order, with a Rejected line per decision", async () => {

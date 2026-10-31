@@ -30,6 +30,8 @@ export interface Strings {
   experienceTitle: string;
   contactTitle: string;
   contactLead: string;
+  contactWhatsapp: string;
+  contactPhone: string;
   seeCase: string;
   seeAll: string;
   caseLinksLabel: string;
@@ -146,7 +148,9 @@ const en: Strings = {
   methodBody: "Open the method",
   experienceTitle: "Experience",
   contactTitle: "Contact",
-  contactLead: "Remote, from Crato, CE, Brazil. Email, LinkedIn and GitHub are the ways to reach me.",
+  contactLead: "Remote, from Crato, CE, Brazil. WhatsApp is the fastest way to reach me; email, LinkedIn and GitHub also work.",
+  contactWhatsapp: "Message me on WhatsApp",
+  contactPhone: "Phone",
   seeCase: "Open case",
   seeAll: "All projects",
   caseLinksLabel: "Links for this case",
@@ -277,7 +281,9 @@ const pt: Strings = {
   methodBody: "Abrir o método",
   experienceTitle: "Experiência",
   contactTitle: "Contato",
-  contactLead: "Remoto, de Crato, CE, Brasil. Email, LinkedIn e GitHub são os caminhos para falar comigo.",
+  contactLead: "Remoto, de Crato, CE, Brasil. O WhatsApp é o jeito mais rápido de falar comigo; email, LinkedIn e GitHub também funcionam.",
+  contactWhatsapp: "Fale comigo no WhatsApp",
+  contactPhone: "Telefone",
   seeCase: "Abrir case",
   seeAll: "Todos os projetos",
   caseLinksLabel: "Links deste case",

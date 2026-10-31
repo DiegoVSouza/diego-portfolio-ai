@@ -21,3 +21,7 @@
 - Pages project: `diego-portfolio-ai`, the owner's choice. Spelling is an open item, because `*.pages.dev` names cannot be renamed.
 - Hash routes will be replaced by prerendered paths, so "Pages needs no rewrite" stops being the reason for routing.
 - Backend stays Python. No Go.
+
+## 2026-10-31: the contact phone is published
+
+The owner reversed the earlier rule and asked for the phone number and a WhatsApp button on the portfolio. The number is in `src/content/profile.ts` only (a test keeps it out of every other source). The CV `.docx` stays out of Git. An earlier commit contained partial digits inside a test regex; since the number is now public on purpose, history is not rewritten.
