@@ -10,6 +10,7 @@ const evidence = "artifacts/evidence/portfolio-w7";
 
 // The Functions are tested on their own with mocks. Here the page gets the same shapes from a stub, so a missing backend is not a console error.
 test.beforeEach(async ({ page }) => {
+  if (process.env.PUBLIC_URL) return; // against the deployed site the real Functions answer
   await page.route("**/api/**", (route) =>
     route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify(route.request().url().includes("/runs/") ? { runs: [] } : { state: "asleep", startAvailable: false }) }),
   );
@@ -95,7 +96,8 @@ test("the demo page requests nothing from a third party until a site key exists,
   await page.goto("/demo/");
   await expect(page.getByRole("heading", { level: 1, name: "Live demo" })).toBeVisible();
   await page.waitForTimeout(500);
-  expect(requests.filter((r) => !r.includes("localhost:44173"))).toEqual([]);
+  const own = new URL(page.url()).origin;
+  expect(requests.filter((r) => !r.split(" ")[1]!.startsWith(own))).toEqual([]);
   expect(requests.filter((r) => r.startsWith("POST"))).toEqual([]);
 });
 

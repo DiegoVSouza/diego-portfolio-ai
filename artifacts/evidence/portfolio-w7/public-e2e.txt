@@ -1,0 +1,14 @@
+
+Running 8 tests using 1 worker
+
+  ✓  1 e2e\site.spec.ts:20:3 › every route passes axe with contrast, does not overflow, and logs no errors at 1000px (23.0s)
+  ✓  2 e2e\site.spec.ts:20:3 › every route passes axe with contrast, does not overflow, and logs no errors at 360px (21.9s)
+  ✓  3 e2e\site.spec.ts:45:1 › with JavaScript off, every route still shows its heading, and a case shows its diagram and its list (SEO-001, FLOW-005) (3.1s)
+  ✓  4 e2e\site.spec.ts:58:1 › English and Portuguese link to each other and set the document language (512ms)
+  ✓  5 e2e\site.spec.ts:67:1 › keyboard: skip link, then a project, then back (610ms)
+  ✓  6 e2e\site.spec.ts:80:1 › the diagram walks through scenes and a failure scenario by keyboard, at both widths (707ms)
+  ✓  7 e2e\site.spec.ts:93:1 › the demo page requests nothing from a third party until a site key exists, and wakes nothing (LIVE-004, SEC-001) (820ms)
+  ✓  8 e2e\site.spec.ts:104:1 › the home page has the role in the first screen, and a squint screenshot is saved for review (691ms)
+
+  8 passed (52.7s)
+exit=0

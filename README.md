@@ -7,7 +7,8 @@
 - **Decision.** A prerendered React site where every number is an evidence record copied from a project repository at an exact commit. A test fails on a digit in case text that has no record. Diagrams are laid out by ELK at build time and drawn as SVG by React; no layout engine reaches the browser.
 - **Measured.** Real Chrome with axe and contrast passes on all 28 routes (14 pages in each language) at 1000 and 360 px. The worst route loads 95.1 KB gzip of JavaScript against a 100 KB budget. Source: `artifacts/evidence/portfolio-w7/check-full.txt`.
 - **Run it.** `npm ci && python scripts/check_fast.py` (then `python scripts/check_full.py` with Chrome installed).
-- **Limits.** Not published yet. The 3D scene (`SCENE-*`) is not built, frame rate on a phone is not measured, and the live demo has not run against a deployed stack.
+- **Live.** https://diego-portfolio-ai.pages.dev (Cloudflare Pages). The same Playwright suite passes against it: `artifacts/evidence/portfolio-w7/public-e2e.txt`.
+- **Limits.** The live demo stack is not deployed, so `/demo/` shows its empty state. The 3D scene (`SCENE-*`) is not built, frame rate on a phone is not measured, and the live demo has not run against a deployed stack.
 - **Docs.** [Architecture](docs/architecture.md), [phase 003](.planning/phases/003-real-portfolio/SPEC.md).
 <!-- case:end -->
 

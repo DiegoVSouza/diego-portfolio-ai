@@ -1,6 +1,6 @@
 # Verify — the real portfolio
 
-Status: W5, the cases of W7 and W9, and the offline part of the demo page are done locally. The 3D scene (W7b), every deploy (W8) and the publication (W10) are **not done**.
+Status: W5, the cases of W7 and W9 are done. **W10 done 2026-10-31:** the site is live at https://diego-portfolio-ai.pages.dev and the e2e suite (axe with contrast, CSP, no JavaScript, keyboard) passes against it. The 3D scene (W7b) and the Fly and Cloudflare demo infrastructure (W8) are **not done**.
 
 | Stage | Gate | Result | Evidence |
 | --- | --- | --- | --- |
@@ -18,7 +18,7 @@ Status: W5, the cases of W7 and W9, and the offline part of the demo page are do
 | EV-002 | PASS locally. `evidence:check` rebuilds from the sibling repositories; skipped when they are absent |
 | EV-003 | PASS (test) |
 | EV-004 | PASS (test): each case has a not-measured item and a failure |
-| LINK-001 | PARTIAL. Links use full commit hashes pinned by `flow:gen`. The public check of each link waits for the repositories to be public |
+| LINK-001 | PASS. 54 pinned links (flows and evidence) checked through the GitHub API after the repositories became public: all resolve |
 | LIVE-001 | PASS for this repository: nothing here sets `LLM_MODE`. The Fly configs are checked in W8 |
 | LIVE-002 | PASS in P05 (`tests/test_demo_live.py`) |
 | LIVE-003 | PASS (test): the page shows an empty state or "unavailable" and never invented steps |
