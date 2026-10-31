@@ -1,0 +1,18 @@
+# Scheduled cost guard (COST-001). Its tokens are Worker secrets, set outside Git:
+#   FLY_READONLY_TOKEN, FLY_STOP_TOKEN
+name = "diego-portfolio-cost-guard"
+main = "index.ts"
+compatibility_date = "2026-10-01"
+
+[triggers]
+crons = ["*/5 * * * *"]
+
+[[kv_namespaces]]
+binding = "DEMO_KV"
+id = "ae7edb6547884e1cb8b49c812f27105f"
+
+[vars]
+STACK_APPS = "supportops-lab-db,supportops-lab-redis,supportops-lab-idp,supportops-lab-p05,supportops-lab-mcp,supportops-lab-web"
+FLY_CEILING_USD = "5"
+# Fly spend is counted from the day the portfolio demo was switched on.
+COUNT_FROM = "2026-10-31T00:00:00Z"

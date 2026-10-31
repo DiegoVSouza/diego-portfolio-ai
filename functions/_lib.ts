@@ -19,6 +19,8 @@ export interface Env {
   DEMO_ACCOUNTS?: string;
   /** Base URL of the P05 API, for the sanitized run list. */
   P05_BASE?: string;
+  /** Fly app name of the P05 API, to check it is already awake before reading its run list. */
+  P05_APP?: string;
   DEMO_KV?: KV;
 }
 

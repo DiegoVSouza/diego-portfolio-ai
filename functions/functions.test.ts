@@ -124,6 +124,32 @@ describe("GET /api/runs/latest", () => {
     expect(text).not.toMatch(/secret ticket|hello|world|visitorText|prompt|response/);
   });
 
+  describe("refreshing from P05", () => {
+    const env = (kv: ReturnType<typeof memoryKV>) => ({ DEMO_KV: kv, P05_BASE: "https://p05.test", P05_APP: "p05", FLY_READONLY_TOKEN: "r" });
+    const run = { runs: [{ id: "r9", at: "2026-10-31T10:00:00", steps: [{ id: "1", agent: "classifier", project: "P01", model: "m", latencyMs: 400, tokens: 595, costUsd: 0.00006 }] }] };
+    const fetcherFor = (state: string) =>
+      vi.fn(async (url: string) => {
+        if (url.includes("api.machines.dev")) return new Response(JSON.stringify([{ id: "m", state }]), { status: 200 });
+        return new Response(JSON.stringify(run), { status: 200 });
+      }) as unknown as typeof fetch;
+
+    it("reads the P05 list and caches it when the machine is already started", async () => {
+      const kv = memoryKV({});
+      const body = await (await latest({ request: new Request("https://x.test"), env: env(kv) }, fetcherFor("started"))).json();
+      expect(body.runs[0].id).toBe("r9");
+      expect(await kv.get("runs")).toContain("r9");
+    });
+
+    it("never calls P05 when the machine is stopped, and serves the last cached run", async () => {
+      const kv = memoryKV({ runs: JSON.stringify(run) });
+      const fetcher = fetcherFor("stopped");
+      const body = await (await latest({ request: new Request("https://x.test"), env: env(kv) }, fetcher)).json();
+      expect(body.runs[0].id).toBe("r9");
+      const urls = (fetcher as unknown as { mock: { calls: [string][] } }).mock.calls.map((c) => c[0]);
+      expect(urls.some((u) => u.startsWith("https://p05.test"))).toBe(false);
+    });
+  });
+
   it("clamps garbage numbers to zero", () => {
     const out = sanitize({ runs: [{ id: "r", at: "x", steps: [{ latencyMs: -5, tokens: "NaN", costUsd: Infinity }] }] });
     expect(out.runs[0]!.steps[0]).toMatchObject({ latencyMs: 0, tokens: 0, costUsd: 0 });

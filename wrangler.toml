@@ -3,6 +3,16 @@ name = "diego-portfolio-ai"
 pages_build_output_dir = "dist"
 compatibility_date = "2026-10-01"
 
-# Bind a KV namespace named DEMO_KV in the dashboard (budget, kill switch, run cache, per-visitor counters).
-# Variables, set outside Git: STACK_APPS, TURNSTILE_SITE_KEY, CONSOLE_URL, DEMO_ACCOUNTS, P05_BASE
-# Secrets, set outside Git: FLY_READONLY_TOKEN, FLY_WAKE_TOKEN, TURNSTILE_SECRET
+# DEMO_KV holds the budget, the kill switch, the run cache and per-visitor counters.
+# DEMO_ACCOUNTS, TURNSTILE_SITE_KEY are set outside Git.
+# Secrets, set outside Git: FLY_READONLY_TOKEN, FLY_WAKE_TOKEN, TURNSTILE_SECRET, DEMO_ACCOUNTS
+
+[[kv_namespaces]]
+binding = "DEMO_KV"
+id = "ae7edb6547884e1cb8b49c812f27105f"
+
+[vars]
+STACK_APPS = "supportops-lab-db,supportops-lab-redis,supportops-lab-idp,supportops-lab-p05,supportops-lab-mcp,supportops-lab-web"
+P05_APP = "supportops-lab-p05"
+P05_BASE = "https://supportops-lab-p05.fly.dev"
+CONSOLE_URL = "https://supportops-lab-web.fly.dev"
