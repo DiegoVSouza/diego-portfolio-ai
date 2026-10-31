@@ -1,6 +1,6 @@
 # Plan — the real portfolio
 
-Revision 2. Stages marked **go** have external effects. The owner's budgets are USD 5 on Fly and USD 10 on models; they do not by themselves authorize a deploy or a push.
+Revision 2. Execution is handed to another model: lab `docs/harness/portfolio/NEXT-EXECUTOR-PROMPT.pt-BR.md`. Stages marked **go** have external effects. The owner's budgets are USD 5 on Fly and USD 10 on models; they do not by themselves authorize a deploy or a push.
 
 | Stage | Where | Content | Gate | Go |
 | --- | --- | --- | --- | --- |
