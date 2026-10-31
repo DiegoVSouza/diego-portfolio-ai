@@ -13,6 +13,7 @@ Revision 2. Execution is handed to another model: lab `docs/harness/portfolio/NE
 | W5 | P07 | Prerender, routes, `/pt/`, content model, evidence generator, Functions with mocks | `check_full.py` | no |
 | W6 | P08 | `colagem-ui` 0.4.0, including `FlowDiagram` and `layoutFlow` | `check_full.py`, tarball pinned | no |
 | W7 | P07 | Home with the system flow, flagship flow with scenarios, demo page, run viewer with live binding, profile and experience in EN | Owner reads; squint review | no |
+| W7b | P07 | Level 2 scene: rail, city, glass, symbol objects, post-processing, modes, adaptive quality, in the order of design system section 11 | `check_full.py`, modes forced, squint review, real-device FPS | no |
 | W8 | lab, P05, P06, Cloudflare | Hardening, volume reduction, CORS release, Keycloak origins, cost guard, Pages console, Turnstile, Fly live deploy | Public e2e with a real model, rollback rehearsal | **go, per group** |
 | W9 | P07 | Other cases with their flows, evidence board, method, `llms.txt`; export Mermaid to every README | `check_full.py`, parity | no |
 | W10 | Cloudflare | Publish `diego-portfolio-ai` | Public axe, link check | **go** |

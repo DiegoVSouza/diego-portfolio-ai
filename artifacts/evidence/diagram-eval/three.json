@@ -1,0 +1,16 @@
+[
+  {
+    "name": "vanilla",
+    "gzip_kb": 136.1,
+    "csp": 0,
+    "webgl2": true,
+    "log": []
+  },
+  {
+    "name": "fiber",
+    "gzip_kb": 314.5,
+    "csp": 0,
+    "webgl2": true,
+    "log": []
+  }
+]
