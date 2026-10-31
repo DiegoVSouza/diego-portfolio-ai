@@ -12,5 +12,5 @@
 - Hosting (ADR-001, `docs/decisions/` in the lab): Cloudflare Pages, static. `public/_headers` carries the CSP. No deploy until the owner gives an explicit go.
 - Budget: initial JS at most 100 KB gzip, checked by `npm run budget` (measured 78.6 KB with the library).
 - Language: UI in English with a pt-BR toggle; `README.md` English, `README.pt-BR.md` Portuguese.
-- Hosting: none decided. No deploy, publish or push without explicit authorization (lab rule 9).
+- No deploy, publish or push without explicit authorization (lab rule 9).
 - Kit: no `web-saas` profile here. P06 and P07 are now two real web projects, so a proposal can be opened as its own kit phase, not in this one.
