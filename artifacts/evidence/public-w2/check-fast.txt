@@ -17,8 +17,8 @@ Not implemented: HTMLCanvasElement's getContext() method: without installing the
 
  Test Files  2 passed (2)
       Tests  20 passed (20)
-   Start at  15:40:25
-   Duration  9.62s (environment 56%, tests 29%, setup 8%, import 6%, transform 1%)
+   Start at  17:01:55
+   Duration  13.92s (environment 41%, tests 38%, setup 16%, import 4%, transform 1%)
 
 lint: exit 0
 typecheck: exit 0
