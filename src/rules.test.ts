@@ -119,7 +119,8 @@ describe("numbers need evidence (EV-001, EV-003)", () => {
 
   it("the phone number is nowhere in the sources or the generated files", () => {
     const files = [...walk(join(root, "src")), join(root, "index.html")].filter((f) => /\.(tsx?|json|html|css)$/.test(f));
-    for (const f of files) expect(/\+?55\s*\(?88\)?\s*9?\s*9797|99797-?4229/.test(readFileSync(f, "utf8")), f).toBe(false);
+    // A generic Brazilian phone pattern, so this file never contains a real number.
+    for (const f of files) expect(/\+?\d{2}\s*\(?\d{2}\)?\s*9?\d{4}-?\d{4}/.test(readFileSync(f, "utf8").replace(/[0-9a-f]{40}/g, "")), f).toBe(false);
     expect(existsSync(join(root, "Diego_Souza_AI_Engineer_EVT_PT.docx"))).toBe(false);
   });
 });

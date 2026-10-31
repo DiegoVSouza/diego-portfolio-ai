@@ -22,7 +22,7 @@ describe("prerendered HTML (SEO-001, SEC-001)", () => {
   });
 
   it("the phone number never appears in rendered pages", async () => {
-    for (const path of ["/", "/experience/", "/pt/experience/"]) expect(/99797|\(88\)/.test(await renderToHtml(path))).toBe(false);
+    for (const path of ["/", "/experience/", "/pt/experience/"]) expect(/\+?\d{2}\s*\(?\d{2}\)?\s*9?\d{4}-?\d{4}/.test(await renderToHtml(path))).toBe(false);
   });
 
   it("a case page has the fixed sections in order, with a Rejected line per decision", async () => {
