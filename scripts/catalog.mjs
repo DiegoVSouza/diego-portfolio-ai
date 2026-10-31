@@ -6,6 +6,18 @@ import { join } from "node:path";
 const root = new URL("..", import.meta.url).pathname.replace(/^\/([A-Za-z]:)/, "$1");
 const out = join(root, "src/data/catalog.generated.json");
 const ids = ["p00", "p01", "p02", "p03", "p04", "p05", "p06"];
+// Public repository of each project. Pinned here because a clone's own origin is a local path, and the
+// catalog must not change with where it was built.
+const OWNER = "https://github.com/DiegoVSouza";
+const REPOS = {
+  p00: "supportops-foundation",
+  p01: "supportops-agents",
+  p02: "supportops-ai-toolkit",
+  p03: "supportops-observability",
+  p04: "supportops-async",
+  p05: "supportops-platform",
+  p06: "supportops-console",
+};
 
 // verified: only PASS/complete words. partial: PASS plus a PENDING/INCOMPLETE/FAIL token. open: no PASS.
 export function classify(status) {
@@ -25,9 +37,7 @@ function meta(id) {
     const file = join(dir, name);
     if (existsSync(file)) version = re.exec(readFileSync(file, "utf8"))?.[1] ?? version;
   }
-  const config = join(dir, ".git/config");
-  const repo = existsSync(config) ? (/url\s*=\s*(\S+)/.exec(readFileSync(config, "utf8"))?.[1] ?? "").replace(/\.git$/, "") : "";
-  return { version, repo };
+  return { version, repo: `${OWNER}/${REPOS[id]}` };
 }
 
 function build() {
@@ -66,7 +76,7 @@ if (mode === "gen") {
 } else if (mode === "check") {
   if (!fresh) {
     console.log("catalog: skipped (sibling projects absent)");
-  } else if (!existsSync(out) || readFileSync(out, "utf8") !== JSON.stringify(fresh, null, 2) + "\n") {
+  } else if (!existsSync(out) || readFileSync(out, "utf8").replace(/\r\n/g, "\n") !== JSON.stringify(fresh, null, 2) + "\n") {
     console.error("catalog: src/data/catalog.generated.json is stale; run npm run catalog:gen");
     process.exit(1);
   } else {
