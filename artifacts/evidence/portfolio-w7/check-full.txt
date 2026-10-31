@@ -1,0 +1,172 @@
+catalog: PASS
+evidence: PASS (12 records)
+flows: PASS (9 flows, paths checked at the pins)
+
+ RUN  v5.0.5 C:/estudo/Golpe/lab/projects/p07
+
+
+ Test Files  3 passed (3)
+      Tests  37 passed (37)
+   Start at  17:45:31
+   Duration  16.09s (environment 76%, tests 10%, setup 10%, import 2%, transform 1%)
+
+lint: exit 0
+typecheck: exit 0
+catalog:check: exit 0
+evidence:check: exit 0
+flow:check: exit 0
+test: exit 0
+check-fast: OK
+[36mvite v8.3.5 [32mbuilding client environment for production...[36m[39m
+transforming...
+✓ 72 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/index.html                                                      0.55 kB │ gzip:  0.31 kB
+dist/assets/playfair-display-vietnamese-900-normal-wtaM1xIw.woff2    5.71 kB
+dist/assets/anton-vietnamese-400-normal-2FfR1wHA.woff                6.82 kB
+dist/assets/playfair-display-vietnamese-900-normal-dpsjWZtQ.woff     7.13 kB
+dist/assets/anton-vietnamese-400-normal-CkBxLiRJ.woff2               8.68 kB
+dist/assets/courier-prime-latin-ext-400-normal-CKOCNFvK.woff         9.04 kB
+dist/assets/courier-prime-latin-ext-700-normal-BIFoAzHx.woff         9.28 kB
+dist/assets/playfair-display-cyrillic-900-normal-C8kZZFQC.woff2     11.86 kB
+dist/assets/playfair-display-latin-ext-900-normal-wdRhZY-D.woff2    12.65 kB
+dist/assets/courier-prime-latin-ext-400-normal-B-EsvyE4.woff2       12.73 kB
+dist/assets/courier-prime-latin-ext-700-normal-ByMJlNdM.woff2       12.92 kB
+dist/assets/playfair-display-cyrillic-900-normal-sDNg_-Xm.woff      14.20 kB
+dist/assets/courier-prime-latin-400-normal-BAlbUm6l.woff            14.38 kB
+dist/assets/courier-prime-latin-700-normal-CVvp4Sof.woff            14.67 kB
+dist/assets/anton-latin-400-normal-AUNGEG_V.woff                    15.63 kB
+dist/assets/playfair-display-latin-ext-900-normal-Dl6M2jFN.woff     16.23 kB
+dist/.vite/manifest.json                                            17.67 kB │ gzip:  2.05 kB
+dist/assets/anton-latin-400-normal-Byf51wtH.woff2                   18.61 kB
+dist/assets/courier-prime-latin-400-normal-BbyBr73r.woff2           18.64 kB
+dist/assets/courier-prime-latin-700-normal-D1YCjmaD.woff2           19.34 kB
+dist/assets/playfair-display-latin-900-normal-oSb7_CWx.woff2        22.37 kB
+dist/assets/special-elite-latin-ext-400-normal-ChcxYnmu.woff2       25.19 kB
+dist/assets/playfair-display-latin-900-normal-DypQvTWf.woff         27.39 kB
+dist/assets/anton-latin-ext-400-normal-BMODBQc6.woff                28.07 kB
+dist/assets/special-elite-latin-ext-400-normal-CaJZjSVf.woff        29.99 kB
+dist/assets/anton-latin-ext-400-normal-SyiqE2Jt.woff2               31.35 kB
+dist/assets/special-elite-latin-400-normal-YjDd9tmf.woff2           53.29 kB
+dist/assets/special-elite-latin-400-normal-BtSRmyJ6.woff            63.41 kB
+dist/assets/index-BeSLwNpo.css                                      29.30 kB │ gzip:  6.48 kB
+dist/assets/t-C8w94HjU.js                                            0.04 kB │ gzip:  0.06 kB
+dist/assets/NotFound-zQlZugXQ.js                                     0.05 kB │ gzip:  0.06 kB
+dist/assets/NotFound-BBfbZFpc.js                                     0.28 kB │ gzip:  0.21 kB
+dist/assets/DesignSystem-CX6JuYc7.js                                 0.60 kB │ gzip:  0.35 kB
+dist/assets/design-system-Bawvoh1J.js                                0.82 kB │ gzip:  0.30 kB
+dist/assets/Method-DUoMOnG3.js                                       0.83 kB │ gzip:  0.42 kB
+dist/assets/observability-P2C-l3bA.js                                0.85 kB │ gzip:  0.30 kB
+dist/assets/toolkit-CAe4DhuE.js                                      0.85 kB │ gzip:  0.30 kB
+dist/assets/harness-CpEMhWMc.js                                      1.01 kB │ gzip:  0.33 kB
+dist/assets/async-C7JoMKsn.js                                        1.24 kB │ gzip:  0.41 kB
+dist/assets/foundation-CN-pezib.js                                   1.27 kB │ gzip:  0.40 kB
+dist/assets/agents-DXx66PP1.js                                       1.29 kB │ gzip:  0.39 kB
+dist/assets/supportops-CStKAaw4.js                                   1.33 kB │ gzip:  0.41 kB
+dist/assets/system-BJ8S0PUY.js                                       1.52 kB │ gzip:  0.46 kB
+dist/assets/harness-6Q7rWlld.js                                      2.01 kB │ gzip:  0.85 kB
+dist/assets/observability-DkGWs8cb.js                                2.03 kB │ gzip:  0.88 kB
+dist/assets/toolkit-BckkHv60.js                                      2.07 kB │ gzip:  0.87 kB
+dist/assets/design-system-7bJ1lmZS.js                                2.08 kB │ gzip:  0.92 kB
+dist/assets/Experience-D5Oec865.js                                   2.10 kB │ gzip:  0.73 kB
+dist/assets/async-YALiho6M.js                                        2.53 kB │ gzip:  0.95 kB
+dist/assets/foundation-CDULwV3L.js                                   2.74 kB │ gzip:  1.12 kB
+dist/assets/agents-D6V2XCmy.js                                       2.95 kB │ gzip:  1.09 kB
+dist/assets/async-CLpnvHVB.js                                        3.08 kB │ gzip:  1.57 kB
+dist/assets/observability-ClgQydg0.js                                3.36 kB │ gzip:  1.62 kB
+dist/assets/harness-CtWlfmY9.js                                      3.93 kB │ gzip:  1.91 kB
+dist/assets/system-BoCwJTrE.js                                       4.05 kB │ gzip:  1.59 kB
+dist/assets/toolkit-auVf7BOm.js                                      4.06 kB │ gzip:  1.93 kB
+dist/assets/design-system-DqMnY-wL.js                                4.39 kB │ gzip:  2.15 kB
+dist/assets/agents-DPnHFCwv.js                                       4.53 kB │ gzip:  2.12 kB
+dist/assets/Home-B0xyfTZp.js                                         4.67 kB │ gzip:  1.43 kB
+dist/assets/supportops-BtGreiaV.js                                   4.67 kB │ gzip:  1.76 kB
+dist/assets/Case-CWeAenxO.js                                         5.03 kB │ gzip:  1.61 kB
+dist/assets/Demo-gSV7Z7hQ.js                                         5.14 kB │ gzip:  2.11 kB
+dist/assets/foundation-AkiMzCNY.js                                   5.51 kB │ gzip:  2.52 kB
+dist/assets/supportops-CAVoNaQF.js                                   6.92 kB │ gzip:  3.19 kB
+dist/assets/evidence-Bh1VmIg5.js                                     7.28 kB │ gzip:  2.61 kB
+dist/assets/profile-2cE20XLi.js                                      8.75 kB │ gzip:  3.71 kB
+dist/assets/Evidence-C1m0NP_2.js                                    27.59 kB │ gzip:  8.80 kB
+dist/assets/Shell-BAM9JoIF.js                                       57.27 kB │ gzip: 20.44 kB
+dist/assets/index-BNoUnh0S.js                                      212.11 kB │ gzip: 66.43 kB
+
+[32m✓ built in 1.09s[39m
+[36mvite v8.3.5 [32mbuilding ssr environment for production...[36m[39m
+transforming...
+✓ 53 modules transformed.
+rendering chunks...
+computing gzip size...
+dist-ssr/.vite/manifest.json                8.62 kB │ gzip:  1.12 kB
+dist-ssr/assets/t-_BYjPMN0.js               0.07 kB │ gzip:  0.08 kB
+dist-ssr/assets/NotFound-D3b6V9RO.js        0.52 kB │ gzip:  0.31 kB
+dist-ssr/assets/DesignSystem-DELKfe4t.js    1.02 kB │ gzip:  0.50 kB
+dist-ssr/assets/Method-qC3f-8lz.js          1.43 kB │ gzip:  0.60 kB
+dist-ssr/assets/design-system-o_RhRoqL.js   1.58 kB │ gzip:  0.40 kB
+dist-ssr/assets/toolkit-O9-4pmm4.js         1.59 kB │ gzip:  0.39 kB
+dist-ssr/assets/observability-7urfvxus.js   1.61 kB │ gzip:  0.40 kB
+dist-ssr/assets/harness-BAPgkyTA.js         1.88 kB │ gzip:  0.42 kB
+dist-ssr/assets/agents-CZK9eRuS.js          2.29 kB │ gzip:  0.48 kB
+dist-ssr/assets/async-Can_8Xm2.js           2.32 kB │ gzip:  0.53 kB
+dist-ssr/assets/foundation-8uq7FqGI.js      2.37 kB │ gzip:  0.52 kB
+dist-ssr/assets/supportops-DVRUHaAX.js      2.47 kB │ gzip:  0.52 kB
+dist-ssr/assets/observability-YX19SS9-.js   2.70 kB │ gzip:  0.98 kB
+dist-ssr/assets/toolkit-CNFx6EuC.js         2.71 kB │ gzip:  0.98 kB
+dist-ssr/assets/design-system-DIrHaYZ4.js   2.75 kB │ gzip:  1.03 kB
+dist-ssr/assets/harness-UyoyEKVF.js         2.76 kB │ gzip:  0.96 kB
+dist-ssr/assets/system-CeNWKLtM.js          2.82 kB │ gzip:  0.58 kB
+dist-ssr/assets/Experience-BtnRppIh.js      3.24 kB │ gzip:  0.94 kB
+dist-ssr/assets/async-Cbr0A6D9.js           3.25 kB │ gzip:  1.63 kB
+dist-ssr/assets/async-29vuFoHb.js           3.43 kB │ gzip:  1.06 kB
+dist-ssr/assets/observability-Cb-a9iCj.js   3.56 kB │ gzip:  1.68 kB
+dist-ssr/assets/foundation-CEAbDvoV.js      3.61 kB │ gzip:  1.24 kB
+dist-ssr/assets/agents-DYQ_J93X.js          3.90 kB │ gzip:  1.20 kB
+dist-ssr/assets/harness-Bwwu6SKC.js         4.12 kB │ gzip:  1.97 kB
+dist-ssr/assets/toolkit-C0bYpbhY.js         4.27 kB │ gzip:  1.99 kB
+dist-ssr/assets/design-system-CRybMnTI.js   4.61 kB │ gzip:  2.21 kB
+dist-ssr/assets/agents-BHwlnfrL.js          4.74 kB │ gzip:  2.17 kB
+dist-ssr/assets/system-Z5MVetc6.js          5.32 kB │ gzip:  1.71 kB
+dist-ssr/assets/foundation-DVyvjSFf.js      5.82 kB │ gzip:  2.59 kB
+dist-ssr/assets/supportops-BenYu4P9.js      6.00 kB │ gzip:  1.92 kB
+dist-ssr/assets/supportops-E8p-qDq-.js      7.26 kB │ gzip:  3.27 kB
+dist-ssr/assets/Home-CPuy80xN.js            8.09 kB │ gzip:  1.89 kB
+dist-ssr/assets/Case-JiCyLHZ8.js            8.39 kB │ gzip:  2.21 kB
+dist-ssr/assets/Demo-C8vH79xZ.js            8.76 kB │ gzip:  2.83 kB
+dist-ssr/assets/Evidence-BvGDYEkW.js       31.45 kB │ gzip:  9.28 kB
+dist-ssr/entry-server.js                   56.95 kB │ gzip: 19.52 kB
+
+[32m✓ built in 268ms[39m
+Each child in a list should have a unique "key" prop.
+
+Check the render method of `J`. See https://react.dev/link/warning-keys for more information.
+Each child in a list should have a unique "key" prop.
+
+Check the render method of `J`. See https://react.dev/link/warning-keys for more information.
+prerender: 29 pages written
+budget: PASS (worst route /evidence/index.html: 95.1 KB gzip of 100 KB; scene chunk 0.0 KB of 500 KB)
+[WebServer] Each child in a list should have a unique "key" prop.
+[WebServer] 
+[WebServer] Check the render method of `J`. See https://react.dev/link/warning-keys for more information.
+[WebServer] Each child in a list should have a unique "key" prop.
+[WebServer] 
+[WebServer] Check the render method of `J`. See https://react.dev/link/warning-keys for more information.
+
+Running 8 tests using 1 worker
+
+  ✓  1 e2e\site.spec.ts:19:3 › every route passes axe with contrast, does not overflow, and logs no errors at 1000px (55.5s)
+  ✓  2 e2e\site.spec.ts:19:3 › every route passes axe with contrast, does not overflow, and logs no errors at 360px (51.4s)
+  ✓  3 e2e\site.spec.ts:44:1 › with JavaScript off, every route still shows its heading, and a case shows its diagram and its list (SEO-001, FLOW-005) (5.0s)
+  ✓  4 e2e\site.spec.ts:57:1 › English and Portuguese link to each other and set the document language (1.3s)
+  ✓  5 e2e\site.spec.ts:66:1 › keyboard: skip link, then a project, then back (1.6s)
+  ✓  6 e2e\site.spec.ts:79:1 › the diagram walks through scenes and a failure scenario by keyboard, at both widths (1.9s)
+  ✓  7 e2e\site.spec.ts:92:1 › the demo page requests nothing from a third party until a site key exists, and wakes nothing (LIVE-004, SEC-001) (1.5s)
+  ✓  8 e2e\site.spec.ts:102:1 › the home page has the role in the first screen, and a squint screenshot is saved for review (1.3s)
+
+  8 passed (2.4m)
+fast: exit 0
+build: exit 0
+budget: exit 0
+e2e: exit 0
+check-full: PASS
+exit=0

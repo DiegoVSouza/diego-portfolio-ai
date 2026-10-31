@@ -1,21 +1,24 @@
-# Lab Portfolio
+# Diego Souza, AI Engineer: portfólio
 
-Site React estático que apresenta os sete projetos de IA independentes do lab (P00–P06) com o status que cada projeto registra de si mesmo. Nada é arredondado para cima: `PENDING` continua `PENDING`, e cada projeto mostra o que ainda está aberto.
+<!-- case:start -->
+## O case
+
+- **Problema.** Um portfólio faz afirmações. Sem uma regra que ligue cada número a uma execução salva, ele deriva para marketing.
+- **Decisão.** Um site React pré-renderizado em que todo número é um registro de evidência copiado de um repositório de projeto em um commit exato. Um teste falha com um dígito no texto de um case que não tenha registro. Os diagramas são posicionados pelo ELK no build e desenhados em SVG pelo React; nenhum motor de layout chega ao navegador.
+- **Medido.** O Chrome real com axe e contraste passa nas 28 rotas (14 páginas em cada idioma) a 1000 e 360 px. A pior rota carrega 95,1 KB gzip de JavaScript contra um orçamento de 100 KB. Fonte: `artifacts/evidence/portfolio-w7/check-full.txt`.
+- **Como rodar.** `npm ci && python scripts/check_fast.py` (depois `python scripts/check_full.py` com Chrome instalado).
+- **Limites.** Ainda não publicado. A cena 3D (`SCENE-*`) não foi construída, a taxa de quadros em celular não foi medida, e o demo live não rodou contra uma stack publicada.
+- **Docs.** [Arquitetura](docs/architecture.md), [fase 003](.planning/phases/003-real-portfolio/SPEC.md).
+<!-- case:end -->
+
+Site React estático de Diego Vieira Gonçalves de Souza, AI Engineer. O texto do CV em inglês em `src/content/profile.ts` é rascunho até o dono revisar; o arquivo do CV e o telefone nunca entram no Git.
 
 ## Desenvolvimento
 
 ```powershell
 npm ci
-npm run dev                      # servidor Vite
-npm run catalog:gen              # atualiza src/data/catalog.generated.json a partir dos projetos irmãos
-python scripts/check_fast.py     # lint, tipos, drift do catálogo, testes unitários e axe
-python scripts/check_full.py     # mais build, orçamento de bundle, Playwright + axe (exige Chrome)
+python scripts/check_fast.py     # lint, tipos, catálogo, evidência, fluxos e testes unitários
+python scripts/check_full.py     # mais build, orçamento por rota e Playwright + axe no Chrome
 ```
 
-## Como o conteúdo é feito
-
-- `src/data/catalog.generated.json` é gerado de `docs/harness/feature_list.json`, `pyproject.toml` ou `package.json` e do remoto Git de cada projeto. Não edite.
-- `src/data/projects.ts` guarda só texto curado (EN e pt-BR) e limites declarados, cada um citando um arquivo do projeto.
-- Nenhum número é escrito à mão.
-
-Design: `DESIGN_SYSTEM_COLAGEM_URBANA_NOITE.md`, nível 1, tema Breu, preset vermelho, a partir do tarball `colagem-ui` em `vendor/` (fixado em `docs/harness/sources.lock.json`). Orçamento: 100 KB gzip de JS inicial. O destino é Cloudflare Pages (ADR-001); nada é publicado sem autorização do dono.
+O README em inglês descreve como o site é construído.

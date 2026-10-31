@@ -23,7 +23,7 @@ export async function onRequestPost({ request, env }: Context<Env>, fetcher: typ
   if (!env.FLY_WAKE_TOKEN || !env.TURNSTILE_SECRET || apps.length === 0) return json({ error: "not_configured" }, 503);
   if ((await env.DEMO_KV?.get("autostart_disabled")) === "1") return json({ error: "autostart_disabled" }, 503);
 
-  let token = "";
+  let token: string;
   try {
     token = String(((await request.json()) as { token?: string }).token ?? "");
   } catch {

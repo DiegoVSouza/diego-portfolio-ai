@@ -87,6 +87,18 @@
       ],
       "status": "PENDING",
       "evidence": ".planning/phases/003-real-portfolio/SPEC.md"
+    },
+    {
+        "id": "portfolio-routes-evidence",
+        "description": "Prerendered EN and pt-BR routes, evidence records from sibling commits, flow diagrams, Functions with mocks",
+        "status": "PASS_LOCAL; NOT_DEPLOYED",
+        "evidence": "artifacts/evidence/portfolio-w7/check-full.txt"
+    },
+    {
+        "id": "portfolio-3d-scene",
+        "description": "Level 2 Three.js scene with fallbacks",
+        "status": "PENDING",
+        "evidence": ".planning/phases/003-real-portfolio/VERIFY.md"
     }
   ]
 }

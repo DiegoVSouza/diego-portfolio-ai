@@ -28,12 +28,13 @@ export async function onRequestGet({ env }: Context<Env>, fetcher: typeof fetch 
     }
   }
   const disabled = (await env.DEMO_KV?.get("autostart_disabled")) === "1";
-  let accounts: unknown = [];
-  try {
-    accounts = env.DEMO_ACCOUNTS ? JSON.parse(env.DEMO_ACCOUNTS) : [];
-  } catch {
-    accounts = [];
-  }
+  const accounts = (() => {
+    try {
+      return env.DEMO_ACCOUNTS ? (JSON.parse(env.DEMO_ACCOUNTS) as unknown) : [];
+    } catch {
+      return [];
+    }
+  })();
   return json(
     {
       state,
