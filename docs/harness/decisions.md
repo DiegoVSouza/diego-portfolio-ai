@@ -18,6 +18,6 @@
 ## Phase 003 (2026-10-31)
 
 - The portfolio becomes a product: see lab `docs/decisions/ADR-002-portfolio-as-product.md` and `.planning/phases/003-real-portfolio/SPEC.md`. These supersede the "seven project cards" scope of phase 001.
-- Pages project: `diego-portifolio-ai`, the owner's choice. Spelling is an open item, because `*.pages.dev` names cannot be renamed.
+- Pages project: `diego-portfolio-ai`, the owner's choice. Spelling is an open item, because `*.pages.dev` names cannot be renamed.
 - Hash routes will be replaced by prerendered paths, so "Pages needs no rewrite" stops being the reason for routing.
 - Backend stays Python. No Go.
