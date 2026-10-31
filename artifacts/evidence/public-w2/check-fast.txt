@@ -1,0 +1,6 @@
+catalog: src/data/catalog.generated.json is stale; run npm run catalog:gen
+lint: exit 0
+typecheck: exit 0
+catalog:check: exit 1
+check-fast: FAIL, run npm run catalog:check and fix the first error
+exit=1
