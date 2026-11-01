@@ -84,3 +84,7 @@
   background: radial-gradient(circle, var(--paper) 1px, transparent 1.6px) 0 0 / 6px 6px, radial-gradient(circle, var(--paper) 1px, transparent 1.6px) 3px 3px / 6px 6px; }
 [data-bg="2d"] .screen-dots { display: block; }
 @media (prefers-reduced-motion: reduce) { .screen-dots { opacity: .04; } }
+
+/* Small text that sits directly over the scene gets its own opaque surface: text never lives on the canvas. */
+.crumb a, .cmd, .case-seal .sub { background: var(--ink); box-decoration-break: clone; -webkit-box-decoration-break: clone; padding: 2px 6px; }
+.cmd { display: inline-block; }
