@@ -21,6 +21,11 @@ export interface Strings {
   aboutTitle: string;
   tourTitle: string;
   tourLead: string;
+  tourStart: string;
+  railDemo: string;
+  railRun: string;
+  railFlow: string;
+  railReadme: string;
   heroCtaSecond: string;
   band: string[];
   proofTitle: string;
@@ -113,6 +118,7 @@ export interface Strings {
   readmeLead: string;
   readmeOpen: string;
   flowLead: string;
+  flowRegion: string;
   sceneAnnounce: string;
   sceneHalftone: string;
   paletteOpen: string;
@@ -174,7 +180,12 @@ const en: Strings = {
   navTour: "Tour",
   aboutTitle: "About me",
   tourTitle: "The tour",
-  tourLead: "Eight projects. Each one has three stops, in order: the live demo, an interactive flow, and the README explained. Start with the first and press the button at the end of each stop.",
+  tourLead: "Eight projects, in order. Each has three stops: how to run it, an interactive flow, and the README explained. Only SupportOps has a live demo; the others you run yourself with one command. Press the button at the end of each stop to move on.",
+  tourStart: "Start with SupportOps",
+  railDemo: "Demo",
+  railRun: "Run it",
+  railFlow: "Flow",
+  railReadme: "README",
   heroCtaSecond: "Read the flagship case",
   band: ["verify", "evidence", "pending stays pending", "trace every step"],
   proofTitle: "What you can check here",
@@ -273,6 +284,7 @@ const en: Strings = {
   demoReplayBody: "This project has no live backend on the site. You can run it yourself with the command below, and the measured results are in the README stop.",
   readmeLead: "The README of this project, in reading order: problem, decisions, failures, results and what I would do differently.",
   readmeOpen: "Open the README on GitHub",
+  flowRegion: "Diagram. Scrolls sideways; use the arrow keys.",
   flowLead: "Click a node to see what it does and open its code. Play steps through the flow, or read the text version below the diagram.",
   sceneAnnounce: "Project {n} of {total}: {name}",
   sceneHalftone: "Halftone",
@@ -342,7 +354,12 @@ const pt: Strings = {
   navTour: "Tour",
   aboutTitle: "Sobre mim",
   tourTitle: "O tour",
-  tourLead: "Oito projetos. Cada um tem três paradas, em ordem: o demo ao vivo, um fluxo interativo e o README explicado. Comece pelo primeiro e aperte o botão no fim de cada parada.",
+  tourLead: "Oito projetos, em ordem. Cada um tem três paradas: como rodar, um fluxo interativo e o README explicado. Só o SupportOps tem demo ao vivo; os outros você roda com um comando. Aperte o botão no fim de cada parada para seguir.",
+  tourStart: "Começar pelo SupportOps",
+  railDemo: "Demo",
+  railRun: "Rodar",
+  railFlow: "Fluxo",
+  railReadme: "README",
   heroCtaSecond: "Ler o case principal",
   band: ["verificar", "evidência", "pendente continua pendente", "rastreie cada passo"],
   proofTitle: "O que você pode conferir aqui",
@@ -441,6 +458,7 @@ const pt: Strings = {
   demoReplayBody: "Este projeto não tem backend ao vivo no site. Você roda ele mesmo com o comando abaixo, e os resultados medidos estão na parada do README.",
   readmeLead: "O README deste projeto, em ordem de leitura: problema, decisões, falhas, resultados e o que eu faria diferente.",
   readmeOpen: "Abrir o README no GitHub",
+  flowRegion: "Diagrama. Rola para o lado; use as setas.",
   flowLead: "Clique num nó para ver o que ele faz e abrir o código. Reproduza o fluxo passo a passo, ou leia a versão em texto abaixo do diagrama.",
   sceneAnnounce: "Projeto {n} de {total}: {name}",
   sceneHalftone: "Pontilhado",

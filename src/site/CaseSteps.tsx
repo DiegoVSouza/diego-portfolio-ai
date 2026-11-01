@@ -17,7 +17,7 @@ export interface Step {
  * visitor with it all get the same three stops, each with its heading, its anchor and one "next" action at the end.
  * The rail at the top is a list of in-page links; with JavaScript it also marks the stop that is on screen.
  */
-export function CaseSteps({ railLabel, position, steps }: { railLabel: string; position: string; steps: Step[] }) {
+export function CaseSteps({ railLabel, labels, position, steps }: { railLabel: string; labels: string[]; position: string; steps: Step[] }) {
   const [current, setCurrent] = useState("");
 
   useEffect(() => {
@@ -48,7 +48,7 @@ export function CaseSteps({ railLabel, position, steps }: { railLabel: string; p
           {steps.map((step, i) => (
             <li key={step.id}>
               <a href={`#${step.id}`} aria-current={current === step.id ? "step" : undefined}>
-                <span className="step-n">{i + 1}</span> {step.label}
+                <span className="step-n">{i + 1}</span> {labels[i] ?? step.label}
               </a>
             </li>
           ))}
@@ -61,7 +61,7 @@ export function CaseSteps({ railLabel, position, steps }: { railLabel: string; p
           </h2>
           {step.children}
           <p className="step-next">
-            {step.next.href.startsWith("#") ? <a className="btn" href={step.next.href}>{step.next.label}</a> : <Link className="btn" to={step.next.href}>{step.next.label}</Link>}
+            {step.next.href.startsWith("#") ? <a className={i === steps.length - 1 ? "btn" : "btn btn-secondary"} href={step.next.href}>{step.next.label}</a> : <Link className={i === steps.length - 1 ? "btn" : "btn btn-secondary"} to={step.next.href}>{step.next.label}</Link>}
           </p>
         </section>
       ))}

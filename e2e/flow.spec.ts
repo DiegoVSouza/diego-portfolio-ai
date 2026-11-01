@@ -14,10 +14,10 @@ test.describe("case stops", () => {
     await ready(page);
     const rail = page.getByRole("navigation", { name: "Stops of this project" });
     await expect(rail).toContainText("Project 3 of 8");
-    await expect(rail.getByRole("link")).toHaveText(["1 Reproduce it", "2 Interactive flow", "3 The README, explained"]);
+    await expect(rail.getByRole("link")).toHaveText(["1 Run it", "2 Flow", "3 README"]);
     for (const name of ["Reproduce it", "Interactive flow", "The README, explained"]) await expect(page.getByRole("heading", { level: 2, name: new RegExp(name) })).toBeVisible();
     await expect(page.getByRole("tab")).toHaveCount(0);
-    await rail.getByRole("link", { name: /The README/ }).click();
+    await rail.getByRole("link", { name: /README/ }).click();
     await expect(page).toHaveURL(/#readme$/);
     await expect(page.getByRole("heading", { name: "Decisions" })).toBeVisible();
   });

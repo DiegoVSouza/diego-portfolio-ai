@@ -4,6 +4,7 @@ import { Button, Command, FlowDiagram, Headline, Lead, Progress, RunLog, Stepper
 import { flowLabels, getFlow, getLayout, pinnedLink } from "../content/flows";
 import { caseCards } from "../content/caseIndex";
 import { Link, hrefFor } from "../site/router";
+import { FlowScroll } from "../site/FlowScroll";
 import { useLang } from "../site/Shell";
 
 /** What /api/status returns. Reading it wakes nothing (LIVE-004). */
@@ -148,7 +149,7 @@ export function DemoPage() {
 
   return (
     <>
-      <p className="crumb"><Link to={`${hrefFor({ page: "case", slug: "supportops" }, lang)}#demo`}>← {t.projectOf.replace("{n}", "1").replace("{total}", String(caseCards.length))}</Link></p>
+      <p className="crumb"><Link to={hrefFor({ page: "case", slug: "supportops" }, lang)}>← {t.projectOf.replace("{n}", "1").replace("{total}", String(caseCards.length))}</Link></p>
       <Headline>{t.demoTitle}</Headline>
       <Lead>{t.demoLead}</Lead>
       <Command verb="demo status" object="" />
@@ -226,6 +227,7 @@ export function DemoPage() {
               labels={t.runLog}
               steps={latest.steps.map((s) => ({ id: s.id, agent: s.agent, project: s.project, model: s.model, latencyMs: s.latencyMs, tokens: s.tokens, costUsd: s.costUsd }))}
             />
+            <FlowScroll label={t.flowRegion}>
             <FlowDiagram
               flow={system}
               layout={getLayout("system")}
@@ -234,6 +236,7 @@ export function DemoPage() {
               live={live}
               links={{ code: (path, node) => pinnedLink(node.repo ?? "p05", path), docs: (path, node) => pinnedLink(node.repo ?? "p05", path) }}
             />
+            </FlowScroll>
           </>
         ) : (
           <p className="surface-text">{t.demoRunsEmpty}</p>

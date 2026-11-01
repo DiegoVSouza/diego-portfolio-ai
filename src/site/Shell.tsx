@@ -40,7 +40,7 @@ function Header() {
       brand={t.brand}
       brandHref={hrefFor({ page: "home" }, lang)}
       navLabel={t.nav}
-      nav={<Link to={`${hrefFor({ page: "case", slug: caseCards[0]!.slug }, lang)}#demo`} aria-current={route.page === "case" || route.page === "demo" ? "page" : undefined}>{t.navTour}</Link>}
+      nav={<Link to={hrefFor({ page: "case", slug: caseCards[0]!.slug }, lang)} aria-current={route.page === "case" || route.page === "demo" ? "page" : undefined}>{t.navTour}</Link>}
     >
       <button type="button" className="tg simple-toggle" aria-pressed={simple} onClick={() => setSimple(!simple)}>
         {t.simpleVersion}

@@ -172,3 +172,17 @@
 
 /* The ghost numeral is decoration: it must never sit between a visitor and a button (it covered "Next project"). */
 .ghost { pointer-events: none; }
+
+/* Legibility and the step rail that stays in view (audit 2026-11-01). */
+.step-rail { position: sticky; top: 0; z-index: 5; display: flex; flex-wrap: wrap; align-items: center; gap: 8px 16px; padding: 8px 12px; margin-top: 16px; }
+.step-pos { margin: 0; font-size: 14px; }
+.step-rail a { min-height: 44px; padding: 4px 10px; font-size: 14px; }
+.step { scroll-margin-top: 80px; }
+.tldr dt { font-size: 13px; }
+.cmd, .seal { font-size: 13px; }
+.flow-btn { font-size: 14px; }
+/* The wide diagrams were shrunk to 12 px text; keep them readable and let the stage scroll sideways instead. */
+.flow-scroll { overflow-x: auto; }
+@media (min-width: 900px) { .flow-scroll .flow-stage { min-width: 1232px; } }
+/* Links that sit alone in a row need a 44 px target. */
+.case-honest a, .proof-meta a, .case-seal .sub a, .plain a, .surface-text a, .contact a, footer a { display: inline-block; min-height: 44px; padding-block: 12px; box-sizing: border-box; }

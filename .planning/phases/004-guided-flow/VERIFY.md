@@ -30,3 +30,18 @@ Status: G1 to G4 and G6 done and verified locally on 2026-11-01. G5, G7 (Continu
 - The Demo stop for the seven non-flagship projects is "Reproduce it" (clone and run), not a replay of a recorded run. A replay needs recorded run data per project, which the evidence files do not carry.
 - G5 (the metro line marking the stop inside a project), FLOW-009 (Continue) and FLOW-010 (View Transitions) are open.
 - Deployed: no.
+
+## Audit after the first build (2026-11-01) and fixes
+
+An audit of the running site (1280 and 390 px, EN and PT) found three serious problems and six medium ones. Fixed in this round, each checked by a render or a test:
+
+- Next project, Start the tour and the header Tour now land on the top of the case (title and TL;DR), not on `#demo` 1,400 px down.
+- The tour text no longer says every project has a live demo; only SupportOps does. The tour section has a "Start with SupportOps" button.
+- The step rail is sticky and shows "Project N of 8" with the current stop marked (verified at 390 px by screenshot). Rail labels are short: Demo or Run it, Flow, README.
+- One numbering: the trail position (01 to 08) is used in the metro, the cards, the command line and the ghost numeral.
+- Only the last stop of a project has the primary button; the others are secondary.
+- Legibility: seal, command and TL;DR labels 13 px, step rail and diagram buttons 14 px, 44 px targets for lone links. Wide diagrams stay wide: measured text went from 11.9 px to 15.8 px (SupportOps) and 13.7 to 18.2 px (agents). The diagram scrolls sideways inside a focusable, named region (`FlowScroll`) because axe flagged `scrollable-region-focusable` on the first attempt.
+
+`check_full`: exit 0, 60 unit and 38 e2e tests, budget 40.0 KB gzip.
+
+Still open: the live demo cannot start until the Turnstile site key and secret are deployed to Pages (owner configured them in `.env`; not yet wired). The desktop diagram's sideways scroll has no visible hint other than the clipped last node. Contrast of text over the 3D scene is not measured.

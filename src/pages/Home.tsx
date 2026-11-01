@@ -17,10 +17,10 @@ export function Home() {
       <Headline>{t.heroTitle}</Headline>
       <Lead>{t.heroLead}</Lead>
       <p className="cta">
-        <Link className="btn" to={`${hrefFor({ page: "case", slug: flagship.slug }, lang)}#demo`}>{t.heroCta}</Link>
+        <Link className="btn" to={hrefFor({ page: "case", slug: flagship.slug }, lang)}>{t.heroCta}</Link>
         <Link className="btn btn-secondary" to={hrefFor({ page: "demo" }, lang)}>{t.navDemo}</Link>
       </p>
-      <Command verb="project open" object="" n={flagship.n} />
+      <Command verb="project open" object="" n="01" />
       <Band words={t.band} />
 
       <section aria-labelledby="about-h">
@@ -57,6 +57,7 @@ export function Home() {
       <section aria-labelledby="tour-h">
         <h2 id="tour-h" className="section-h">{t.tourTitle}</h2>
         <p className="surface-text">{t.tourLead}</p>
+        <p><Link className="btn" to={hrefFor({ page: "case", slug: flagship.slug }, lang)}>{t.tourStart}</Link></p>
       </section>
 
       <section aria-labelledby="flag-h">
@@ -65,7 +66,7 @@ export function Home() {
         <Card
           variant="focus"
           index={1}
-          numeral={flagship.n}
+          numeral="01"
           label={`${flagship.ids}: ${flagship.name[lang]}`}
           headingLevel={3}
           title={<Link className="card-link" to={hrefFor({ page: "case", slug: flagship.slug }, lang)}>{flagship.name[lang]}</Link>}
@@ -73,7 +74,7 @@ export function Home() {
           meta={`${flagship.ids} · ${flagship.group[lang]}`}
           tag={flagship.hook[lang]}
           seal={<StatusSeal kind={flagship.seal.kind} label={flagship.seal.label[lang]} />}
-          command={<Command verb="project open" object="" n={flagship.n} />}
+          command={<Command verb="project open" object="" n="01" />}
         />
         </div>
         <LinkTrio
@@ -93,7 +94,7 @@ export function Home() {
             <li key={c.slug} data-scene-case={c.slug} id={`project-${c.slug}`}>
               <Card
                 index={i}
-                numeral={c.n}
+                numeral={String(i + 2).padStart(2, "0")}
                 label={`${c.ids}: ${c.name[lang]}`}
                 headingLevel={3}
                 title={<Link className="card-link" to={hrefFor({ page: "case", slug: c.slug }, lang)}>{c.name[lang]}</Link>}
@@ -118,7 +119,7 @@ export function Home() {
           <li><a href={profile.github} rel="noopener noreferrer">GitHub</a></li>
         </ul>
       </section>
-      <GhostNumber n={flagship.n} />
+      <GhostNumber n="01" />
     </>
   );
 }

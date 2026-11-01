@@ -5,6 +5,7 @@ import { ev, modeLabel, permalink, resolve } from "../content/evidence";
 import { OWNER, REPO_NAMES, flowLabels, getFlow, getLayout, pinDates, pinnedLink, pins } from "../content/flows";
 import { Link, hrefFor } from "../site/router";
 import { CaseSteps } from "../site/CaseSteps";
+import { FlowScroll } from "../site/FlowScroll";
 import { useLang } from "../site/Shell";
 import { NotFound } from "./NotFound";
 
@@ -22,10 +23,11 @@ export function CasePage({ slug }: { slug: string }) {
   const index = caseCards.findIndex((x) => x.slug === c.slug);
   const next = caseCards[index + 1] ?? cardBySlug(c.next)!;
   const live = c.slug === "supportops";
+  const pos = String(index + 1).padStart(2, "0");
   const isLast = index === caseCards.length - 1;
   const nextStop = isLast
     ? { label: t.nextContact, href: `${hrefFor({ page: "home" }, lang)}#contact-h` }
-    : { label: `${t.nextProject}: ${next.name[lang]}`, href: `${hrefFor({ page: "case", slug: next.slug }, lang)}#demo` };
+    : { label: `${t.nextProject}: ${next.name[lang]}`, href: hrefFor({ page: "case", slug: next.slug }, lang) };
   const repoUrl = `${OWNER}/${REPO_NAMES[c.repoKey]}`;
   const pin = pins[c.repoKey];
   return (
@@ -35,7 +37,7 @@ export function CasePage({ slug }: { slug: string }) {
       </p>
       <Headline>{c.name[lang]}</Headline>
       <Lead>{c.outcome[lang]}</Lead>
-      <Command verb="project open" object="" n={c.n} />
+      <Command verb="project open" object="" n={pos} />
       <p className="case-seal">
         <StatusSeal kind={c.seal.kind} label={c.seal.label[lang]} />
         <span className="sub">
@@ -68,6 +70,7 @@ export function CasePage({ slug }: { slug: string }) {
 
       <CaseSteps
         railLabel={t.stepsLabel}
+        labels={[live ? t.railDemo : t.railRun, t.railFlow, t.railReadme]}
         position={t.projectOf.replace("{n}", String(index + 1)).replace("{total}", String(caseCards.length))}
         steps={[
           {
@@ -101,6 +104,7 @@ ${c.validate.command}`}</code></pre>
               <section id="architecture" aria-labelledby="how-h">
                 <h3 id="how-h" className="sub-h">{t.how}</h3>
                 <p className="surface-text">{t.flowLead}</p>
+                <FlowScroll label={t.flowRegion}>
                 <FlowDiagram
                   flow={flow}
                   layout={getLayout(c.slug)}
@@ -108,6 +112,7 @@ ${c.validate.command}`}</code></pre>
                   labels={flowLabels(lang)}
                   links={{ code: (path, node) => pinnedLink(node.repo ?? c.repoKey, path), docs: (path, node) => pinnedLink(node.repo ?? c.repoKey, path) }}
                 />
+                </FlowScroll>
               </section>
             ),
           },
@@ -179,7 +184,7 @@ ${c.validate.command}`}</code></pre>
         ]}
       />
 
-      <GhostNumber n={c.n} />
+      <GhostNumber n={pos} />
     </>
   );
 }
