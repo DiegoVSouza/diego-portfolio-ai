@@ -25,7 +25,7 @@ export interface WorldContext {
   districtCount: number;
   /** The line on the arrival gate. */
   headline: string;
-  models: { truck: string; moto: string; buildings?: string[]; cars?: string[]; station?: string };
+  models: { truck: string; moto: string; buildings?: string[]; cars?: string[]; station?: string; /** Metro cars: head, middle, tail (Kenney Train Kit, CC0, with a baked palette). */ trains?: string[] };
   /** Called when a model has loaded after the first frame, so the scene draws again. */
   onModels(): void;
 }
@@ -37,6 +37,8 @@ export interface World {
   readonly landmarks: number;
   vehicleKinds(): number;
   stations(): number;
+  /** Which train is on the viaduct: the Kenney metro cars, or the generated fallback. */
+  trainKind(): "kenney" | "procedural";
   /** Sign text is painted again once the display font is ready. */
   repaintText(): void;
 }
@@ -92,6 +94,22 @@ export async function buildWorld(c: WorldContext): Promise<World> {
   })();
   const windowMat = new THREE.MeshStandardMaterial({ vertexColors: true, flatShading: true, roughness: 0.8, metalness: 0.1, emissive: new THREE.Color().setScalar(1), emissiveMap: winTex, emissiveIntensity: 1 });
   const flatMat = () => new THREE.MeshStandardMaterial({ vertexColors: true, flatShading: true, roughness: 0.6, metalness: 0.2 });
+  /**
+   * A model with a baked palette (scripts/glb_bake_palette.py) carries two numbers per vertex, not a colour: lightness and accent.
+   * The shader mixes the design tokens with them (ink to paper by lightness, then to the accent colour), so the model follows the tokens.
+   */
+  const paletteMat = () => {
+    const m = new THREE.MeshStandardMaterial({ vertexColors: true, flatShading: true, roughness: 0.55, metalness: 0.25 });
+    m.onBeforeCompile = (shader) => {
+      shader.uniforms.uInk = { value: p.ink };
+      shader.uniforms.uPaper = { value: p.paper };
+      shader.uniforms.uRed = { value: p.red };
+      shader.fragmentShader = shader.fragmentShader
+        .replace("#include <common>", "#include <common>\nuniform vec3 uInk;\nuniform vec3 uPaper;\nuniform vec3 uRed;")
+        .replace("#include <color_fragment>", "diffuseColor.rgb = mix(mix(uInk, uPaper, vColor.r), uRed, vColor.g);");
+    };
+    return m;
+  };
 
   /* ---------- building blocks ---------- */
   const parts: Part[][] = Array.from({ length: D }, () => []);
@@ -125,7 +143,7 @@ export async function buildWorld(c: WorldContext): Promise<World> {
   const toneTower = () => (rnd() < 0.16 ? p.dred : rnd() < 0.5 ? grey(0.28) : grey(0.19));
 
   /* ---------- real buildings, when they load ---------- */
-  const protos = (await Promise.all((c.models.buildings ?? []).map(loadModel)))
+  const protos = (await Promise.all((c.models.buildings ?? []).map((url) => loadModel(url))))
     .filter((g): g is THREE.BufferGeometry => g !== null)
     .map((g) => {
       g.computeBoundingBox();
@@ -336,6 +354,8 @@ export async function buildWorld(c: WorldContext): Promise<World> {
   lane(3, { count: 8, latMin: 36, latMax: 60, hMin: 14, hMax: 30, wMin: 5, wMax: 9, side: 1 });
   const VIADUCT_LAT = -19;
   const VIADUCT_Y = 15;
+  /** Each of the two tracks runs this far from the viaduct's middle. */
+  const LANE = 2.8;
   const [vu0, vu1] = [rail.u(first[3]!, -0.45), rail.u(last[3]!, 0.45)];
   const viaductLength = (vu1 - vu0) * rail.length;
   {
@@ -345,9 +365,10 @@ export async function buildWorld(c: WorldContext): Promise<World> {
       const x = f.p.x + f.R.x * VIADUCT_LAT;
       const z = f.p.z + f.R.z * VIADUCT_LAT;
       const ry = yaw(f.T);
-      solid(3, 7.4, 1.4, 7.6, x, VIADUCT_Y - 1.4, z, ry, grey(0.24), false);
-      for (const s of [-1, 1]) solid(3, 0.3, 0.3, 7.6, x + f.R.x * s * 1.8, VIADUCT_Y, z + f.R.z * s * 1.8, ry, grey(0.5), false);
-      if (i % 2 === 0) solid(3, 2.2, VIADUCT_Y - 1.4, 2.2, x, 0, z, ry, grey(0.18), false);
+      solid(3, 10.4, 1.4, 7.6, x, VIADUCT_Y - 1.4, z, ry, grey(0.24), false);
+      // Two tracks, two rails each.
+      for (const lane of [-LANE, LANE]) for (const s of [-1, 1]) solid(3, 0.3, 0.3, 7.6, x + f.R.x * (lane + s * 1.3), VIADUCT_Y, z + f.R.z * (lane + s * 1.3), ry, grey(0.5), false);
+      if (i % 2 === 0) solid(3, 3, VIADUCT_Y - 1.4, 2.4, x, 0, z, ry, grey(0.18), false);
     }
   }
   let stationCount = 0;
@@ -383,11 +404,14 @@ export async function buildWorld(c: WorldContext): Promise<World> {
   };
   const TRAINS = 2;
   const MIDS = 3;
-  const heads = new THREE.InstancedMesh(trainCar(true), flatMat(), TRAINS * 2);
-  const mids = new THREE.InstancedMesh(trainCar(false), flatMat(), TRAINS * MIDS);
+  // The procedural train is the fallback; the Kenney metro cars replace it when they load.
+  let heads = new THREE.InstancedMesh(trainCar(true), flatMat(), TRAINS * 2);
+  let mids = new THREE.InstancedMesh(trainCar(false), flatMat(), TRAINS * MIDS);
+  let tails: THREE.InstancedMesh | null = null;
   heads.frustumCulled = false;
   mids.frustumCulled = false;
   scene.add(heads, mids);
+  let realTrain = false;
 
   /* ---------- district 4, CRAFT: low rooftops with billboards, scaffolding and a crane ---------- */
   await tick();
@@ -670,6 +694,33 @@ export async function buildWorld(c: WorldContext): Promise<World> {
     });
   }
 
+  if (c.models.trains?.length === 3) {
+    void Promise.all(c.models.trains.map((url) => loadModel(url, ["color"]))).then(([head, mid, tail]) => {
+      if (!head || !mid || !tail) return;
+      // Scale the cars (about 2.6 long, 1.1 to 1.35 wide) to 9.4 long, and stand them on their wheels, centred on their own origin.
+      const prepare = (g: THREE.BufferGeometry) => {
+        g.computeBoundingBox();
+        const bb = g.boundingBox!;
+        g.translate(-(bb.min.x + bb.max.x) / 2, -bb.min.y, -(bb.min.z + bb.max.z) / 2);
+        return g.scale(3.6, 3.6, 3.6);
+      };
+      const make = (g: THREE.BufferGeometry, n: number) => {
+        const m = new THREE.InstancedMesh(prepare(g), paletteMat(), n);
+        m.frustumCulled = false;
+        return m;
+      };
+      scene.remove(heads, mids);
+      heads.geometry.dispose();
+      mids.geometry.dispose();
+      heads = make(head, TRAINS);
+      mids = make(mid, TRAINS * MIDS);
+      tails = make(tail, TRAINS);
+      scene.add(heads, mids, tails);
+      realTrain = true;
+      c.onModels();
+    });
+  }
+
   const place = (time: number, reduce: boolean) => {
     // Traffic: a lane each way down the avenue.
     if (fleet) {
@@ -688,26 +739,32 @@ export async function buildWorld(c: WorldContext): Promise<World> {
         k.mesh.instanceMatrix.needsUpdate = true;
       }
     }
-    // Two trains on the viaduct, head and tail cars facing out, shuttling along it.
+    // Two trains, one on each track of the viaduct, head and tail cars facing out, shuttling along it.
     const head = reduce ? 0.35 : (time * 0.03) % 1;
-    const length = 9.6;
+    const length = 9.8;
     for (let t = 0; t < TRAINS; t += 1) {
       const cars = MIDS + 2;
       for (let slot = 0; slot < cars; slot += 1) {
         const phase = (((head + t * 0.5 - (slot * length) / viaductLength) % 1) + 1) % 1;
         rail.frameAt(vu0 + phase * (vu1 - vu0), f);
-        const offset = VIADUCT_LAT + (t ? 1.5 : -1.5);
-        dummy.position.set(f.p.x + f.R.x * offset, VIADUCT_Y + 0.1, f.p.z + f.R.z * offset);
-        const isHead = slot === 0 || slot === cars - 1;
-        dummy.rotation.set(0, yaw(f.T) + (slot === cars - 1 ? Math.PI : 0), 0);
+        const offset = VIADUCT_LAT + (t ? LANE : -LANE);
+        dummy.position.set(f.p.x + f.R.x * offset, VIADUCT_Y + (realTrain ? 0.35 : 0.1), f.p.z + f.R.z * offset);
+        const isHead = slot === 0;
+        const isTail = slot === cars - 1;
+        // A model faces +z. The first car leads with its own nose; the last one is the other end of the train: turned about, in the procedural train.
+        dummy.rotation.set(0, yaw(f.T) + (isTail && !realTrain ? Math.PI : 0), 0);
         dummy.scale.setScalar(1);
         dummy.updateMatrix();
-        if (isHead) heads.setMatrixAt(t * 2 + (slot === 0 ? 0 : 1), dummy.matrix);
-        else mids.setMatrixAt(t * MIDS + (slot - 1), dummy.matrix);
+        if (isHead) heads.setMatrixAt(realTrain ? t : t * 2, dummy.matrix);
+        else if (isTail) {
+          if (realTrain && tails) tails.setMatrixAt(t, dummy.matrix);
+          else heads.setMatrixAt(t * 2 + 1, dummy.matrix);
+        } else mids.setMatrixAt(t * MIDS + (slot - 1), dummy.matrix);
       }
     }
     heads.instanceMatrix.needsUpdate = true;
     mids.instanceMatrix.needsUpdate = true;
+    if (tails) tails.instanceMatrix.needsUpdate = true;
   };
 
   return {
@@ -717,6 +774,7 @@ export async function buildWorld(c: WorldContext): Promise<World> {
     },
     vehicleKinds: () => kindsLoaded,
     stations: () => stationCount,
+    trainKind: () => (realTrain ? "kenney" : "procedural"),
     repaintText: () => painters.forEach((paint) => paint()),
   };
 }

@@ -12,6 +12,7 @@ repository (the building pack alone is 254 MB); only the prepared GLB files are,
 | `car-s64.glb` | `S64Compact_v1_C.zip`, `Body/S64Compact_Body_1.fbx` | **CC0** (`licence.txt`); author not named | 35 KB; 1.6k |
 | `building-sample.glb` | `Free Sample.zip`, `Building_06.fbx` | **OWNER-DECLARED** (no licence file) | 256 KB; 23k |
 | `metro-station.glb` | `ModularUndergroundMetro.zip`, 8 pieces assembled by `scripts/build_station.mjs` | **OWNER-DECLARED** (no licence file) | 29 KB; 2.9k |
+| `train-subway-a.glb`, `train-subway-b.glb`, `train-subway-c.glb` | Kenney Train Kit 1.1: `train-electric-subway-a/b/c` (head, middle, tail), credit also to Guus Vermeulen and Tony Schaer | **CC0** (`License.txt`) | 69 to 81 KB; 1.5k, 1.3k, 1.6k |
 | `truck.glb`, `moto.glb` | Kenney | **CC0** | already in the repository |
 
 ### What OWNER-DECLARED means
@@ -46,6 +47,10 @@ node scripts/fbx_to_glb.mjs out.glb Body.fbx                       # cars: keep 
 node scripts/fbx_to_glb.mjs --no-normals out.glb Building_06.fbx   # buildings: then weld, simplify, prune, quantize as above
 node scripts/build_station.mjs "<extracted>/Objects" station.glb   # metro station, then weld and quantize
 
+# 3b. Kenney Train Kit (GLB with a colormap texture): bake the palette into vertex roles, drop the texture, then prune and weld
+python -I scripts/glb_bake_palette.py "<kit>/Models/GLB format/train-electric-subway-a.glb" baked.glb
+npx --yes @gltf-transform/cli@4.5.1 prune baked.glb pruned.glb && npx --yes @gltf-transform/cli@4.5.1 weld pruned.glb train-subway-a.glb
+
 # 4. register and audit
 node tools/assets.mjs register assets/game/models/<file>.glb --author ... --license CC0 --url ...
 node tools/assets.mjs register assets/game/models/<file>.glb --author ... --license none --url ... --owner-declared "reason"
@@ -60,6 +65,9 @@ Not simplified below 23k triangles: `Building_06` (29 separate meshes; the simpl
 
 - **Buildings:** in the four towered districts every third (or fourth) tower is one of four building models, scaled to its own height, turned to face the
   avenue (the front is assumed to be +Z), and merged per district. The other towers stay boxes with lit windows.
+- **Metro:** two trains of five cars on the viaduct, one on each track: the Kenney subway cars (head, three middle, tail), scaled to 9.4 long. Their palette is baked
+  into two numbers per vertex (lightness, accent) and the material mixes the design tokens with them, so the train follows the tokens and needs no texture (the CSP
+  has no `blob:` in `img-src`). `canvas[data-train]` says `kenney` or `procedural`; if the models fail, a generated train takes their place.
 - **Cars:** the truck, the moto and the two cars share one 13-instance fleet. The cars' front is +X (clear for A_R7, assumed for S64Compact) and is
   turned to +Z.
 - **Station:** one, 24 m long, on the viaduct of the platform district, with the platform along the avenue. Two trains shuttle past it.

@@ -57,4 +57,5 @@ each card should already appear in a part of the city, and each scroll scene sho
 - **Scroll.** No inner scrolling panels (they captured the wheel), no sticky elements, shorter rest at a stop (12 %), faster follow, pixel ratio capped at 1.25;
   the JavaScript cost per frame is published as `canvas[data-cpu-ms]` (0.7 ms measured while scrolling in Edge). GPU cost on a real phone is still unmeasured.
 - **Vehicles.** Truck 9, car 7.4, moto 5.2 units (they were 3.8 and 3.4); two trains of five cars with bogies, wheels, window band, doors, air-conditioning and cabs.
-- **Models.** The Kenney Train Kit (CC0) would replace the procedural train, but its download is manual (kenney.nl blocks the kit's tool): pending the owner.
+- **Models.** The Kenney Train Kit (CC0, downloaded by the owner) supplies the metro cars: `train-electric-subway-a/b/c`, with the palette baked into vertex roles so the
+  tokens colour them. The procedural train stays as the fallback.

@@ -26,7 +26,7 @@ export interface SceneOptions {
   /** Case pages: hold the camera at this stop. Nothing moves and the page does not scroll the scene. */
   focus?: number;
   /** Real models, served by the site (Kenney, Quaternius and the owner's packs: see docs/harness/assets-pipeline.md). */
-  models: { truck: string; moto: string; buildings?: string[]; cars?: string[]; station?: string };
+  models: { truck: string; moto: string; buildings?: string[]; cars?: string[]; station?: string; trains?: string[] };
   onActive?: (index: number) => void;
   onQuality?: (scale: number) => void;
   /** Called when WebGL is lost or the loop throws. The host then falls back to level 1. */
@@ -129,6 +129,7 @@ export async function start(canvas: HTMLCanvasElement, options: SceneOptions): P
     canvas.dataset.landmarks = String(world.landmarks);
     canvas.dataset.vehicleKinds = String(world.vehicleKinds());
     canvas.dataset.stations = String(world.stations());
+    canvas.dataset.train = world.trainKind();
     refreshOrigin();
     dirty = true;
     schedule();

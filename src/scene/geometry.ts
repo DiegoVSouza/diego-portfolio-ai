@@ -18,14 +18,14 @@ export function rng(seed: number): () => number {
 }
 
 /** Non-indexed, position and normal only: flat shading and a clean merge. */
-export const flat = (g: THREE.BufferGeometry): THREE.BufferGeometry => {
+export const flat = (g: THREE.BufferGeometry, keep: string[] = []): THREE.BufferGeometry => {
   const out = g.index ? g.toNonIndexed() : g;
-  for (const key of Object.keys(out.attributes)) if (key !== "position" && key !== "normal") out.deleteAttribute(key);
+  for (const key of Object.keys(out.attributes)) if (key !== "position" && key !== "normal" && !keep.includes(key)) out.deleteAttribute(key);
   return out;
 };
 
 export function mergeFlat(list: THREE.BufferGeometry[]): THREE.BufferGeometry {
-  const merged = mergeGeometries(list.map(flat));
+  const merged = mergeGeometries(list.map((g) => flat(g)));
   list.forEach((g) => g.dispose());
   if (!merged) throw new Error("mergeFlat: nothing to merge");
   return merged;

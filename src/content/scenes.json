@@ -15,22 +15,22 @@
       "focus": "Skip link first, then the header, then the first call to action"
     },
     {
-      "id": "S1-flight",
+      "id": "S1-journey",
       "kind": "scroll",
       "status": "built",
-      "proof": "The project card list and the symbol object of the active project, chosen by scroll position",
+      "proof": "One card per stop, hung on a billboard in its part of the city; the camera parks on it and the next billboard shows ahead",
       "trigger": {
         "type": "scroll",
         "range": [
           0,
           1
         ],
-        "per": "project"
+        "per": "stop"
       },
-      "staticFrame": "artifacts/evidence/portfolio-w7b/home-3d.png",
-      "reducedMotion": "No flight: the camera jumps to the active project's station and stops",
-      "mobile": "Project cards in the page. No canvas on portrait screens",
-      "focus": "Links inside the cards, in page order. The canvas never takes focus"
+      "staticFrame": "artifacts/evidence/portfolio-w12/stop-3.png",
+      "reducedMotion": "A static frame per stop: the card sits on its billboard, no swing, no events",
+      "mobile": "Cards in page order, no canvas on portrait screens, the menu is a bar with previous and next",
+      "focus": "The menu, then the card of the current stop; the other cards are inert previews"
     },
     {
       "id": "S2-descent",
@@ -53,7 +53,7 @@
       "id": "S3-case",
       "kind": "stepper",
       "status": "built",
-      "proof": "Four tabs: demo, architecture with the diagram and its text list, decisions with the rejected option and the failure gallery, and numbers with what was not measured. The summary and the honesty links stay above the tabs",
+      "proof": "Three chapters with a banner, a body and one action each: run it, the flow with its diagram and its scenarios, the README with its decisions, failures and numbers; the summary and the honesty links stay above them",
       "trigger": {
         "type": "action",
         "events": [
@@ -62,16 +62,16 @@
           "hash"
         ]
       },
-      "staticFrame": "artifacts/evidence/portfolio-w7b/case-agents-3d.png",
+      "staticFrame": "artifacts/evidence/portfolio-w13/project-flow-1.png",
       "reducedMotion": "The diagram walkthrough changes scenes with no travelling token",
       "mobile": "The tab bar scrolls sideways; sections are stacked inside a tab",
       "focus": "Tabs by arrow keys, Home and End; Tab moves into the open panel"
     },
     {
-      "id": "S4-line",
+      "id": "S4-menu",
       "kind": "action",
       "status": "built",
-      "proof": "The metro line lists the eight projects, marks the open one, and moves one station with Next, Previous, or the j and k keys; Back to the surface returns to that project on the home",
+      "proof": "The game menu lists the six districts, marks the active one and lists its projects under it; j and k step one stop and the number keys jump to a district",
       "trigger": {
         "type": "action",
         "events": [
@@ -83,16 +83,16 @@
           "k"
         ]
       },
-      "staticFrame": "artifacts/evidence/portfolio-w7b/case-agents-3d.png",
+      "staticFrame": "artifacts/evidence/portfolio-w12/stop-5.png",
       "reducedMotion": "Identical",
       "mobile": "A bar at the bottom with Previous, the current station name and Next",
       "focus": "Station links in order, the current one marked with aria-current; the bar buttons are real buttons"
     },
     {
-      "id": "S5-contact",
+      "id": "S5-terminal",
       "kind": "scroll",
       "status": "built",
-      "proof": "WhatsApp button, phone, e-mail, LinkedIn and GitHub, in a normal section",
+      "proof": "About, then the WhatsApp button, phone, e-mail, LinkedIn and GitHub on the last card, at the harbour",
       "trigger": {
         "type": "scroll",
         "range": [

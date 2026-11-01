@@ -72,6 +72,8 @@ See the `states` table in `scenes.json`. The demo states are tested in `src/app.
 
 ## Shatter decision
 
+> **Status (phase 005 revision):** removed. The project symbols no longer exist: nothing spins, floats or shatters. What remains of the idea is the short RGB split when a stop settles. The table below is the record of the decision.
+
 In the scene, a symbol object shatters 140 ms after the selection settles and then recomposes. On its own this is effect without content.
 
 | Option | What it is | Cost | Status |

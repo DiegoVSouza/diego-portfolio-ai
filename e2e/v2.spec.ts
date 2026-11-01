@@ -233,6 +233,8 @@ test("the scene is built from the real downloaded models, not the fallbacks (ass
   await expect.poll(async () => Number(await canvas.getAttribute("data-vehicle-kinds")), { timeout: 15_000 }).toBe(4);
   // The platform district has its metro station, built from the Modular Underground Metro pieces.
   await expect.poll(async () => Number(await canvas.getAttribute("data-stations")), { timeout: 15_000 }).toBe(1);
+  // The metro on the viaduct is the Kenney Train Kit (CC0), not the generated fallback.
+  await expect.poll(async () => canvas.getAttribute("data-train"), { timeout: 15_000 }).toBe("kenney");
   // The city stays inside its draw-call budget (phase 005: at most 100 on the first frame).
   expect(Number(await canvas.getAttribute("data-draws"))).toBeLessThanOrEqual(100);
   // No model fell back to a generated one: a fallback logs a warning.

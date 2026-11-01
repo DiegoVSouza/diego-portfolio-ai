@@ -13,6 +13,9 @@ import buildingMedium from "../../assets/game/models/building-medium.glb?url";
 import buildingSmall from "../../assets/game/models/building-small.glb?url";
 import buildingSample from "../../assets/game/models/building-sample.glb?url";
 import metroStation from "../../assets/game/models/metro-station.glb?url";
+import trainA from "../../assets/game/models/train-subway-a.glb?url";
+import trainB from "../../assets/game/models/train-subway-b.glb?url";
+import trainC from "../../assets/game/models/train-subway-c.glb?url";
 import carR7 from "../../assets/game/models/car-r7.glb?url";
 import carS64 from "../../assets/game/models/car-s64.glb?url";
 import type { Quality, SceneController } from "./scene";
@@ -82,7 +85,7 @@ export function SceneHost({ mode, focusSlug, pulseKey }: { mode: BackgroundMode;
               districtCount: districts.length,
               headline: "AI ENGINEER",
               mode,
-              models: { truck: truckUrl, moto: motoUrl, buildings: [buildingLarge, buildingMedium, buildingSmall, buildingSample], cars: [carR7, carS64], station: metroStation },
+              models: { truck: truckUrl, moto: motoUrl, buildings: [buildingLarge, buildingMedium, buildingSmall, buildingSample], cars: [carR7, carS64], station: metroStation, trains: [trainA, trainB, trainC] },
               halftone: readHalftone(),
               focus,
               onActive: (index) => {

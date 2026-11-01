@@ -5,10 +5,10 @@ import { flat, mergeGeometries } from "./geometry";
 const loader = new GLTFLoader();
 
 /**
- * One GLB from the site's own origin, as a single merged geometry (position, and normal when the file has one) in world space.
+ * One GLB from the site's own origin, as a single merged geometry (position, normal when the file has one, and the attributes named in `keep`) in world space.
  * Resolves to null when anything goes wrong, so the caller can fall back to a generated model: no model is required.
  */
-export function loadModel(url: string): Promise<THREE.BufferGeometry | null> {
+export function loadModel(url: string, keep: string[] = []): Promise<THREE.BufferGeometry | null> {
   return fetch(url)
     .then((r) => (r.ok ? r.arrayBuffer() : Promise.reject(new Error(`HTTP ${r.status}`))))
     .then(
@@ -37,7 +37,7 @@ export function loadModel(url: string): Promise<THREE.BufferGeometry | null> {
                   g.setAttribute(key, new THREE.BufferAttribute(wide, attr.itemSize));
                 }
                 g.applyMatrix4(mesh.matrixWorld);
-                list.push(flat(g));
+                list.push(flat(g, keep));
               });
               resolve(list.length ? mergeGeometries(list) : null);
             },
