@@ -79,6 +79,15 @@ export async function start(canvas: HTMLCanvasElement, options: SceneOptions): P
   const anchor = V3(0, 0, 0);
   const projected = V3(0, 0, 0);
   const cards: (HTMLElement | null)[] = [];
+  /** The last value written to each custom property of each card: a write that changes nothing still costs a style recalculation. */
+  const written = new Map<HTMLElement, Record<string, string>>();
+  const put = (el: HTMLElement, name: string, value: string) => {
+    let known = written.get(el);
+    if (!known) written.set(el, (known = {}));
+    if (known[name] === value) return;
+    known[name] = value;
+    el.style.setProperty(name, value);
+  };
   const cardWidth: number[] = [];
 
   // State.
@@ -263,6 +272,7 @@ export async function start(canvas: HTMLCanvasElement, options: SceneOptions): P
     schedule();
   };
 
+  let lastTravel = 1;
   const camPos = V3(0, 0, 0);
   const camLook = V3(0, 0, 0);
   const view = V3(0, 0, 0);
@@ -302,8 +312,10 @@ export async function start(canvas: HTMLCanvasElement, options: SceneOptions): P
     }
     redLight.position.set(camera.position.x + 4, camera.position.y + 3, camera.position.z - 6);
     // The page's panels lean with the camera (src/pages/Home.tsx listens); the attribute is what the e2e suite reads.
-    canvas.dataset.travel = pan.toFixed(3);
-    if (motion && !fixed) window.dispatchEvent(new CustomEvent("scene:travel", { detail: { yaw: pan, roll } }));
+    if (Math.abs(pan - lastTravel) > 0.004 || pan === 0) {
+      lastTravel = pan;
+      canvas.dataset.travel = pan.toFixed(3);
+    }
   };
 
   /**
@@ -324,7 +336,7 @@ export async function start(canvas: HTMLCanvasElement, options: SceneOptions): P
       if (!visible) {
         if (el.dataset.shown !== "0") {
           el.dataset.shown = "0";
-          el.style.setProperty("--o", "0");
+          put(el, "--o", "0");
           el.inert = true;
         }
         continue;
@@ -334,7 +346,7 @@ export async function start(canvas: HTMLCanvasElement, options: SceneOptions): P
       const depth = -projected.z;
       if (depth < 3) {
         el.dataset.shown = "0";
-        el.style.setProperty("--o", "0");
+        put(el, "--o", "0");
         el.inert = true;
         continue;
       }
@@ -347,10 +359,10 @@ export async function start(canvas: HTMLCanvasElement, options: SceneOptions): P
       const near = ad < 0.22;
       // Previews fade in from the distance; the card at its stop is fully there.
       const o = near ? 1 : Math.max(0, 0.9 * (1 - (ad - 0.22) / 0.9));
-      el.style.setProperty("--x", px.toFixed(1));
-      el.style.setProperty("--y", py.toFixed(1));
-      el.style.setProperty("--s", scale.toFixed(3));
-      el.style.setProperty("--o", o.toFixed(2));
+      put(el, "--x", px.toFixed(1));
+      put(el, "--y", py.toFixed(1));
+      put(el, "--s", scale.toFixed(3));
+      put(el, "--o", o.toFixed(2));
       if (el.dataset.shown !== "1" || el.inert === near) {
         el.dataset.shown = "1";
         el.inert = !near;
@@ -359,7 +371,7 @@ export async function start(canvas: HTMLCanvasElement, options: SceneOptions): P
       else delete el.dataset.near;
       shown += 1;
     }
-    canvas.dataset.cards = String(shown);
+    if (canvas.dataset.cards !== String(shown)) canvas.dataset.cards = String(shown);
   };
 
   // CPU time of one frame in milliseconds (our own JavaScript, not the GPU), averaged over sixty frames: the number to watch for a stuttering scroll.

@@ -3,8 +3,8 @@ export type Quality = "auto" | "high" | "low";
 export const SCALES = [1, 0.8, 0.65, 0.5];
 const WARM_UP = 60;
 const WINDOW = 45;
-const SLOW = 0.027;
-const FAST = 0.0175;
+const SLOW = 0.022;
+const FAST = 0.0135;
 const RAISE_LOCK_MS = 6000;
 
 /**
