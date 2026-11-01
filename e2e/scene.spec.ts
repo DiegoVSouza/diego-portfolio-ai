@@ -108,3 +108,24 @@ test("static frame of the contact section (scene S5)", async ({ page }) => {
   mkdirSync(evidence, { recursive: true });
   await section.screenshot({ path: `${evidence}/contact.png` });
 });
+
+test("the half-tone pass is on by default, the h key and the button turn it off, and the choice is remembered", async ({ page }) => {
+  const problems = watch(page);
+  await page.goto("/");
+  const canvas = page.locator("canvas.scene");
+  await expect(canvas).toHaveAttribute("data-scene", "3d", { timeout: 20_000 });
+  await expect(canvas).toHaveAttribute("data-halftone", "on");
+  const button = page.getByRole("button", { name: "Halftone" });
+  await expect(button).toHaveAttribute("aria-pressed", "true");
+  mkdirSync(evidence, { recursive: true });
+  await page.waitForTimeout(400);
+  await page.screenshot({ path: `${evidence}/home-halftone.png` });
+  await page.keyboard.press("h");
+  await expect(canvas).toHaveAttribute("data-halftone", "off");
+  await expect(button).toHaveAttribute("aria-pressed", "false");
+  await page.reload();
+  await expect(page.locator("canvas.scene")).toHaveAttribute("data-halftone", "off", { timeout: 20_000 });
+  await page.getByRole("button", { name: "Halftone" }).click();
+  await expect(page.locator("canvas.scene")).toHaveAttribute("data-halftone", "on");
+  expect(problems).toEqual([]);
+});

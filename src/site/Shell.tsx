@@ -59,6 +59,7 @@ export function Shell({ children, hud, ghost }: { children: ReactNode; hud?: str
   return (
     <>
       <Layers ghost={ghost ?? "07"} />
+      <div className="screen-dots" aria-hidden="true" />
       {(route.page === "home" || route.page === "demo" || route.page === "case") && <SceneHost mode={mode} slugs={caseCards.map((c) => c.slug)} labels={caseCards.map((c) => c.name[lang])} focusSlug={route.page === "case" ? route.slug : undefined} />}
       <SkipLink>{t.skip}</SkipLink>
       <Header />

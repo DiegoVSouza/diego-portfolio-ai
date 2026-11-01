@@ -4,6 +4,9 @@
  * This file is a lazy chunk: the page never depends on it, and any failure here leaves the level 1 background.
  */
 import * as THREE from "three";
+import { EffectComposer } from "three/examples/jsm/postprocessing/EffectComposer.js";
+import { RenderPass } from "three/examples/jsm/postprocessing/RenderPass.js";
+import { ShaderPass } from "three/examples/jsm/postprocessing/ShaderPass.js";
 
 export type SceneMode = "3d" | "3d-static";
 export type Quality = "auto" | "high" | "low";
@@ -12,6 +15,8 @@ export interface SceneOptions {
   /** One entry per project, in scroll order. */
   slugs: string[];
   mode: SceneMode;
+  /** Half-tone screen pass (the identity of the design system). On by default. */
+  halftone?: boolean;
   /** Case pages: hold the camera at this project's station. The page does not scroll the scene and nothing moves. */
   focus?: number;
   onActive?: (index: number) => void;
@@ -24,6 +29,7 @@ export interface SceneController {
   dispose(): void;
   setQuality(q: Quality): void;
   setMotion(on: boolean): void;
+  setHalftone(on: boolean): void;
   /** Fires one finite event per finished run step (used by /demo/). Driven only by real run data. */
   pulse(): void;
 }
@@ -50,6 +56,36 @@ function token(name: string): THREE.Color {
   if (!/^#[0-9a-f]{3,8}$/i.test(raw)) throw new Error(`token ${name} is not a plain color`);
   return new THREE.Color(raw);
 }
+
+/** The half-tone shader writes final sRGB values, so the tokens go in as plain sRGB, not through THREE.Color (which converts to linear). */
+function tokenVec(name: string): THREE.Vector3 {
+  const raw = getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+  if (!/^#[0-9a-f]{3,6}$/i.test(raw)) throw new Error(`token ${name} is not a plain color`);
+  const hex = raw.slice(1);
+  const n = parseInt(hex.length === 3 ? hex.split("").map((c) => c + c).join("") : hex, 16);
+  return new THREE.Vector3(((n >> 16) & 255) / 255, ((n >> 8) & 255) / 255, (n & 255) / 255);
+}
+
+const HALFTONE_VERTEX = `varying vec2 vUv; void main(){ vUv = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }`;
+
+/** Grid at 45 degrees, three tones (ink, accent, paper), dot radius grows with luminance, paper outline on edges. */
+const HALFTONE_FRAGMENT = `
+  uniform sampler2D tDiffuse; uniform vec2 res; uniform float cell; uniform vec3 cInk; uniform vec3 cRed; uniform vec3 cPaper; varying vec2 vUv;
+  float lum(vec3 c){ return sqrt(dot(c, vec3(.2126,.7152,.0722))); }
+  void main(){
+    vec3 c = texture2D(tDiffuse, vUv).rgb;
+    float l = lum(c);
+    vec2 px = 1.5/res;
+    float e = abs(lum(texture2D(tDiffuse, vUv+vec2(px.x,0.)).rgb) - lum(texture2D(tDiffuse, vUv-vec2(px.x,0.)).rgb))
+            + abs(lum(texture2D(tDiffuse, vUv+vec2(0.,px.y)).rgb) - lum(texture2D(tDiffuse, vUv-vec2(0.,px.y)).rgb));
+    vec2 p = vUv*res; float a = .7853;
+    mat2 r = mat2(cos(a), -sin(a), sin(a), cos(a));
+    float d = length(fract(r*p/cell) - .5);
+    vec3 col = mix(cInk, cRed, step(d, smoothstep(0.,.5,l)*.75));
+    col = mix(col, cPaper, step(d, clamp((l-.5)*2.,0.,1.)*.75));
+    col = mix(col, cPaper, step(.34, e));
+    gl_FragColor = vec4(col, 1.);
+  }`;
 
 type Tone = "paper" | "red" | "dark";
 
@@ -81,6 +117,27 @@ export function start(canvas: HTMLCanvasElement, options: SceneOptions): SceneCo
   scene.background = ink;
   scene.fog = new THREE.Fog(ink, 18, 110);
   const camera = new THREE.PerspectiveCamera(55, 1, 0.1, 160);
+
+  // Post-process: the composer renders the scene and the half-tone pass writes to the screen.
+  // The composer renders several passes per frame; count draw calls across all of them, reset once per frame.
+  renderer.info.autoReset = false;
+  const composer = new EffectComposer(renderer);
+  composer.addPass(new RenderPass(scene, camera));
+  const halftonePass = new ShaderPass({
+    uniforms: {
+      tDiffuse: { value: null },
+      res: { value: new THREE.Vector2(1, 1) },
+      cell: { value: 5 },
+      cInk: { value: tokenVec("--ink") },
+      cRed: { value: tokenVec("--red") },
+      cPaper: { value: tokenVec("--paper") },
+    },
+    vertexShader: HALFTONE_VERTEX,
+    fragmentShader: HALFTONE_FRAGMENT,
+  });
+  composer.addPass(halftonePass);
+  let useHalftone = options.halftone !== false;
+  canvas.dataset.halftone = useHalftone ? "on" : "off";
 
   const count = Math.max(1, options.slugs.length);
   const length = count * STATION + 60;
@@ -331,6 +388,12 @@ export function start(canvas: HTMLCanvasElement, options: SceneOptions): SceneCo
     const scale = quality === "high" ? 1 : quality === "low" ? SCALES[3]! : SCALES[level]!;
     renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.5) * scale);
     renderer.setSize(width, height, false);
+    // The dot cell follows the device pixel ratio actually in use, so adaptive quality does not change the dot's look.
+    const pr = renderer.getPixelRatio();
+    composer.setPixelRatio(pr);
+    composer.setSize(width, height);
+    halftonePass.uniforms.res!.value.set(width * pr, height * pr);
+    halftonePass.uniforms.cell!.value = 5 * pr;
     options.onQuality?.(scale);
   };
   const onScroll = () => {
@@ -423,7 +486,9 @@ export function start(canvas: HTMLCanvasElement, options: SceneOptions): SceneCo
       return;
     }
     place(current, now);
-    renderer.render(scene, camera);
+    renderer.info.reset();
+    if (useHalftone) composer.render();
+    else renderer.render(scene, camera);
     if (!canvas.dataset.draws) canvas.dataset.draws = String(renderer.info.render.calls);
     dirty = false;
 
@@ -514,6 +579,7 @@ export function start(canvas: HTMLCanvasElement, options: SceneOptions): SceneCo
       if (Array.isArray(m)) m.forEach((x) => x.dispose());
       else m?.dispose();
     });
+    composer.dispose();
     renderer.dispose();
   }
 
@@ -535,6 +601,12 @@ export function start(canvas: HTMLCanvasElement, options: SceneOptions): SceneCo
           p.mesh.rotation.copy(p.homeRot);
         }
       }
+      dirty = true;
+      schedule();
+    },
+    setHalftone(on) {
+      useHalftone = on;
+      canvas.dataset.halftone = on ? "on" : "off";
       dirty = true;
       schedule();
     },

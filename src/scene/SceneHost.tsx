@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import type { BackgroundMode } from "colagem-ui";
 import { useLang } from "../site/Shell";
 import { onPulse } from "./pulse";
@@ -16,6 +16,15 @@ function onIdle(run: () => void): () => void {
 
 /** Portrait screens keep the level 1 background: the city needs width, and phones should not pay for it. */
 const portrait = (): boolean => typeof matchMedia === "function" && matchMedia("(max-aspect-ratio: 1/1)").matches;
+
+const HALFTONE_KEY = "scene-halftone";
+const readHalftone = (): boolean => {
+  try {
+    return window.localStorage.getItem(HALFTONE_KEY) !== "off";
+  } catch {
+    return true;
+  }
+};
 
 const saveData = (): boolean => {
   const connection = (navigator as Navigator & { connection?: { saveData?: boolean } }).connection;
@@ -39,6 +48,8 @@ export function SceneHost({ mode, slugs, labels, focusSlug, pulseKey }: { mode: 
   };
   const [quality, setQuality] = useState<Quality>("auto");
   const [motion, setMotion] = useState(true);
+  const [halftone, setHalftone] = useState(true);
+  useEffect(() => setHalftone(readHalftone()), []);
   const slugKey = slugs.join(",");
   const focus = focusSlug === undefined ? undefined : slugs.indexOf(focusSlug);
 
@@ -54,6 +65,7 @@ export function SceneHost({ mode, slugs, labels, focusSlug, pulseKey }: { mode: 
             controller.current = start(element, {
               slugs: slugKey.split(","),
               mode,
+              halftone: readHalftone(),
               focus: focus === undefined || focus < 0 ? undefined : focus,
               onActive: (index) => {
                 element.dataset.active = String(index);
@@ -97,6 +109,30 @@ export function SceneHost({ mode, slugs, labels, focusSlug, pulseKey }: { mode: 
     setQuality(next);
     controller.current?.setQuality(next);
   };
+  const toggleHalftone = useCallback(() => {
+    setHalftone((on) => {
+      const next = !on;
+      controller.current?.setHalftone(next);
+      try {
+        window.localStorage.setItem(HALFTONE_KEY, next ? "on" : "off");
+      } catch {
+        // storage can be blocked; the choice then lasts for this visit only
+      }
+      return next;
+    });
+  }, []);
+  // The "h" key flips the half-tone, as in the original scene. It never fires while typing.
+  useEffect(() => {
+    if (!running) return undefined;
+    const onKey = (event: KeyboardEvent) => {
+      const target = event.target as HTMLElement | null;
+      if (event.key.toLowerCase() !== "h" || event.ctrlKey || event.metaKey || event.altKey) return;
+      if (target && (/^(INPUT|TEXTAREA|SELECT)$/.test(target.tagName) || target.isContentEditable)) return;
+      toggleHalftone();
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [running, toggleHalftone]);
   const toggleMotion = () => {
     setMotion(!motion);
     controller.current?.setMotion(!motion);
@@ -111,6 +147,9 @@ export function SceneHost({ mode, slugs, labels, focusSlug, pulseKey }: { mode: 
           <span className="sr" role="status" aria-live="polite">{announcement}</span>
           <button type="button" className="tg" onClick={cycle}>
             {t.sceneQuality}: {quality === "auto" ? t.sceneQualityAuto : quality === "high" ? t.sceneQualityHigh : t.sceneQualityLow}
+          </button>
+          <button type="button" className="tg" aria-pressed={halftone} aria-keyshortcuts="h" onClick={toggleHalftone}>
+            {t.sceneHalftone}
           </button>
           {mode === "3d" && focus === undefined && (
             <button type="button" className="tg" aria-pressed={motion} onClick={toggleMotion}>

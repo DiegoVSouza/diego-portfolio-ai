@@ -78,3 +78,9 @@
 .palette li[role="option"] { padding: 10px; cursor: pointer; border-left: 4px solid transparent; }
 .palette li[aria-selected="true"] { background: var(--ink); border-left-color: var(--red); }
 .palette-empty { padding: 10px; color: var(--mut); }
+
+/* Level 1 half-tone: two offset dot grids on a screen layer behind the content. It shows only when the 3D scene is not used. */
+.screen-dots { display: none; position: fixed; inset: 0; z-index: var(--z-bg); pointer-events: none; opacity: .06; mix-blend-mode: screen;
+  background: radial-gradient(circle, var(--paper) 1px, transparent 1.6px) 0 0 / 6px 6px, radial-gradient(circle, var(--paper) 1px, transparent 1.6px) 3px 3px / 6px 6px; }
+[data-bg="2d"] .screen-dots { display: block; }
+@media (prefers-reduced-motion: reduce) { .screen-dots { opacity: .04; } }

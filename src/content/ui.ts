@@ -91,6 +91,7 @@ export interface Strings {
   demoAccounts: string;
   sceneLabel: string;
   sceneAnnounce: string;
+  sceneHalftone: string;
   paletteOpen: string;
   paletteTitle: string;
   paletteHint: string;
@@ -228,6 +229,7 @@ const en: Strings = {
   demoAccounts: "Demo accounts",
   sceneLabel: "Background scene",
   sceneAnnounce: "Project {n} of {total}: {name}",
+  sceneHalftone: "Halftone",
   paletteOpen: "Search pages",
   paletteTitle: "Go to",
   paletteHint: "Type a page or a project",
@@ -372,6 +374,7 @@ const pt: Strings = {
   demoAccounts: "Contas de demo",
   sceneLabel: "Cena de fundo",
   sceneAnnounce: "Projeto {n} de {total}: {name}",
+  sceneHalftone: "Pontilhado",
   paletteOpen: "Buscar páginas",
   paletteTitle: "Ir para",
   paletteHint: "Digite uma página ou um projeto",
