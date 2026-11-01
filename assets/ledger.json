@@ -1,6 +1,51 @@
 {
   "assets": [
     {
+      "path": "assets/game/models/building-large.glb",
+      "author": "Quaternius (Downtown City MegaKit, Standard); simplified and stripped of textures by gltf-transform 4.5.1",
+      "license": "CC0",
+      "url": "https://quaternius.com",
+      "source": "manual",
+      "sha256": "4234a4065f9100386f7654f50c02946062a9e50f853a367a662dfef1d5cb208c",
+      "fetchedAt": "2026-11-01T17:50:42.733Z"
+    },
+    {
+      "path": "assets/game/models/building-medium.glb",
+      "author": "Quaternius (Downtown City MegaKit, Standard); simplified and stripped of textures by gltf-transform 4.5.1",
+      "license": "CC0",
+      "url": "https://quaternius.com",
+      "source": "manual",
+      "sha256": "eea7e6192dda5cfdfd5e58e8a2dcf825ef01ba2d5ba4d371522aa5fa26967775",
+      "fetchedAt": "2026-11-01T17:50:42.823Z"
+    },
+    {
+      "path": "assets/game/models/building-small.glb",
+      "author": "Quaternius (Downtown City MegaKit, Standard); simplified and stripped of textures by gltf-transform 4.5.1",
+      "license": "CC0",
+      "url": "https://quaternius.com",
+      "source": "manual",
+      "sha256": "08b0863ea42da58bffe555619bcc804df5c132fbeb53b0d7b1f9b0cbfc559113",
+      "fetchedAt": "2026-11-01T17:50:42.918Z"
+    },
+    {
+      "path": "assets/game/models/car-r7.glb",
+      "author": "Unknown author (A_R7 pack; licence.txt in the pack says CC0); converted from FBX by scripts/fbx_to_glb.mjs",
+      "license": "CC0",
+      "url": "https://github.com/DiegoVSouza (local pack A_R7.zip, licence.txt: CC0)",
+      "source": "manual",
+      "sha256": "aad87b49852dd790b470e6dd1a9537c8f90c58513ae52d56c913d3f62e4a854d",
+      "fetchedAt": "2026-11-01T17:50:42.997Z"
+    },
+    {
+      "path": "assets/game/models/car-s64.glb",
+      "author": "Unknown author (S64Compact_v1_C pack; licence.txt in the pack says CC0); converted from FBX by scripts/fbx_to_glb.mjs",
+      "license": "CC0",
+      "url": "https://github.com/DiegoVSouza (local pack S64Compact_v1_C.zip, licence.txt: CC0)",
+      "source": "manual",
+      "sha256": "15a21b08087064749a29c59defb50f55b8164ca28d88d62871ae6011b7c7b532",
+      "fetchedAt": "2026-11-01T17:50:43.101Z"
+    },
+    {
       "path": "assets/game/models/moto.glb",
       "author": "Kenney (kenney.nl), textures removed by scripts/glb_strip_textures.py",
       "license": "CC0",

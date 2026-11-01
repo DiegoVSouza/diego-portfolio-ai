@@ -159,3 +159,21 @@ test("travelling under reduced motion: no swing, no events, the scroll still rea
   expect(await page.evaluate(() => (window as unknown as { __turns: number }).__turns)).toBe(0);
   await context.close();
 });
+
+test("the scene is built from the real downloaded models, not the fallbacks (assets: Quaternius buildings, two cars)", async ({ page }) => {
+  await mockApi(page);
+  const problems: string[] = [];
+  page.on("console", (m) => { if (m.type() === "error" || m.type() === "warning") problems.push(m.text()); });
+  page.on("pageerror", (e) => problems.push(`pageerror ${e.message}`));
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto("/");
+  const canvas = page.locator("canvas.scene");
+  await expect(canvas).toHaveAttribute("data-scene", "3d", { timeout: 20_000 });
+  // Twelve skyline towers come from the building models, and the fleet has a truck, a moto and two cars.
+  await expect(canvas).toHaveAttribute("data-landmarks", "12");
+  await expect.poll(async () => Number(await canvas.getAttribute("data-vehicle-kinds")), { timeout: 15_000 }).toBe(4);
+  // No model fell back to a generated one: a fallback logs a warning.
+  expect(problems.filter((p) => /did not load/.test(p))).toEqual([]);
+  // Nothing sits at the origin (the known stacking bug) and the scene is not empty.
+  await expect(canvas).toHaveAttribute("data-at-origin", "0");
+});

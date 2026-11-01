@@ -26,7 +26,7 @@ export interface SceneOptions {
   /** Case pages: hold the camera at this project's station. Nothing moves and the page does not scroll the scene. */
   focus?: number;
   /** Real models, served by the site (Kenney, CC0). */
-  models: { truck: string; moto: string };
+  models: { truck: string; moto: string; buildings?: string[]; cars?: string[] };
   onActive?: (index: number) => void;
   onQuality?: (scale: number) => void;
   /** Called when WebGL is lost or the loop throws. The host then falls back to level 1. */
@@ -154,6 +154,7 @@ export async function start(canvas: HTMLCanvasElement, options: SceneOptions): P
   let ready = false;
   let vehiclesWaiting = false;
   const vehiclesLoaded = () => {
+    canvas.dataset.vehicleKinds = String(city.vehicleKinds());
     city.place(time, !motion);
     refreshOrigin();
     dirty = true;
@@ -175,6 +176,7 @@ export async function start(canvas: HTMLCanvasElement, options: SceneOptions): P
       else vehiclesWaiting = true;
     },
   });
+  canvas.dataset.landmarks = String(city.landmarks);
   if (document.fonts?.load) {
     void document.fonts
       .load('400 430px "Anton"')

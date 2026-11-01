@@ -17,7 +17,7 @@ export interface CityContext {
   /** Short words for the vertical neon signs, one per project. */
   signs: string[];
   /** URLs of the real models (Kenney, CC0). If one fails to load, a generated model takes its place. */
-  models: { truck: string; moto: string };
+  models: { truck: string; moto: string; /** Downtown buildings (Quaternius, CC0), simplified. Without them the skyline is boxes. */ buildings?: string[]; /** Cars (CC0), length along X with the front at +X. */ cars?: string[] };
   onVehicles(): void;
 }
 
@@ -25,6 +25,10 @@ export interface City {
   /** Put every moving instance where it belongs at `time` seconds. Called every frame in motion mode, once in static modes. */
   place(time: number, reduce: boolean): void;
   ghosts: { mesh: THREE.Mesh; material: THREE.MeshBasicMaterial; index: number }[];
+  /** How many skyline buildings come from the real models (zero when they failed to load). */
+  landmarks: number;
+  /** How many kinds of vehicle are in the fleet once the models have loaded (truck, moto, cars). */
+  vehicleKinds(): number;
   /** Ghost numbers are painted again once the display font is ready. */
   repaintGhosts(): void;
 }
@@ -107,6 +111,49 @@ export async function buildCity(c: CityContext): Promise<City> {
   });
   scene.add(scraps);
 
+  const loader = new GLTFLoader();
+  const loadModel = (url: string): Promise<THREE.BufferGeometry | null> =>
+    fetch(url)
+      .then((r) => (r.ok ? r.arrayBuffer() : Promise.reject(new Error(`HTTP ${r.status}`))))
+      .then(
+        (buffer) =>
+          new Promise<THREE.BufferGeometry | null>((resolve) => {
+            loader.parse(
+              buffer,
+              "",
+              (gltf) => {
+                const list: THREE.BufferGeometry[] = [];
+                gltf.scene.updateMatrixWorld(true);
+                gltf.scene.traverse((o) => {
+                  const mesh = o as THREE.Mesh;
+                  if (mesh.isMesh) {
+                    const g = mesh.geometry.clone();
+                    // KHR_mesh_quantization keeps normalised integers; a world matrix would overflow them.
+                    for (const key of ["position", "normal"]) {
+                      const attr = g.getAttribute(key);
+                      if (!attr || attr.array instanceof Float32Array) continue;
+                      const wide = new Float32Array(attr.count * attr.itemSize);
+                      for (let i = 0; i < attr.count; i += 1) {
+                        wide[i * attr.itemSize] = attr.getX(i);
+                        wide[i * attr.itemSize + 1] = attr.getY(i);
+                        wide[i * attr.itemSize + 2] = attr.getZ(i);
+                      }
+                      g.setAttribute(key, new THREE.BufferAttribute(wide, attr.itemSize));
+                    }
+                    g.applyMatrix4(mesh.matrixWorld);
+                    list.push(flat(g));
+                  }
+                });
+                resolve(list.length ? mergeGeometries(list) : null);
+              },
+              () => resolve(null),
+            );
+          }),
+      )
+      .catch((error: unknown) => {
+        console.warn(`scene: model ${url} did not load, a generated model is used`, error);
+        return null;
+      });
   await tick();
   /* ---------- FUNDO: skyline with lit windows ---------- */
   const winTex = (() => {
@@ -129,6 +176,14 @@ export async function buildCity(c: CityContext): Promise<City> {
     t.colorSpace = THREE.SRGBColorSpace;
     return t;
   })();
+  // Real buildings, when they load: each is centred on its footprint, with its base on y = 0.
+  const protos = ((await Promise.all((c.models.buildings ?? []).map(loadModel))).filter((g): g is THREE.BufferGeometry => g !== null)).map((g) => {
+    g.computeBoundingBox();
+    const bb = g.boundingBox!;
+    g.translate(-(bb.min.x + bb.max.x) / 2, -bb.min.y, -(bb.min.z + bb.max.z) / 2);
+    return { g, height: bb.max.y - bb.min.y };
+  });
+  const landmarkParts: THREE.BufferGeometry[] = [];
   const towerParts: THREE.BufferGeometry[] = [];
   const beacons: THREE.BufferGeometry[] = [];
   const signSpots: { x: number; y: number; z: number }[] = [];
@@ -143,6 +198,20 @@ export async function buildCity(c: CityContext): Promise<City> {
     const x = at.x + R.x * s * lat;
     const z = at.z + R.z * s * lat + (rnd() - 0.5) * 5;
     const y = at.y - 26 + h / 2;
+    if (protos.length && n % 3 === 0) {
+      // A real building facing the avenue (the model's front is +Z), scaled to this tower's height.
+      const proto = protos[(n / 3) % protos.length]!;
+      const target = 24 + rnd() * 22;
+      const k = target / proto.height;
+      const real = proto.g.clone().scale(k, k, k);
+      real.rotateY(Math.atan2(-R.x * s, -R.z * s));
+      real.translate(x, at.y - 26, z);
+      tint(real, rnd() < 0.18 ? p.dred : rnd() < 0.5 ? grey(0.28) : grey(0.19));
+      landmarkParts.push(real);
+      if (rnd() < 0.55) beacons.push(new THREE.BoxGeometry(0.5, 0.5, 0.5).translate(x, at.y - 26 + target + 0.3, z));
+      if (signSpots.length < 14 && target > 26) signSpots.push({ x, y: at.y - 26 + target * 0.6, z: z + d / 2 + 0.06 });
+      continue;
+    }
     const g = new THREE.BoxGeometry(w, h, d);
     const uv = g.attributes.uv!;
     for (let i = 0; i < uv.count; i += 1) {
@@ -163,6 +232,11 @@ export async function buildCity(c: CityContext): Promise<City> {
   );
   towers.frustumCulled = false;
   scene.add(towers);
+  if (landmarkParts.length) {
+    const landmarks = new THREE.Mesh(mergeGeometries(landmarkParts)!, towers.material);
+    landmarks.frustumCulled = false;
+    scene.add(landmarks);
+  }
   const beaconMesh = new THREE.Mesh(mergeFlat(beacons), new THREE.MeshBasicMaterial({ color: p.red }));
   beaconMesh.frustumCulled = false;
   scene.add(beaconMesh);
@@ -260,51 +334,30 @@ export async function buildCity(c: CityContext): Promise<City> {
 
   type Fleet = { mesh: THREE.InstancedMesh; n: number; base: number };
   let fleet: Fleet[] | null = null;
-  const VEHICLES = 9;
+  let kindsLoaded = 0;
+  const VEHICLES = 13;
   const vehicleData = Array.from({ length: VEHICLES }, (_, i) => ({ u: rnd(), sp: (0.025 + rnd() * 0.03) * (i % 2 ? 1 : -1), off: (i % 2 ? 1 : -1) * 1.6 }));
 
-  const loader = new GLTFLoader();
-  const loadModel = (url: string): Promise<THREE.BufferGeometry | null> =>
-    fetch(url)
-      .then((r) => (r.ok ? r.arrayBuffer() : Promise.reject(new Error(`HTTP ${r.status}`))))
-      .then(
-        (buffer) =>
-          new Promise<THREE.BufferGeometry | null>((resolve) => {
-            loader.parse(
-              buffer,
-              "",
-              (gltf) => {
-                const list: THREE.BufferGeometry[] = [];
-                gltf.scene.updateMatrixWorld(true);
-                gltf.scene.traverse((o) => {
-                  const mesh = o as THREE.Mesh;
-                  if (mesh.isMesh) {
-                    const g = mesh.geometry.clone();
-                    g.applyMatrix4(mesh.matrixWorld);
-                    list.push(flat(g));
-                  }
-                });
-                resolve(list.length ? mergeGeometries(list) : null);
-              },
-              () => resolve(null),
-            );
-          }),
-      )
-      .catch((error: unknown) => {
-        console.warn(`scene: model ${url} did not load, a generated model is used`, error);
-        return null;
-      });
-  void Promise.all([loadModel(c.models.truck), loadModel(c.models.moto)]).then(([truck, moto]) => {
-    const sources = [truck ?? truckFallback(), moto ?? truckFallback()];
-    fleet = sources.map((g, k) => {
-      const n = k ? 4 : VEHICLES - 4;
-      const mesh = new THREE.InstancedMesh(fit(g.clone(), k ? 2.6 : 3.8), new THREE.MeshStandardMaterial({ flatShading: true, roughness: 0.6, metalness: 0.2 }), n);
+  // The fleet: a truck, a moto and the real cars. A model that fails to load is replaced (truck, moto) or left out (cars).
+  const carFront = (g: THREE.BufferGeometry | null) => g?.rotateY(-Math.PI / 2) ?? null; // the cars' front is +X; vehicles drive along +Z
+  void Promise.all([loadModel(c.models.truck), loadModel(c.models.moto), ...(c.models.cars ?? []).map((url) => loadModel(url).then(carFront))]).then(([truck, moto, ...cars]) => {
+    const kinds = [
+      { g: truck ?? truckFallback(), n: 3, size: 3.8 },
+      { g: moto ?? truckFallback(), n: 3, size: 2.6 },
+      ...cars.map((g, i) => ({ g, n: i ? 3 : 4, size: 3.4 })).filter((k): k is { g: THREE.BufferGeometry; n: number; size: number } => k.g !== null),
+    ];
+    let base = 0;
+    fleet = kinds.slice(0, 4).map((k) => {
+      const mesh = new THREE.InstancedMesh(fit(k.g.clone(), k.size), new THREE.MeshStandardMaterial({ flatShading: true, roughness: 0.6, metalness: 0.2 }), k.n);
       mesh.frustumCulled = false;
       const tones = [p.red, p.paper, grey(0.17), p.red];
-      for (let i = 0; i < n; i += 1) mesh.setColorAt(i, col.copy(tones[i % 4]!));
+      for (let i = 0; i < k.n; i += 1) mesh.setColorAt(i, col.copy(tones[(i + base) % 4]!));
       scene.add(mesh);
-      return { mesh, n, base: k ? VEHICLES - 4 : 0 };
+      const f = { mesh, n: k.n, base };
+      base += k.n;
+      return f;
     });
+    kindsLoaded = kinds.length;
     c.onVehicles();
   });
 
@@ -413,6 +466,8 @@ export async function buildCity(c: CityContext): Promise<City> {
   return {
     place,
     ghosts,
+    landmarks: landmarkParts.length,
+    vehicleKinds: () => kindsLoaded,
     repaintGhosts: () => {
       paintGhosts();
       for (const m of signMats) (m.map!.userData as { paint?: () => void }).paint?.();

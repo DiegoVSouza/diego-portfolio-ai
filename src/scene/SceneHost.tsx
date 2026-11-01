@@ -5,6 +5,11 @@ import { useSimple } from "../site/simple";
 import { onPulse } from "./pulse";
 import motoUrl from "../../assets/game/models/moto.glb?url";
 import truckUrl from "../../assets/game/models/truck.glb?url";
+import buildingLarge from "../../assets/game/models/building-large.glb?url";
+import buildingMedium from "../../assets/game/models/building-medium.glb?url";
+import buildingSmall from "../../assets/game/models/building-small.glb?url";
+import carR7 from "../../assets/game/models/car-r7.glb?url";
+import carS64 from "../../assets/game/models/car-s64.glb?url";
 import type { Quality, SceneController } from "./scene";
 
 /** Loads after first paint, on idle. If anything fails the level 1 background stays and the page never notices. */
@@ -62,7 +67,7 @@ export function SceneHost({ mode, slugs, focusSlug, pulseKey }: { mode: Backgrou
             const started = await start(element, {
               slugs: slugKey.split(","),
               mode,
-              models: { truck: truckUrl, moto: motoUrl },
+              models: { truck: truckUrl, moto: motoUrl, buildings: [buildingLarge, buildingMedium, buildingSmall], cars: [carR7, carS64] },
               halftone: readHalftone(),
               focus: focus === undefined || focus < 0 ? undefined : focus,
               onActive: (index) => {
