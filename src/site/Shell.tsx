@@ -1,9 +1,22 @@
 import { SceneHost } from "../scene/SceneHost";
-import { useEffect, type ReactNode } from "react";
+import { lazy, Suspense, useEffect, useState, type ReactNode } from "react";
 import { AppFooter, AppHeader, Hud, Layers, SideIndex, SkipLink, useBackgroundMode, type Lang } from "colagem-ui";
 import { caseCards } from "../content/caseIndex";
 import { strings, type Strings } from "../content/ui";
 import { Link, hrefFor, useRoute, type Route } from "./router";
+
+const Palette = lazy(() => import("./Palette").then((m) => ({ default: m.Palette })));
+
+/** The palette is an enhancement. It loads after hydration, in its own chunk, so it never counts toward first load. */
+function LazyPalette() {
+  const [on, setOn] = useState(false);
+  useEffect(() => setOn(true), []);
+  return on ? (
+    <Suspense fallback={null}>
+      <Palette />
+    </Suspense>
+  ) : null;
+}
 
 export function useLang(): { lang: Lang; t: Strings } {
   const { route } = useRoute();
@@ -46,7 +59,7 @@ export function Shell({ children, hud, ghost }: { children: ReactNode; hud?: str
   return (
     <>
       <Layers ghost={ghost ?? "07"} />
-      {(route.page === "home" || route.page === "demo" || route.page === "case") && <SceneHost mode={mode} slugs={caseCards.map((c) => c.slug)} focusSlug={route.page === "case" ? route.slug : undefined} />}
+      {(route.page === "home" || route.page === "demo" || route.page === "case") && <SceneHost mode={mode} slugs={caseCards.map((c) => c.slug)} labels={caseCards.map((c) => c.name[lang])} focusSlug={route.page === "case" ? route.slug : undefined} />}
       <SkipLink>{t.skip}</SkipLink>
       <Header />
       {route.page === "case" && (
@@ -61,6 +74,7 @@ export function Shell({ children, hud, ghost }: { children: ReactNode; hud?: str
         <p>
           <Link to={hrefFor({ page: "design-system" }, lang)}>{t.navDesign}</Link> · <a href="/llms.txt">llms.txt</a> · <a href="/resume.md">{t.resume}</a>
         </p>
+        <p><LazyPalette /></p>
       </AppFooter>
     </>
   );

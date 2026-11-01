@@ -68,3 +68,13 @@
 @media (prefers-reduced-motion: reduce) { .scene { transition: none; } }
 .scene-controls { position: fixed; right: 12px; bottom: 12px; z-index: var(--z-hud); display: flex; gap: 8px; }
 .scene-controls .tg { background: var(--ink); }
+
+/* Command palette. Opaque surface, hard shadow, no rounded corners. */
+.palette { background: var(--card); color: var(--paper); border: 3px solid var(--paper); box-shadow: 8px 8px 0 var(--red); padding: 14px; width: min(560px, calc(100vw - 32px)); margin: 12vh auto auto; }
+.palette::backdrop { background: var(--ink); opacity: .85; }
+.palette .cmd { display: flex; gap: 8px; align-items: center; margin: 0 0 10px; }
+.palette input { flex: 1; min-width: 0; background: var(--ink); color: var(--paper); border: 2px solid var(--paper); padding: 10px; font: inherit; }
+.palette ul { list-style: none; margin: 0; padding: 0; max-height: 50vh; overflow: auto; }
+.palette li[role="option"] { padding: 10px; cursor: pointer; border-left: 4px solid transparent; }
+.palette li[aria-selected="true"] { background: var(--ink); border-left-color: var(--red); }
+.palette-empty { padding: 10px; color: var(--mut); }

@@ -7,8 +7,8 @@ flows: PASS (9 flows, paths checked at the pins)
 
  Test Files  6 passed (6)
       Tests  55 passed (55)
-   Start at  21:45:50
-   Duration  13.79s (environment 69%, setup 16%, tests 9%, transform 4%, import 2%)
+   Start at  21:54:51
+   Duration  8.34s (environment 79%, setup 12%, tests 6%, import 1%, transform 1%, worker 1%)
 
 lint: exit 0
 typecheck: exit 0
@@ -19,10 +19,10 @@ test: exit 0
 check-fast: OK
 [36mvite v8.3.5 [32mbuilding client environment for production...[36m[39m
 transforming...
-✓ 77 modules transformed.
+✓ 78 modules transformed.
 rendering chunks...
 computing gzip size...
-dist/index.html                                                      0.55 kB │ gzip:   0.31 kB
+dist/index.html                                                      0.55 kB │ gzip:   0.32 kB
 dist/assets/playfair-display-vietnamese-900-normal-wtaM1xIw.woff2    5.71 kB
 dist/assets/anton-vietnamese-400-normal-2FfR1wHA.woff                6.82 kB
 dist/assets/playfair-display-vietnamese-900-normal-dpsjWZtQ.woff     7.13 kB
@@ -38,7 +38,7 @@ dist/assets/courier-prime-latin-400-normal-BAlbUm6l.woff            14.38 kB
 dist/assets/courier-prime-latin-700-normal-CVvp4Sof.woff            14.67 kB
 dist/assets/anton-latin-400-normal-AUNGEG_V.woff                    15.63 kB
 dist/assets/playfair-display-latin-ext-900-normal-Dl6M2jFN.woff     16.23 kB
-dist/.vite/manifest.json                                            17.85 kB │ gzip:   2.09 kB
+dist/.vite/manifest.json                                            18.12 kB │ gzip:   2.12 kB
 dist/assets/anton-latin-400-normal-Byf51wtH.woff2                   18.61 kB
 dist/assets/courier-prime-latin-400-normal-BbyBr73r.woff2           18.64 kB
 dist/assets/courier-prime-latin-700-normal-D1YCjmaD.woff2           19.34 kB
@@ -50,13 +50,13 @@ dist/assets/special-elite-latin-ext-400-normal-CaJZjSVf.woff        29.99 kB
 dist/assets/anton-latin-ext-400-normal-SyiqE2Jt.woff2               31.35 kB
 dist/assets/special-elite-latin-400-normal-YjDd9tmf.woff2           53.29 kB
 dist/assets/special-elite-latin-400-normal-BtSRmyJ6.woff            63.41 kB
-dist/assets/index-PUILhUtk.css                                      29.71 kB │ gzip:   6.56 kB
+dist/assets/index-BXxIs_IO.css                                      30.43 kB │ gzip:   6.74 kB
 dist/assets/t-C8w94HjU.js                                            0.04 kB │ gzip:   0.06 kB
-dist/assets/NotFound-PiNM1046.js                                     0.05 kB │ gzip:   0.06 kB
-dist/assets/NotFound-BGIO6EkI.js                                     0.28 kB │ gzip:   0.21 kB
-dist/assets/DesignSystem-DPX9BtSJ.js                                 0.60 kB │ gzip:   0.35 kB
+dist/assets/NotFound-GBEH9HQc.js                                     0.05 kB │ gzip:   0.06 kB
+dist/assets/NotFound-DYkkCJij.js                                     0.28 kB │ gzip:   0.21 kB
+dist/assets/DesignSystem-B6VQXjEH.js                                 0.60 kB │ gzip:   0.35 kB
 dist/assets/design-system-Bawvoh1J.js                                0.82 kB │ gzip:   0.30 kB
-dist/assets/Method-DfY4Mza_.js                                       0.83 kB │ gzip:   0.42 kB
+dist/assets/Method-CF-pbpop.js                                       0.83 kB │ gzip:   0.42 kB
 dist/assets/observability-P2C-l3bA.js                                0.85 kB │ gzip:   0.30 kB
 dist/assets/toolkit-CAe4DhuE.js                                      0.85 kB │ gzip:   0.30 kB
 dist/assets/harness-CpEMhWMc.js                                      1.01 kB │ gzip:   0.33 kB
@@ -69,9 +69,10 @@ dist/assets/harness-6Q7rWlld.js                                      2.01 kB │
 dist/assets/observability-DkGWs8cb.js                                2.03 kB │ gzip:   0.88 kB
 dist/assets/toolkit-BckkHv60.js                                      2.07 kB │ gzip:   0.87 kB
 dist/assets/design-system-7bJ1lmZS.js                                2.08 kB │ gzip:   0.92 kB
-dist/assets/Experience-DttYG1o1.js                                   2.24 kB │ gzip:   0.75 kB
+dist/assets/Experience-BRQPsTpx.js                                   2.24 kB │ gzip:   0.76 kB
 dist/assets/async-YALiho6M.js                                        2.53 kB │ gzip:   0.95 kB
 dist/assets/foundation-CDULwV3L.js                                   2.74 kB │ gzip:   1.12 kB
+dist/assets/Palette-B4kJ2J8S.js                                      2.82 kB │ gzip:   1.33 kB
 dist/assets/agents-D6V2XCmy.js                                       2.95 kB │ gzip:   1.09 kB
 dist/assets/async-CLpnvHVB.js                                        3.08 kB │ gzip:   1.57 kB
 dist/assets/observability-ClgQydg0.js                                3.36 kB │ gzip:   1.62 kB
@@ -81,16 +82,16 @@ dist/assets/toolkit-auVf7BOm.js                                      4.06 kB │
 dist/assets/design-system-DqMnY-wL.js                                4.39 kB │ gzip:   2.15 kB
 dist/assets/agents-DPnHFCwv.js                                       4.53 kB │ gzip:   2.12 kB
 dist/assets/supportops-BtGreiaV.js                                   4.67 kB │ gzip:   1.76 kB
-dist/assets/Home-BXfQVEim.js                                         4.94 kB │ gzip:   1.50 kB
-dist/assets/Case-Bn98iuCp.js                                         5.04 kB │ gzip:   1.61 kB
+dist/assets/Home-uh4Izw2U.js                                         4.94 kB │ gzip:   1.50 kB
+dist/assets/Case-BTexOMNV.js                                         5.04 kB │ gzip:   1.61 kB
 dist/assets/foundation-AkiMzCNY.js                                   5.51 kB │ gzip:   2.52 kB
-dist/assets/Demo-DvvbpIlh.js                                         5.59 kB │ gzip:   2.26 kB
+dist/assets/Demo-Bqtnsa5u.js                                         5.59 kB │ gzip:   2.26 kB
 dist/assets/supportops-CAVoNaQF.js                                   6.92 kB │ gzip:   3.19 kB
 dist/assets/evidence-Bh1VmIg5.js                                     7.28 kB │ gzip:   2.61 kB
 dist/assets/profile-BVHseAm4.js                                      8.81 kB │ gzip:   3.75 kB
-dist/assets/Evidence-BQDuasj5.js                                    27.60 kB │ gzip:   8.80 kB
-dist/assets/Shell-DYtej3wS.js                                       60.03 kB │ gzip:  21.32 kB
-dist/assets/index-Bqdxv1jH.js                                      212.11 kB │ gzip:  66.45 kB
+dist/assets/Evidence-Dms1faES.js                                    27.60 kB │ gzip:   8.80 kB
+dist/assets/Shell-A7JXtV75.js                                       61.04 kB │ gzip:  21.71 kB
+dist/assets/index-DB9dsrz6.js                                      212.11 kB │ gzip:  66.45 kB
 dist/assets/scene-CvcbWKsl.js                                      540.25 kB │ gzip: 135.02 kB
 
 [33m[plugin builtin:vite-reporter] 
@@ -98,17 +99,17 @@ dist/assets/scene-CvcbWKsl.js                                      540.25 kB │
 - Using dynamic import() to code-split the application
 - Use build.rolldownOptions.output.codeSplitting to improve chunking: https://rolldown.rs/reference/OutputOptions.codeSplitting
 - Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.[39m
-[32m✓ built in 1.23s[39m
+[32m✓ built in 1.07s[39m
 [36mvite v8.3.5 [32mbuilding ssr environment for production...[36m[39m
 transforming...
-✓ 56 modules transformed.
+✓ 57 modules transformed.
 rendering chunks...
 computing gzip size...
-dist-ssr/.vite/manifest.json                8.80 kB │ gzip:  1.16 kB
+dist-ssr/.vite/manifest.json                9.05 kB │ gzip:  1.20 kB
 dist-ssr/assets/t-_BYjPMN0.js               0.07 kB │ gzip:  0.08 kB
 dist-ssr/assets/NotFound-Bxsy7ddQ.js        0.52 kB │ gzip:  0.31 kB
-dist-ssr/assets/DesignSystem-iInopNv4.js    1.02 kB │ gzip:  0.50 kB
-dist-ssr/assets/Method-BtmircfH.js          1.43 kB │ gzip:  0.61 kB
+dist-ssr/assets/DesignSystem-DR842GPE.js    1.02 kB │ gzip:  0.50 kB
+dist-ssr/assets/Method-Dlk-bwQB.js          1.43 kB │ gzip:  0.60 kB
 dist-ssr/assets/design-system-o_RhRoqL.js   1.58 kB │ gzip:  0.40 kB
 dist-ssr/assets/toolkit-O9-4pmm4.js         1.59 kB │ gzip:  0.39 kB
 dist-ssr/assets/observability-7urfvxus.js   1.61 kB │ gzip:  0.40 kB
@@ -131,19 +132,20 @@ dist-ssr/assets/agents-DYQ_J93X.js          3.90 kB │ gzip:  1.20 kB
 dist-ssr/assets/harness-Bwwu6SKC.js         4.12 kB │ gzip:  1.97 kB
 dist-ssr/assets/toolkit-C0bYpbhY.js         4.27 kB │ gzip:  1.99 kB
 dist-ssr/assets/design-system-CRybMnTI.js   4.61 kB │ gzip:  2.21 kB
+dist-ssr/assets/Palette-CogeFooF.js         4.73 kB │ gzip:  1.80 kB
 dist-ssr/assets/agents-BHwlnfrL.js          4.74 kB │ gzip:  2.17 kB
 dist-ssr/assets/system-Z5MVetc6.js          5.32 kB │ gzip:  1.71 kB
 dist-ssr/assets/foundation-DVyvjSFf.js      5.82 kB │ gzip:  2.59 kB
 dist-ssr/assets/supportops-BenYu4P9.js      6.00 kB │ gzip:  1.92 kB
 dist-ssr/assets/supportops-E8p-qDq-.js      7.26 kB │ gzip:  3.27 kB
-dist-ssr/assets/Case-yULHXbrc.js            8.39 kB │ gzip:  2.20 kB
-dist-ssr/assets/Home-BeOGbM-9.js            8.56 kB │ gzip:  1.98 kB
-dist-ssr/assets/Demo-8OhR1PBt.js            9.52 kB │ gzip:  3.07 kB
+dist-ssr/assets/Case-DzpCeZKf.js            8.39 kB │ gzip:  2.20 kB
+dist-ssr/assets/Home-BcY0WRkG.js            8.56 kB │ gzip:  1.99 kB
+dist-ssr/assets/Demo-CSsoi_nR.js            9.52 kB │ gzip:  3.07 kB
 dist-ssr/assets/scene-CNI6fhuq.js          15.91 kB │ gzip:  5.06 kB
-dist-ssr/assets/Evidence-Ca3wVZLr.js       31.45 kB │ gzip:  9.28 kB
-dist-ssr/entry-server.js                   61.85 kB │ gzip: 21.14 kB
+dist-ssr/assets/Evidence--5bN3XcM.js       31.45 kB │ gzip:  9.28 kB
+dist-ssr/entry-server.js                   63.35 kB │ gzip: 21.64 kB
 
-[32m✓ built in 290ms[39m
+[32m✓ built in 154ms[39m
 Each child in a list should have a unique "key" prop.
 
 Check the render method of `J`. See https://react.dev/link/warning-keys for more information.
@@ -151,7 +153,7 @@ Each child in a list should have a unique "key" prop.
 
 Check the render method of `J`. See https://react.dev/link/warning-keys for more information.
 prerender: 29 pages written
-budget: PASS (worst route /evidence/index.html: 95.9 KB gzip of 100 KB; scene chunk 131.0 KB of 500 KB)
+budget: PASS (worst route /evidence/index.html: 96.3 KB gzip of 100 KB; scene chunk 131.0 KB of 500 KB)
 [WebServer] [plugin builtin:vite-reporter] 
 [WebServer] (!) Some chunks are larger than 500 kB after minification. Consider:
 [WebServer] - Using dynamic import() to code-split the application
@@ -164,25 +166,30 @@ budget: PASS (worst route /evidence/index.html: 95.9 KB gzip of 100 KB; scene ch
 [WebServer] 
 [WebServer] Check the render method of `J`. See https://react.dev/link/warning-keys for more information.
 
-Running 15 tests using 1 worker
+Running 20 tests using 1 worker
 
-  ✓   1 e2e\scene.spec.ts:18:1 › SCENE-001/002/004: the 3d scene starts under the CSP, is hidden from assistive technology and takes no pointer events (1.6s)
-  ✓   2 e2e\scene.spec.ts:39:1 › SCENE-003: under reduced motion the scene is static and offers no motion toggle (1.2s)
-  ✓   3 e2e\scene.spec.ts:52:1 › SCENE-001: without WebGL the level 1 background stays, with no error (1.0s)
-  ✓   4 e2e\scene.spec.ts:71:1 › a case page holds the camera at its own project and does not scroll the scene (1.4s)
-  ✓   5 e2e\scene.spec.ts:86:1 › the scene stays off pages that do not use it (696ms)
-  ✓   6 e2e\scene.spec.ts:92:1 › a portrait screen keeps the level 1 background and mounts no canvas (2.7s)
-  ✓   7 e2e\scene.spec.ts:104:1 › static frame of the contact section (scene S5) (1.2s)
-  ✓   8 e2e\site.spec.ts:20:3 › every route passes axe with contrast, does not overflow, and logs no errors at 1000px (1.1m)
-  ✓   9 e2e\site.spec.ts:20:3 › every route passes axe with contrast, does not overflow, and logs no errors at 360px (1.1m)
-  ✓  10 e2e\site.spec.ts:45:1 › with JavaScript off, every route still shows its heading, and a case shows its diagram and its list (SEO-001, FLOW-005) (5.5s)
-  ✓  11 e2e\site.spec.ts:58:1 › English and Portuguese link to each other and set the document language (1.3s)
-  ✓  12 e2e\site.spec.ts:67:1 › keyboard: skip link, then a project, then back (1.6s)
-  ✓  13 e2e\site.spec.ts:80:1 › the diagram walks through scenes and a failure scenario by keyboard, at both widths (1.8s)
-  ✓  14 e2e\site.spec.ts:93:1 › the demo page requests nothing from a third party until a site key exists, and wakes nothing (LIVE-004, SEC-001) (1.4s)
-  ✓  15 e2e\site.spec.ts:104:1 › the home page has the role in the first screen, and a squint screenshot is saved for review (1.9s)
+  ✓   1 e2e\palette.spec.ts:10:1 › the palette opens with / and with Ctrl+K, filters, and Enter goes to the page (1.3s)
+  ✓   2 e2e\palette.spec.ts:28:1 › typing a slash in a form field does not open the palette (1.0s)
+  ✓   3 e2e\palette.spec.ts:36:1 › arrow keys move the selection and the palette reaches a project in Portuguese (885ms)
+  ✓   4 e2e\palette.spec.ts:47:1 › the footer button opens the palette for a mouse user (830ms)
+  ✓   5 e2e\palette.spec.ts:53:1 › the home announces the active project when the scroll changes it (473ms)
+  ✓   6 e2e\scene.spec.ts:18:1 › SCENE-001/002/004: the 3d scene starts under the CSP, is hidden from assistive technology and takes no pointer events (797ms)
+  ✓   7 e2e\scene.spec.ts:39:1 › SCENE-003: under reduced motion the scene is static and offers no motion toggle (725ms)
+  ✓   8 e2e\scene.spec.ts:52:1 › SCENE-001: without WebGL the level 1 background stays, with no error (562ms)
+  ✓   9 e2e\scene.spec.ts:71:1 › a case page holds the camera at its own project and does not scroll the scene (940ms)
+  ✓  10 e2e\scene.spec.ts:86:1 › the scene stays off pages that do not use it (448ms)
+  ✓  11 e2e\scene.spec.ts:92:1 › a portrait screen keeps the level 1 background and mounts no canvas (2.1s)
+  ✓  12 e2e\scene.spec.ts:104:1 › static frame of the contact section (scene S5) (840ms)
+  ✓  13 e2e\site.spec.ts:20:3 › every route passes axe with contrast, does not overflow, and logs no errors at 1000px (45.6s)
+  ✓  14 e2e\site.spec.ts:20:3 › every route passes axe with contrast, does not overflow, and logs no errors at 360px (37.5s)
+  ✓  15 e2e\site.spec.ts:45:1 › with JavaScript off, every route still shows its heading, and a case shows its diagram and its list (SEO-001, FLOW-005) (4.0s)
+  ✓  16 e2e\site.spec.ts:58:1 › English and Portuguese link to each other and set the document language (874ms)
+  ✓  17 e2e\site.spec.ts:67:1 › keyboard: skip link, then a project, then back (1.2s)
+  ✓  18 e2e\site.spec.ts:80:1 › the diagram walks through scenes and a failure scenario by keyboard, at both widths (1.4s)
+  ✓  19 e2e\site.spec.ts:93:1 › the demo page requests nothing from a third party until a site key exists, and wakes nothing (LIVE-004, SEC-001) (1.0s)
+  ✓  20 e2e\site.spec.ts:104:1 › the home page has the role in the first screen, and a squint screenshot is saved for review (1.4s)
 
-  15 passed (3.0m)
+  20 passed (2.0m)
 fast: exit 0
 build: exit 0
 budget: exit 0

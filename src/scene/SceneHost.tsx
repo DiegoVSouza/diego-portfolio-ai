@@ -22,7 +22,7 @@ const saveData = (): boolean => {
   return Boolean(connection?.saveData);
 };
 
-export function SceneHost({ mode, slugs, focusSlug, pulseKey }: { mode: BackgroundMode; slugs: string[]; focusSlug?: string; pulseKey?: number }) {
+export function SceneHost({ mode, slugs, labels, focusSlug, pulseKey }: { mode: BackgroundMode; slugs: string[]; labels: string[]; focusSlug?: string; pulseKey?: number }) {
   const canvas = useRef<HTMLCanvasElement | null>(null);
   const controller = useRef<SceneController | null>(null);
   const { t } = useLang();
@@ -30,6 +30,13 @@ export function SceneHost({ mode, slugs, focusSlug, pulseKey }: { mode: Backgrou
   // The server renders no canvas, so the client adds it only after hydration. Nothing can mismatch.
   const [mounted, setMounted] = useState(false);
   useEffect(() => setMounted(true), []);
+  const [announcement, setAnnouncement] = useState("");
+  // The scene is not re-created when the language changes, so the callback reads the latest text through a ref.
+  const announce = useRef<(index: number) => void>(() => undefined);
+  announce.current = (index: number) => {
+    if (focusSlug !== undefined) return;
+    setAnnouncement(t.sceneAnnounce.replace("{n}", String(index + 1)).replace("{total}", String(slugs.length)).replace("{name}", labels[index] ?? ""));
+  };
   const [quality, setQuality] = useState<Quality>("auto");
   const [motion, setMotion] = useState(true);
   const slugKey = slugs.join(",");
@@ -50,6 +57,7 @@ export function SceneHost({ mode, slugs, focusSlug, pulseKey }: { mode: Backgrou
               focus: focus === undefined || focus < 0 ? undefined : focus,
               onActive: (index) => {
                 element.dataset.active = String(index);
+                announce.current(index);
               },
               onQuality: (scale) => {
                 element.dataset.quality = String(scale);
@@ -100,6 +108,7 @@ export function SceneHost({ mode, slugs, focusSlug, pulseKey }: { mode: Backgrou
       <canvas ref={canvas} className={running ? "scene on" : "scene"} aria-hidden="true" />
       {running && (
         <aside className="scene-controls" aria-label={t.sceneLabel}>
+          <span className="sr" role="status" aria-live="polite">{announcement}</span>
           <button type="button" className="tg" onClick={cycle}>
             {t.sceneQuality}: {quality === "auto" ? t.sceneQualityAuto : quality === "high" ? t.sceneQualityHigh : t.sceneQualityLow}
           </button>

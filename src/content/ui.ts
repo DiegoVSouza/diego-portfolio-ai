@@ -90,6 +90,11 @@ export interface Strings {
   demoNoWake: string;
   demoAccounts: string;
   sceneLabel: string;
+  sceneAnnounce: string;
+  paletteOpen: string;
+  paletteTitle: string;
+  paletteHint: string;
+  paletteEmpty: string;
   sceneQuality: string;
   sceneQualityAuto: string;
   sceneQualityHigh: string;
@@ -222,6 +227,11 @@ const en: Strings = {
   demoNoWake: "Waking is available once the demo is deployed.",
   demoAccounts: "Demo accounts",
   sceneLabel: "Background scene",
+  sceneAnnounce: "Project {n} of {total}: {name}",
+  paletteOpen: "Search pages",
+  paletteTitle: "Go to",
+  paletteHint: "Type a page or a project",
+  paletteEmpty: "Nothing matches",
   sceneQuality: "Quality",
   sceneQualityAuto: "auto",
   sceneQualityHigh: "high",
@@ -361,6 +371,11 @@ const pt: Strings = {
   demoNoWake: "Acordar fica disponível quando o demo estiver publicado.",
   demoAccounts: "Contas de demo",
   sceneLabel: "Cena de fundo",
+  sceneAnnounce: "Projeto {n} de {total}: {name}",
+  paletteOpen: "Buscar páginas",
+  paletteTitle: "Ir para",
+  paletteHint: "Digite uma página ou um projeto",
+  paletteEmpty: "Nada encontrado",
   sceneQuality: "Qualidade",
   sceneQualityAuto: "auto",
   sceneQualityHigh: "alta",
