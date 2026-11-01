@@ -1,14 +1,14 @@
 {
   "pins": {
-    "lab": "7b67eddcce5622bcb2be08e8ca1bb1d3dedbd91c",
-    "p00": "0725025fbc00113b9314035c6a9fe626efbd00ff",
-    "p01": "e9de403be35d00e695eb78dd73e045f80852c4fb",
-    "p02": "22eb0c26b895facfbc8c1044458f9b3960cf60e7",
-    "p03": "afd9b4923ed744fc2d23fd11cc667067cf3e6f1e",
-    "p04": "ceaeedc0fd8b47b53f42a4020d2c6199cf4e474d",
-    "p05": "6e51483b6b4c6f35e4b3f988e8d5e097a9a85383",
-    "p06": "a85a52186ccf6fe6c7df57c509fbc0e69f4f8ff9",
-    "p07": "83c225310378f8b778a3ac4e14b6b7c5341040d1"
+    "lab": "30abe40e233735c86550f515d3bfba08ce15b319",
+    "p00": "047eef5ccfe22d514f6647a6244417e841065d00",
+    "p01": "79f26bfd80791fa5f5280d1f48f1f721858528e0",
+    "p02": "4345ec985ebb7aaad9b61adf0d3d6f8b346bc0ab",
+    "p03": "20ef0b1ec40433321c055c9bffa53244f55debe1",
+    "p04": "0919d41a1b10abd6437b858b9411408951a1ef4a",
+    "p05": "0d845c0f6825be2f14f75cd6698ce2ae50aac4d1",
+    "p06": "de960b86a7138b0753d3cf3a692f025dba4d4f43",
+    "p07": "6a0dbf67b0568dcce051670ac2ebf836b80ca112"
   },
   "pinDates": {
     "lab": "2026-10-31",

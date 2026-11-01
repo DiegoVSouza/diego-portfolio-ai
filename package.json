@@ -22,7 +22,7 @@
     "og": "node scripts/og.mjs"
   },
   "dependencies": {
-    "colagem-ui": "file:vendor/colagem-ui-0.4.0.tgz",
+    "colagem-ui": "file:vendor/colagem-ui-0.4.1.tgz",
     "preact": "10.29.2",
     "preact-render-to-string": "6.6.1",
     "react": "19.3.1",

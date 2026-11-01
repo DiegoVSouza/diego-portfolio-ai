@@ -70,7 +70,7 @@ const HALFTONE_VERTEX = `varying vec2 vUv; void main(){ vUv = uv; gl_Position = 
 
 /** Grid at 45 degrees, three tones (ink, accent, paper), dot radius grows with luminance, paper outline on edges. */
 const HALFTONE_FRAGMENT = `
-  uniform sampler2D tDiffuse; uniform vec2 res; uniform float cell; uniform vec3 cInk; uniform vec3 cRed; uniform vec3 cPaper; uniform float split; varying vec2 vUv;
+  uniform sampler2D tDiffuse; uniform vec2 res; uniform float cell; uniform vec3 cInk; uniform vec3 cRed; uniform vec3 cPaper; uniform float split; uniform float dim; varying vec2 vUv;
   float lum(vec3 c){ return sqrt(dot(c, vec3(.2126,.7152,.0722))); }
   void main(){
     // RGB split only while the selection settles: red and blue are read from opposite sides of the pixel.
@@ -88,6 +88,8 @@ const HALFTONE_FRAGMENT = `
     col = mix(col, cPaper, step(.34, e));
     // Left vignette: the side where the text sits stays calm.
     col = mix(col, cInk, smoothstep(.55, 0., vUv.x) * .45);
+    // The scene is a backdrop: pulled toward the ink so the content in front of it stays the focus.
+    col = mix(col, cInk, dim);
     gl_FragColor = vec4(col, 1.);
   }`;
 
@@ -136,6 +138,7 @@ export function start(canvas: HTMLCanvasElement, options: SceneOptions): SceneCo
       cRed: { value: tokenVec("--red") },
       cPaper: { value: tokenVec("--paper") },
       split: { value: 0 },
+      dim: { value: options.focus === undefined ? 0.3 : 0.5 },
     },
     vertexShader: HALFTONE_VERTEX,
     fragmentShader: HALFTONE_FRAGMENT,

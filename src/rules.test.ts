@@ -168,3 +168,26 @@ describe("routes (SEO-001)", () => {
     expect(parsePath("/pt/whatever/").page).toBe("not-found");
   });
 });
+
+describe("flow layouts (a diagram must not collapse)", () => {
+  it("every generated node has a real size, lies inside the canvas and overlaps no other node", () => {
+    const dir = join(root, "src/data/flow-layouts");
+    const files = readdirSync(dir).filter((f) => f.endsWith(".json"));
+    expect(files.length).toBeGreaterThanOrEqual(9);
+    for (const file of files) {
+      const layout = JSON.parse(readFileSync(join(dir, file), "utf8")) as Record<"horizontal" | "vertical", { width: number; height: number; nodes: { id: string; x: number; y: number; w: number; h: number }[] }>;
+      for (const mode of ["horizontal", "vertical"] as const) {
+        const l = layout[mode];
+        for (const n of l.nodes) {
+          expect(n.w, `${file} ${mode} ${n.id} width`).toBeGreaterThanOrEqual(120);
+          expect(n.h, `${file} ${mode} ${n.id} height`).toBeGreaterThanOrEqual(54);
+          expect(n.x + n.w, `${file} ${mode} ${n.id} inside`).toBeLessThanOrEqual(l.width);
+          expect(n.y + n.h, `${file} ${mode} ${n.id} inside`).toBeLessThanOrEqual(l.height);
+        }
+        for (const a of l.nodes) for (const b of l.nodes) {
+          if (a.id < b.id) expect(a.x + a.w <= b.x || b.x + b.w <= a.x || a.y + a.h <= b.y || b.y + b.h <= a.y, `${file} ${mode} ${a.id} overlaps ${b.id}`).toBe(true);
+        }
+      }
+    }
+  });
+});

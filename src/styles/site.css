@@ -88,3 +88,10 @@
 /* Small text that sits directly over the scene gets its own opaque surface: text never lives on the canvas. */
 .crumb a, .cmd, .case-seal .sub { background: var(--ink); box-decoration-break: clone; -webkit-box-decoration-break: clone; padding: 2px 6px; }
 .cmd { display: inline-block; }
+
+/* Reading comes first. Every section of text sits on an opaque panel; the scene is the backdrop around and behind it. */
+.wrap > section { background: var(--ink); padding: 20px 24px; margin-block: 28px; border-left: 4px solid var(--red); }
+.wrap > section > :first-child { margin-top: 0; }
+@media (max-width: 600px) { .wrap > section { padding: 16px; } }
+/* On a narrow screen the fixed HUD label would sit on top of the text. The page heading already says the same thing. */
+@media (max-width: 700px) { .hud { display: none; } }
