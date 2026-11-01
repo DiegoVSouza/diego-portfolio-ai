@@ -141,11 +141,11 @@
 .metro-on a { background: var(--red); color: var(--on-red); }
 .metro-n { font-family: var(--f-display); }
 .metro-bar { display: none; }
-@media (min-width: 901px) {
+@media (min-width: 1200px) {
   .metro { left: 16px; top: 50%; transform: translateY(-50%); width: 196px; }
   .metro-name { overflow-wrap: anywhere; }
 }
-@media (max-width: 900px) {
+@media (max-width: 1199px) {
   .metro { left: 0; right: 0; bottom: 0; background: var(--ink); border-top: 3px solid var(--red); }
   .metro-stations { display: none; }
   .metro-bar { display: flex; align-items: center; gap: 8px; padding: 8px 12px; }
@@ -154,5 +154,5 @@
   .scene-controls { bottom: 64px; }
   .wrap { padding-bottom: 72px; }
 }
-@media (max-width: 900px) { footer { padding-bottom: 72px; } }
-@media (max-width: 900px) { .metro-bar .tg { font-size: 20px; min-width: 48px; min-height: 44px; } }
+@media (max-width: 1199px) { footer { padding-bottom: 72px; } }
+@media (max-width: 1199px) { .metro-bar .tg { font-size: 20px; min-width: 48px; min-height: 44px; } }
