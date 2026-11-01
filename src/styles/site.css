@@ -185,7 +185,113 @@
 .cmd, .seal { font-size: 13px; }
 .flow-btn { font-size: 14px; }
 /* The wide diagrams were shrunk to 12 px text; keep them readable and let the stage scroll sideways instead. */
-.flow-scroll { overflow-x: auto; }
-@media (min-width: 900px) { .flow-scroll .flow-stage { min-width: 1232px; } }
 /* Links that sit alone in a row need a 44 px target. */
 .case-honest a, .proof-meta a, .case-seal .sub a, .plain a, .surface-text a, .contact a, footer a { display: inline-block; min-height: 44px; padding-block: 12px; box-sizing: border-box; }
+
+/* ================= v2: focus, hover and motion ================= */
+:root { --ease-out: cubic-bezier(0.22, 1, 0.36, 1); }
+
+/* Bigger, livelier calls to action. */
+.btn-big { min-height: 56px; padding: 0 var(--space-6); font-size: 18px; box-shadow: 6px 6px 0 var(--dred); transition: transform 180ms var(--ease-out), box-shadow 180ms var(--ease-out), background-color 180ms; }
+.btn-big:hover, .btn-big:focus-visible { transform: translate(-3px, -3px); box-shadow: 10px 10px 0 var(--dred); }
+.btn-big:active { transform: translate(3px, 3px); box-shadow: 2px 2px 0 var(--dred); }
+.btn-secondary.btn-big { box-shadow: 6px 6px 0 var(--red); }
+.btn-secondary.btn-big:hover, .btn-secondary.btn-big:focus-visible { box-shadow: 10px 10px 0 var(--red); }
+.btn { transition: transform 180ms var(--ease-out), background-color 180ms, color 180ms; }
+.btn-secondary:hover:not(:disabled) { background: var(--paper); color: var(--ink); }
+
+/* Hover everywhere it was missing. Colour and shadow only: nothing shifts the layout. */
+a:not(.btn):not(.card-link) { transition: color 160ms; }
+a:not(.btn):hover { color: var(--paper); text-decoration-thickness: 3px; }
+.card-link { text-decoration: none; background: linear-gradient(var(--red), var(--red)) 0 100% / 0 4px no-repeat; transition: background-size 280ms var(--ease-out); }
+.card-link:hover, .card-link:focus-visible { background-size: 100% 4px; }
+.cw { transition: transform 280ms var(--ease-out); }
+.cw:hover { transform: rotate(0deg) translateY(-6px); }
+.cw:hover::after { background: var(--red); }
+.hero-steps li, .proof-mini li, .step-rail a, .metro-stations a, .tg, .flow-btn { transition: background-color 160ms, color 160ms, transform 160ms var(--ease-out), border-color 160ms; }
+.hero-steps li:hover { transform: translateX(6px); background: var(--ink-2); }
+.tg:hover:not(:disabled):not([aria-pressed="true"]):not([aria-current="true"]) { background: var(--paper); color: var(--ink); }
+.flow-btn:hover:not(:disabled):not([aria-pressed="true"]) { background: var(--paper); color: var(--ink); }
+.step-rail a:hover { transform: translateY(-2px); border-color: var(--red); }
+.metro-stations a:hover { transform: translateX(4px); }
+
+/* The tests and evidence of a project, and any heavy detail, sit in an accordion. */
+.card-extra { max-width: 540px; margin: var(--space-3) 0 var(--space-5); }
+.card-extra .cta { margin: var(--space-4) 0 var(--space-3); }
+.disclosure { background: var(--card); color: var(--paper); border-left: 6px solid var(--page-mut); margin: var(--space-2) 0; transition: border-color 200ms, background-color 200ms; }
+.disclosure:hover, .disclosure[open] { border-left-color: var(--red); background: var(--ink-2); }
+.disclosure > summary { list-style: none; cursor: pointer; display: flex; align-items: center; gap: var(--space-3); min-height: 48px; padding: 0 var(--space-4); font: 700 14px/1.3 var(--f-body); text-transform: uppercase; letter-spacing: 0.08em; }
+.disclosure > summary::-webkit-details-marker { display: none; }
+.disclosure-title { flex: 1; }
+.disclosure-hint { color: var(--mut); font-weight: 400; text-transform: none; letter-spacing: normal; font-size: 13px; }
+.disclosure-mark { width: 14px; height: 14px; position: relative; flex: none; }
+.disclosure-mark::before, .disclosure-mark::after { content: ""; position: absolute; background: var(--red-text); inset: 6px 0 auto 0; height: 2px; transition: transform 280ms var(--ease-out); }
+.disclosure-mark::after { transform: rotate(90deg); }
+.disclosure[open] .disclosure-mark::after { transform: rotate(0deg); }
+.disclosure-body { overflow: hidden; padding: 0 var(--space-4) var(--space-4); }
+.disclosure-body > :first-child { margin-top: 0; }
+.proof-mini { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--space-3); }
+.proof-mini li { padding-left: var(--space-3); border-left: 3px solid var(--red); }
+.proof-mini strong { font-family: var(--f-display); font-size: 22px; margin-right: var(--space-2); }
+.proof-mini-meta { display: block; font-size: 13px; color: var(--mut); }
+.proof-mini-meta a { color: var(--paper); }
+
+/* Guided tour: the step opens on hover, tap or keyboard. */
+.tour { list-style: none; margin: var(--space-3) 0; padding: 0; display: grid; gap: var(--space-2); }
+.tour-step > summary { font-size: 16px; text-transform: none; letter-spacing: normal; }
+.tour-n { display: inline-grid; place-items: center; width: 30px; height: 30px; margin-right: var(--space-2); background: var(--red); color: var(--on-red); font-family: var(--f-display); }
+
+/* The live demo: the call to action first, the account ready to use, the rest below. */
+.demo-hero { border-left-width: 8px !important; }
+.accounts { list-style: none; padding: 0; margin: var(--space-3) 0; display: grid; gap: var(--space-3); grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr)); }
+.account { background: var(--card); color: var(--paper); border-left: 6px solid var(--red); padding: var(--space-3) var(--space-4); display: grid; gap: var(--space-2); transition: transform 180ms var(--ease-out); }
+.account:hover { transform: translateY(-3px); }
+.account-role { font: 700 12px/1 var(--f-body); text-transform: uppercase; letter-spacing: 0.14em; color: var(--mut); }
+.account-field { display: flex; align-items: center; justify-content: space-between; gap: var(--space-2); }
+.account-field code { font-size: 16px; }
+.copy-btn { min-height: 36px; min-width: 0; }
+
+/* Diagram: full width, never cropped, the focus of its stop. */
+.flow-stage-wrap { margin: var(--space-4) 0; }
+.flow-hint { display: flex; align-items: center; gap: var(--space-3); margin: 0 0 var(--space-3); padding: 10px 14px; background: var(--paper); color: var(--ink); font-weight: 700; max-width: none; }
+.flow-hint-dot { width: 14px; height: 14px; flex: none; background: var(--red); animation: flow-ping 1.6s ease-out infinite; }
+@keyframes flow-ping { 0% { box-shadow: 0 0 0 0 var(--red); } 100% { box-shadow: 0 0 0 16px transparent; } }
+.flow-stage-wrap .flow-stage { padding: var(--space-4); border: 3px solid var(--red); }
+.flow-stage-wrap .flow-controls .flow-btn:first-child { background: var(--red); border-color: var(--red); color: var(--on-red); min-width: 96px; }
+.flow-stage-wrap .flow-controls .flow-btn { min-height: 48px; font-size: 15px; }
+.flow-node .flow-box { transition: fill 240ms, stroke 240ms; }
+.flow-node:hover .flow-box, .flow-node:focus-visible .flow-box { stroke: var(--red-text); stroke-width: 4; }
+.flow-node:hover .flow-label { fill: var(--red-text); }
+.flow-node.focus:hover .flow-label { fill: var(--ink); }
+/* Resting diagram invites a click; once a step plays, the nodes in that step pulse and the edges flow. */
+.flow-svg .flow-node:not(.dim):not(.focus):not(.selected) .flow-box { animation: flow-idle 3.2s ease-in-out infinite; }
+.flow-svg .flow-node.focus .flow-box { animation: flow-pulse 1.2s ease-in-out infinite; }
+.flow-svg .flow-node.focus .flow-shadow { animation: flow-pulse-shadow 1.2s ease-in-out infinite; }
+.flow-svg .flow-edge.on path { stroke-dasharray: 10 8; animation: flow-run 0.9s linear infinite; }
+@keyframes flow-idle { 50% { stroke: var(--red-text); } }
+@keyframes flow-pulse { 50% { stroke-width: 6; } }
+@keyframes flow-pulse-shadow { 50% { transform: translate(10px, 10px); } }
+@keyframes flow-run { to { stroke-dashoffset: -36; } }
+/* The text version stays for screen readers, out of sight. */
+.flow-text { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; margin: 0; }
+.flow-caption { font-size: 18px; border-left-width: 10px; }
+.flow-step { color: var(--red-text); }
+.flow-detail { border-left: 10px solid var(--red); animation: flow-detail-in 320ms var(--ease-out); }
+@keyframes flow-detail-in { from { opacity: 0; transform: translateY(10px); } }
+
+/* Home: wide, with the cards in two columns over the city. */
+[data-page="home"].wrap { max-width: 1320px; margin-left: auto; margin-right: auto; }
+@media (min-width: 1200px) { [data-page="home"].wrap { margin-left: auto; } }
+[data-page="home"].wrap > section { max-width: none; }
+[data-page="home"].wrap > section .surface-text { max-width: 70ch; }
+[data-page="home"].wrap ul.grid { grid-template-columns: repeat(auto-fit, minmax(min(100%, 420px), 1fr)); gap: var(--space-6) var(--space-6); }
+[data-page="home"].wrap .cw { max-width: none; }
+[data-page="home"].wrap .card-extra { max-width: none; }
+.portfolio-count { font-family: var(--f-display); font-size: clamp(56px, 9vw, 120px); line-height: 1; margin: var(--space-3) 0 0; color: var(--paper); }
+.portfolio-count span { font-size: 0.28em; letter-spacing: 0.1em; margin-left: var(--space-2); color: var(--red-text); }
+.hero-steps li { cursor: default; }
+
+@media (prefers-reduced-motion: reduce) {
+  .flow-hint-dot, .flow-svg .flow-node .flow-box, .flow-svg .flow-node .flow-shadow, .flow-svg .flow-edge path, .flow-detail { animation: none !important; }
+  .btn-big, .cw, .card-link, .account, .disclosure-mark::before, .disclosure-mark::after { transition: none; }
+}

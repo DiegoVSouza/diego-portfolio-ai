@@ -66,7 +66,8 @@ export function RouterProvider({ initial, children }: { initial: string; childre
     // replace it. A page that needs the Turnstile origin must therefore be loaded as a document, or the script is
     // blocked and the widget never appears (found in production, 2026-11-01).
     if (needsChallenge(to) && !needsChallenge(window.location.pathname)) {
-      window.location.assign(to);
+      // A full load cannot be avoided, but the stripes still cover it so opening a project always feels the same.
+      descend(() => window.location.assign(to));
       return;
     }
     // Load the page's chunk first, then switch, so the old page stays up instead of a blank one.

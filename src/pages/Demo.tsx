@@ -1,10 +1,11 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { emitPulse } from "../scene/pulse";
-import { Button, Command, FlowDiagram, Headline, Lead, Progress, RunLog, Stepper, StatusSeal, WakeNotice, useElapsed, type RunStep } from "colagem-ui";
+import { Button, Command, FlowDiagram, Headline, Lead, Progress, RunLog, StatusSeal, WakeNotice, useElapsed, type RunStep } from "colagem-ui";
 import { flowLabels, getFlow, getLayout, pinnedLink } from "../content/flows";
 import { caseCards } from "../content/caseIndex";
 import { Link, hrefFor } from "../site/router";
-import { FlowScroll } from "../site/FlowScroll";
+import { Disclosure } from "../site/Disclosure";
+import { FlowStage } from "../site/FlowStage";
 import { useLang } from "../site/Shell";
 
 /** What /api/status returns. Reading it wakes nothing (LIVE-004). */
@@ -68,7 +69,6 @@ export function DemoPanel({ embedded = false }: { embedded?: boolean }) {
   const [token, setToken] = useState("");
   const [waking, setWaking] = useState(false);
   const [failed, setFailed] = useState(false);
-  const [step, setStep] = useState(0);
   const H = embedded ? "h3" : "h2";
   const Sub = embedded ? "h4" : "h3";
   const hClass = embedded ? "sub-h" : "section-h";
@@ -151,16 +151,22 @@ export function DemoPanel({ embedded = false }: { embedded?: boolean }) {
     if (node) live[node] = `${s.latencyMs} ms · ${s.tokens} tok`;
   }
 
+  const awake = state === "awake" && Boolean(status?.consoleUrl);
   return (
     <>
-      <section aria-labelledby="status-h">
-        <H id="status-h" className={hClass}>{t.demoStatus}</H>
-        <p role="status">
+      <section aria-labelledby="live-h" className="demo-hero">
+        <H id="live-h" className={hClass}>{t.linkDemo}</H>
+        <p role="status" className="demo-state">
           <StatusSeal kind={state === "awake" ? "full" : state === "asleep" ? "none" : "partial"} label={!loaded ? "…" : state === "awake" ? t.demoAwake : state === "asleep" ? t.demoAsleep : t.demoUnknown} />
         </p>
-        {status?.services && status.services.length > 0 && (
-          <ul className="plain">{status.services.map((s) => <li key={s.name}><code>{s.name}</code>: {s.state}</li>)}</ul>
-        )}
+        <p className="cta">
+          {awake ? (
+            <a className="btn btn-big" href={status!.consoleUrl!} rel="noopener noreferrer">{t.openDemo} ↗</a>
+          ) : (
+            <Button onClick={() => void start()} disabled={!canStart} disabledReason={canStart ? undefined : !status?.startAvailable ? t.demoNoWake : !token ? t.demoNeedChallenge : undefined}>{t.demoStart}</Button>
+          )}
+        </p>
+        {!awake && <div ref={widget} />}
         {waking && (
           <WakeNotice
             service="demo"
@@ -176,72 +182,99 @@ export function DemoPanel({ embedded = false }: { embedded?: boolean }) {
             {t.demoUnknown} <Button variant="secondary" size="sm" onClick={() => void start()}>{t.demoStart}</Button>
           </p>
         )}
-        <div ref={widget} />
-        <Button onClick={() => void start()} disabled={!canStart} disabledReason={canStart ? undefined : !status?.startAvailable ? t.demoNoWake : !token ? t.demoNeedChallenge : undefined}>{t.demoStart}</Button>
-        <p className="sub">{t.demoStartWhy}</p>
-        {status?.budget && (
-          <>
-            <Sub className="sub-h">{t.demoBudget}</Sub>
-            <Progress value={Math.round((status.budget.leftUsd / status.budget.ceilingUsd) * 100)} label={`${t.demoBudget}: USD ${status.budget.leftUsd.toFixed(2)} / ${status.budget.ceilingUsd.toFixed(2)}`} />
-          </>
-        )}
-        <p className="sub">{t.demoLimitNote}</p>
-      </section>
-
-      <section aria-labelledby="acc-h">
-        <H id="acc-h" className={hClass}>{t.demoAccounts}</H>
+        <Sub className="sub-h">{t.demoAccounts}</Sub>
         {status?.accounts && status.accounts.length > 0 ? (
-          <table className="dt">
-            <caption className="sr">{t.demoAccounts}</caption>
-            <tbody>
+          <>
+            <p className="sub">{t.accountsReady}</p>
+            <ul className="accounts">
               {status.accounts.map((a) => (
-                <tr key={a.user}><th scope="row">{a.role}</th><td><code>{a.user}</code></td><td><code>{a.password}</code></td></tr>
+                <li key={a.user} className="account">
+                  <span className="account-role">{a.role}</span>
+                  <span className="account-field"><code>{a.user}</code><CopyButton value={a.user} label={t.copy} done={t.copied} /></span>
+                  <span className="account-field"><code>{a.password}</code><CopyButton value={a.password} label={t.copy} done={t.copied} /></span>
+                </li>
               ))}
-            </tbody>
-          </table>
+            </ul>
+          </>
         ) : (
           <p className="surface-text">{t.demoAccountsBody}</p>
         )}
-        {status?.consoleUrl && <p><a className="btn" href={status.consoleUrl} rel="noopener noreferrer">Console</a></p>}
         <p className="sub">{t.demoPublic}</p>
       </section>
 
       <section aria-labelledby="demo-tour-h">
         <H id="demo-tour-h" className={hClass}>{t.demoTour}</H>
-        <Stepper
-          label={t.demoTour}
-          current={step}
-          onSelect={setStep}
-          steps={t.demoSteps.map(([title, body], i) => ({ id: String(i), title, body: <p>{body}</p> }))}
-        />
+        <p className="sub">{t.tourHint}</p>
+        <ol className="tour">
+          {t.demoSteps.map(([title, body], i) => (
+            <li key={title}>
+              <Disclosure hover className="tour-step" summary={<><span className="tour-n">{i + 1}</span> {title}</>}>
+                <p>{body}</p>
+              </Disclosure>
+            </li>
+          ))}
+        </ol>
       </section>
 
-      <section aria-labelledby="runs-h">
-        <H id="runs-h" className={hClass}>{t.demoRuns}</H>
-        {latest ? (
-          <>
-            <p className="sub">{latest.at}</p>
-            <RunLog
-              caption={t.demoRuns}
-              labels={t.runLog}
-              steps={latest.steps.map((s) => ({ id: s.id, agent: s.agent, project: s.project, model: s.model, latencyMs: s.latencyMs, tokens: s.tokens, costUsd: s.costUsd }))}
-            />
-            <FlowScroll label={t.flowRegion}>
-            <FlowDiagram
-              flow={system}
-              layout={getLayout("system")}
-              lang={lang}
-              labels={flowLabels(lang)}
-              live={live}
-              links={{ code: (path, node) => pinnedLink(node.repo ?? "p05", path), docs: (path, node) => pinnedLink(node.repo ?? "p05", path) }}
-            />
-            </FlowScroll>
-          </>
-        ) : (
-          <p className="surface-text">{t.demoRunsEmpty}</p>
-        )}
+      <section aria-labelledby="tech-h">
+        <H id="tech-h" className={hClass}>{t.techDetails}</H>
+        <Disclosure summary={t.stackStatus}>
+          {status?.services && status.services.length > 0 && (
+            <ul className="plain">{status.services.map((s) => <li key={s.name}><code>{s.name}</code>: {s.state}</li>)}</ul>
+          )}
+          <p className="sub">{t.demoStartWhy}</p>
+          {status?.budget && (
+            <>
+              <Sub className="sub-h">{t.demoBudget}</Sub>
+              <Progress value={Math.round((status.budget.leftUsd / status.budget.ceilingUsd) * 100)} label={`${t.demoBudget}: USD ${status.budget.leftUsd.toFixed(2)} / ${status.budget.ceilingUsd.toFixed(2)}`} />
+            </>
+          )}
+          <p className="sub">{t.demoLimitNote}</p>
+        </Disclosure>
+        <Disclosure summary={t.demoRuns} hint={latest ? latest.at : undefined}>
+          {latest ? (
+            <>
+              <RunLog
+                caption={t.demoRuns}
+                labels={t.runLog}
+                steps={latest.steps.map((s) => ({ id: s.id, agent: s.agent, project: s.project, model: s.model, latencyMs: s.latencyMs, tokens: s.tokens, costUsd: s.costUsd }))}
+              />
+              <FlowStage label={t.flowRegion} hint={t.flowHint}>
+                <FlowDiagram
+                  flow={system}
+                  layout={getLayout("system")}
+                  lang={lang}
+                  labels={flowLabels(lang)}
+                  live={live}
+                  links={{ code: (path, node) => pinnedLink(node.repo ?? "p05", path), docs: (path, node) => pinnedLink(node.repo ?? "p05", path) }}
+                />
+              </FlowStage>
+            </>
+          ) : (
+            <p className="surface-text">{t.demoRunsEmpty}</p>
+          )}
+        </Disclosure>
       </section>
     </>
+  );
+}
+
+/** Copies one value. A blocked clipboard fails silently; the value is on screen either way. */
+function CopyButton({ value, label, done }: { value: string; label: string; done: string }) {
+  const [copied, setCopied] = useState(false);
+  return (
+    <button
+      type="button"
+      className="tg copy-btn"
+      onClick={() => {
+        void navigator.clipboard?.writeText(value).then(() => {
+          setCopied(true);
+          window.setTimeout(() => setCopied(false), 1400);
+        }).catch(() => undefined);
+      }}
+    >
+      {copied ? done : label}
+    </button>
   );
 }
 

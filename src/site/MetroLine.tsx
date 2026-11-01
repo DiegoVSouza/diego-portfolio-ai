@@ -15,7 +15,7 @@ export function MetroLine() {
   const [homeActive, setHomeActive] = useState(-1);
   const [announcement, setAnnouncement] = useState("");
   const last = useRef(-2);
-  const onHome = route.page === "home";
+  const onHome = false; // the sidebar belongs to a project page; the home has its own scroll
   const onCase = route.page === "case";
   const active = onCase ? caseCards.findIndex((c) => c.slug === route.slug) : homeActive;
   const total = caseCards.length;
@@ -80,7 +80,7 @@ export function MetroLine() {
     return () => window.removeEventListener("keydown", onKey);
   }, [onHome, onCase, goTo, active]);
 
-  if (!onHome && !onCase) return null;
+  if (!onCase) return null;
   const current = active >= 0 ? caseCards[active]! : null;
   return (
     <nav className="metro" aria-label={t.metroLabel} data-ready="true">

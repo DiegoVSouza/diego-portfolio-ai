@@ -44,14 +44,14 @@ describe("prerendered HTML (SEO-001, SEC-001)", () => {
     const html = await renderToHtml("/projects/supportops/");
     const demo = html.indexOf('<section id="demo"');
     const flow = html.indexOf('<section id="flow"');
-    const status = html.indexOf('id="status-h"');
+    const status = html.indexOf('id="live-h"');
     expect(demo).toBeGreaterThan(0);
     expect(status).toBeGreaterThan(demo);
     expect(status).toBeLessThan(flow);
     expect(html).toContain("Stack status");
     expect(html).not.toContain('href="/demo/"');
     const other = await renderToHtml("/projects/agents/");
-    expect(other).not.toContain('id="status-h"');
+    expect(other).not.toContain('id="live-h"');
   });
 
   it("a case without a live backend offers the command to reproduce it, in the first stop", async () => {
@@ -86,7 +86,7 @@ describe("prerendered HTML (SEO-001, SEC-001)", () => {
 
   it("the home page opens with the flagship and projects, then About and contact (FLOW-001)", async () => {
     const html = await renderToHtml("/");
-    const order = ["flag-h", "projects-h", "about-h", "contact-h"].map((id) => html.indexOf(`id="${id}"`));
+    const order = ["portfolio-h", "flag-h", "projects-h", "about-h", "contact-h"].map((id) => html.indexOf(`id="${id}"`));
     expect(order.every((i) => i > 0)).toBe(true);
     expect([...order].sort((a, b) => a - b)).toEqual(order);
     expect(html).not.toContain('id="map-h"');

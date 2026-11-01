@@ -6,7 +6,7 @@ import { OWNER, REPO_NAMES, flowLabels, getFlow, getLayout, pinDates, pinnedLink
 import { Link, hrefFor } from "../site/router";
 import { CaseSteps } from "../site/CaseSteps";
 import { DemoPanel } from "./Demo";
-import { FlowScroll } from "../site/FlowScroll";
+import { FlowStage } from "../site/FlowStage";
 import { useLang } from "../site/Shell";
 import { NotFound } from "./NotFound";
 
@@ -105,7 +105,7 @@ ${c.validate.command}`}</code></pre>
               <section id="architecture" aria-labelledby="how-h">
                 <h3 id="how-h" className="sub-h">{t.how}</h3>
                 <p className="surface-text">{t.flowLead}</p>
-                <FlowScroll label={t.flowRegion}>
+                <FlowStage label={t.flowRegion} hint={t.flowHint}>
                 <FlowDiagram
                   flow={flow}
                   layout={getLayout(c.slug)}
@@ -113,7 +113,7 @@ ${c.validate.command}`}</code></pre>
                   labels={flowLabels(lang)}
                   links={{ code: (path, node) => pinnedLink(node.repo ?? c.repoKey, path), docs: (path, node) => pinnedLink(node.repo ?? c.repoKey, path) }}
                 />
-                </FlowScroll>
+                </FlowStage>
               </section>
             ),
           },

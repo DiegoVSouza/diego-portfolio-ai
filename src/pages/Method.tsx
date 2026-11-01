@@ -1,6 +1,6 @@
 import { FlowDiagram, Headline, Lead } from "colagem-ui";
 import { OWNER, REPO_NAMES, flowLabels, getFlow, getLayout, pinnedLink } from "../content/flows";
-import { FlowScroll } from "../site/FlowScroll";
+import { FlowStage } from "../site/FlowStage";
 import { useLang } from "../site/Shell";
 
 export function MethodPage() {
@@ -9,7 +9,7 @@ export function MethodPage() {
     <>
       <Headline>{t.methodTitle}</Headline>
       <Lead>{t.methodLead}</Lead>
-      <FlowScroll label={t.flowRegion}>
+      <FlowStage label={t.flowRegion} hint={t.flowHint}>
       <FlowDiagram
         flow={getFlow("harness")}
         layout={getLayout("harness")}
@@ -17,7 +17,7 @@ export function MethodPage() {
         labels={flowLabels(lang)}
         links={{ code: (path, node) => pinnedLink(node.repo ?? "lab", path), docs: (path, node) => pinnedLink(node.repo ?? "lab", path) }}
       />
-      </FlowScroll>
+      </FlowStage>
       <dl className="rules">
         {t.methodRules.map(([title, body]) => (
           <div key={title}><dt>{title}</dt><dd>{body}</dd></div>

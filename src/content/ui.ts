@@ -29,6 +29,18 @@ export interface Strings {
   heroCtaSecond: string;
   band: string[];
   heroSteps: string[];
+  openDemo: string;
+  copy: string;
+  copied: string;
+  accountsReady: string;
+  tourHint: string;
+  techDetails: string;
+  testsEvidence: string;
+  portfolioTitle: string;
+  portfolioLead: string;
+  openProject: string;
+  flowHint: string;
+  stackStatus: string;
   heroStepsLabel: string;
   proofTitle: string;
   mapTitle: string;
@@ -191,6 +203,18 @@ const en: Strings = {
   railReadme: "README",
   heroCtaSecond: "Read the flagship case",
   band: ["verify", "evidence", "pending stays pending", "trace every step"],
+  openDemo: "Open live demo",
+  copy: "Copy",
+  copied: "Copied",
+  accountsReady: "Ready to use. Sign in with one of these accounts.",
+  tourHint: "Hover a step to read it. On touch, tap.",
+  techDetails: "Technical details",
+  testsEvidence: "Tests and evidence",
+  portfolioTitle: "An interactive portfolio",
+  portfolioLead: "Every project here runs, shows its flow and links to its code. Open one to see it work; the tests and numbers are tucked inside each card.",
+  openProject: "View project",
+  flowHint: "Press Play, or click any box to see what it does. The pulse follows the current step.",
+  stackStatus: "Stack status and start",
   heroStepsLabel: "How to read this site",
   heroSteps: ["Try the live demo of one project", "Follow the guided tour: run it, see the flow, read the README", "Check the evidence: every number links to a commit"],
   proofTitle: "What you can check here",
@@ -290,8 +314,8 @@ const en: Strings = {
   demoReplayBody: "This project has no live backend on the site. You can run it yourself with the command below, and the measured results are in the README stop.",
   readmeLead: "The README of this project, in reading order: problem, decisions, failures, results and what I would do differently.",
   readmeOpen: "Open the README on GitHub",
-  flowRegion: "Diagram. Scrolls sideways; use the arrow keys.",
-  flowLead: "Click a node to see what it does and open its code. Play steps through the flow, or read the text version below the diagram.",
+  flowRegion: "Interactive diagram",
+  flowLead: "Click a node to see what it does and open its code. Play steps through the flow.",
   sceneAnnounce: "Project {n} of {total}: {name}",
   sceneHalftone: "Halftone",
   paletteOpen: "Search pages",
@@ -368,6 +392,18 @@ const pt: Strings = {
   railReadme: "README",
   heroCtaSecond: "Ler o case principal",
   band: ["verificar", "evidência", "pendente continua pendente", "rastreie cada passo"],
+  openDemo: "Abrir demo ao vivo",
+  copy: "Copiar",
+  copied: "Copiado",
+  accountsReady: "Pronto para usar. Entre com uma destas contas.",
+  tourHint: "Passe o mouse sobre um passo para ler. No toque, toque nele.",
+  techDetails: "Detalhes técnicos",
+  testsEvidence: "Testes e evidências",
+  portfolioTitle: "Um portfólio interativo",
+  portfolioLead: "Cada projeto aqui roda, mostra seu fluxo e aponta para o código. Abra um para vê-lo funcionando; os testes e números ficam dentro de cada cartão.",
+  openProject: "Ver projeto",
+  flowHint: "Aperte Play, ou clique em qualquer caixa para ver o que ela faz. O pulso acompanha o passo atual.",
+  stackStatus: "Estado da stack e início",
   heroStepsLabel: "Como ler este site",
   heroSteps: ["Teste a demo ao vivo de um projeto", "Siga o tour guiado: rode, veja o fluxo, leia o README", "Confira as evidências: cada número aponta para um commit"],
   proofTitle: "O que você pode conferir aqui",
@@ -467,8 +503,8 @@ const pt: Strings = {
   demoReplayBody: "Este projeto não tem backend ao vivo no site. Você roda ele mesmo com o comando abaixo, e os resultados medidos estão na parada do README.",
   readmeLead: "O README deste projeto, em ordem de leitura: problema, decisões, falhas, resultados e o que eu faria diferente.",
   readmeOpen: "Abrir o README no GitHub",
-  flowRegion: "Diagrama. Rola para o lado; use as setas.",
-  flowLead: "Clique num nó para ver o que ele faz e abrir o código. Reproduza o fluxo passo a passo, ou leia a versão em texto abaixo do diagrama.",
+  flowRegion: "Diagrama interativo",
+  flowLead: "Clique num nó para ver o que ele faz e abrir o código. Reproduza o fluxo passo a passo.",
   sceneAnnounce: "Projeto {n} de {total}: {name}",
   sceneHalftone: "Pontilhado",
   paletteOpen: "Buscar páginas",
