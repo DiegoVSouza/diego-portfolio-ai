@@ -7,7 +7,7 @@
 import * as THREE from "three";
 import { burstGeo, burstMaterial, type BurstUniforms } from "./burst";
 import { buildCity } from "./city";
-import { V3, fit, rng } from "./geometry";
+import { V3, fit, rng, tick } from "./geometry";
 import { buildPane } from "./glass";
 import { createPost } from "./post";
 import { createQuality, type Quality } from "./quality";
@@ -44,7 +44,7 @@ export interface SceneController {
 
 const SETTLE_MS = 140;
 
-export function start(canvas: HTMLCanvasElement, options: SceneOptions): SceneController {
+export async function start(canvas: HTMLCanvasElement, options: SceneOptions): Promise<SceneController> {
   const p = readPalette();
   const count = Math.max(1, options.slugs.length);
   const fixed = options.focus !== undefined;
@@ -82,7 +82,8 @@ export function start(canvas: HTMLCanvasElement, options: SceneOptions): SceneCo
 
   // One ring of broken glass per project.
   const glassMaterial = new THREE.MeshStandardMaterial({ vertexColors: true, flatShading: true, roughness: 0.6, metalness: 0.1, side: THREE.DoubleSide });
-  const panes = Array.from({ length: count }, (_, k) => {
+  const panes: { mesh: THREE.Mesh; phase: number }[] = [];
+  for (let k = 0; k < count; k += 1) {
     const group = new THREE.Group();
     const mesh = new THREE.Mesh(buildPane(rnd, p), glassMaterial);
     group.add(mesh);
@@ -90,19 +91,22 @@ export function start(canvas: HTMLCanvasElement, options: SceneOptions): SceneCo
     group.position.copy(at(tp, V3(0, 0, 0)));
     group.lookAt(at(tp + 0.05, V3(0, 0, 0)));
     scene.add(group);
-    return { mesh, phase: rnd() * 6.28 };
-  });
+    panes.push({ mesh, phase: rnd() * 6.28 });
+    await tick();
+  }
 
   // One solid per project, which breaks into its triangles when it takes the focus.
-  const solids = options.slugs.map((slug, i) => {
+  const solids: { group: THREE.Group; u: BurstUniforms; burst: number; index: number }[] = [];
+  for (let i = 0; i < options.slugs.length; i += 1) {
     const group = new THREE.Group();
     const material = burstMaterial(p);
-    const build = SYMBOLS[slug] ?? fallbackSymbol;
+    const build = SYMBOLS[options.slugs[i]!] ?? fallbackSymbol;
     const mesh = new THREE.Mesh(burstGeo(fit(build(), 5.4), rnd), material);
     group.add(mesh);
     scene.add(group);
-    return { group, u: material.userData.u as BurstUniforms, burst: 0, index: i };
-  });
+    solids.push({ group, u: material.userData.u as BurstUniforms, burst: 0, index: i });
+    await tick();
+  }
 
   // State.
   let motion = options.mode === "3d" && !fixed;
@@ -143,7 +147,7 @@ export function start(canvas: HTMLCanvasElement, options: SceneOptions): SceneCo
     canvas.dataset.atOrigin = String(n);
   };
 
-  const city = buildCity({
+  const city = await buildCity({
     scene,
     p,
     rnd,

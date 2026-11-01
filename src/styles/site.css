@@ -104,9 +104,10 @@
 .case-tabs[data-enhanced="true"] .case-panel > section:first-child { margin-top: 0; }
 
 /* The descent: four stripes sweep the screen while a project opens. */
-.wipe { position: fixed; inset: 0; z-index: var(--z-wipe); pointer-events: none; overflow: hidden; visibility: hidden; }
-.wipe.go { visibility: visible; }
-.wipe i { position: absolute; top: -130%; height: 130%; width: 30vw; transform: skewX(-18deg); will-change: transform; }
+.wipe { position: fixed; inset: 0; z-index: var(--z-wipe); pointer-events: none; overflow: hidden; display: none; }
+.wipe.go { display: block; }
+.wipe i { position: absolute; top: -130%; height: 130%; width: 30vw; transform: skewX(-18deg); }
+.wipe.go i { will-change: transform; }
 .wipe i:nth-child(1) { left: -6vw; background: var(--red); }
 .wipe i:nth-child(2) { left: 20vw; background: var(--paper); }
 .wipe i:nth-child(3) { left: 46vw; background: var(--ink-2); }
@@ -116,7 +117,7 @@
 .wipe.go i:nth-child(3) { animation-delay: 80ms; }
 .wipe.go i:nth-child(4) { animation-delay: 120ms; }
 @keyframes sweep { from { transform: translateY(0) skewX(-18deg); } to { transform: translateY(240%) skewX(-18deg); } }
-@media (prefers-reduced-motion: reduce) { .wipe.go i { animation: none; } .wipe { display: none; } }
+@media (prefers-reduced-motion: reduce) { .wipe.go i { animation: none; } .wipe.go { display: none; } }
 
 /* The simple version: text and diagrams only. */
 [data-simple="true"] .layers, [data-simple="true"] .screen-dots, [data-simple="true"] .scene, [data-simple="true"] .scene-controls, [data-simple="true"] .wipe { display: none !important; }

@@ -63,10 +63,10 @@ export function SceneHost({ mode, slugs, labels, focusSlug, pulseKey }: { mode: 
     let cancelled = false;
     const cancelIdle = onIdle(() => {
       import("./scene")
-        .then(({ start }) => {
+        .then(async ({ start }) => {
           if (cancelled) return;
           try {
-            controller.current = start(element, {
+            const started = await start(element, {
               slugs: slugKey.split(","),
               mode,
               models: { truck: truckUrl, moto: motoUrl },
@@ -85,6 +85,11 @@ export function SceneHost({ mode, slugs, labels, focusSlug, pulseKey }: { mode: 
                 document.documentElement.dataset.bg = "2d";
               },
             });
+            if (cancelled) {
+              started.dispose();
+              return;
+            }
+            controller.current = started;
             element.dataset.scene = mode;
             setRunning(true);
           } catch {

@@ -1,6 +1,9 @@
 import * as THREE from "three";
 import { mergeGeometries } from "three/examples/jsm/utils/BufferGeometryUtils.js";
 
+/** Give the browser a turn between two heavy build steps, so no single task blocks the page for long. */
+export const tick = (): Promise<void> => new Promise((resolve) => setTimeout(resolve, 0));
+
 export const V3 = (x: number, y: number, z: number) => new THREE.Vector3(x, y, z);
 
 /** Seeded random numbers, so the city is the same on every visit. */

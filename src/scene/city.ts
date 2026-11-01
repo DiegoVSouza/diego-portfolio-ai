@@ -1,6 +1,6 @@
 import * as THREE from "three";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
-import { V3, bar, box, fit, flat, mergeFlat, mergeGeometries, tint } from "./geometry";
+import { V3, bar, box, fit, flat, mergeFlat, mergeGeometries, tick, tint } from "./geometry";
 import { truckFallback } from "./symbols";
 import type { Palette } from "./tokens";
 
@@ -29,7 +29,7 @@ export interface City {
   repaintGhosts(): void;
 }
 
-export function buildCity(c: CityContext): City {
+export async function buildCity(c: CityContext): Promise<City> {
   const { scene, p, rnd, count: NC } = c;
   const dummy = new THREE.Object3D();
   const col = new THREE.Color();
@@ -68,6 +68,7 @@ export function buildCity(c: CityContext): City {
   };
   paintGhosts();
 
+  await tick();
   /* ---------- FRENTE: speed streaks and torn paper ---------- */
   const STREAKS = 60;
   const streaks = new THREE.InstancedMesh(new THREE.BoxGeometry(1, 1, 1), new THREE.MeshStandardMaterial({ roughness: 0.6, metalness: 0.1, flatShading: true }), STREAKS);
@@ -106,6 +107,7 @@ export function buildCity(c: CityContext): City {
   });
   scene.add(scraps);
 
+  await tick();
   /* ---------- FUNDO: skyline with lit windows ---------- */
   const winTex = (() => {
     const cv = document.createElement("canvas");
@@ -165,6 +167,7 @@ export function buildCity(c: CityContext): City {
   beaconMesh.frustumCulled = false;
   scene.add(beaconMesh);
 
+  await tick();
   /* vertical neon signs carrying the project names */
   const signPairs: [THREE.Color, THREE.Color][] = [[p.red, p.paper], [p.paper, p.ink2], [p.ink2, p.red], [p.red, p.ink2], [p.paper, p.red], [p.ink2, p.paper]];
   const words = [...c.signs, "LIVE", "AI", "EVIDENCE"];
@@ -202,6 +205,7 @@ export function buildCity(c: CityContext): City {
     scene.add(m);
   });
 
+  await tick();
   /* ---------- MEIO: viaduct, elevated trains ---------- */
   const rail = c.lane(22, 9, -8);
   const railLength = rail.getLength();
@@ -241,6 +245,7 @@ export function buildCity(c: CityContext): City {
   cars.frustumCulled = false;
   scene.add(cars);
 
+  await tick();
   /* ---------- MEIO: avenue with light trails and vehicles ---------- */
   const road = c.lane(-5, -11, 2);
   const TRAILS = 46;
@@ -303,6 +308,7 @@ export function buildCity(c: CityContext): City {
     c.onVehicles();
   });
 
+  await tick();
   /* ---------- FRENTE: overhead cables ---------- */
   {
     const pts: number[] = [];
