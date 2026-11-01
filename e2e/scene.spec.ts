@@ -42,6 +42,8 @@ test("SCENE-003: under reduced motion the scene is static and offers no motion t
   const problems = watch(page);
   await page.goto("/");
   await expect(page.locator("canvas.scene")).toHaveAttribute("data-scene", "3d-static", { timeout: 20_000 });
+  // No light trail, scrap or other instance is left stacked at the origin.
+  await expect(page.locator("canvas.scene")).toHaveAttribute("data-at-origin", "0");
   await expect(page.getByRole("button", { name: /^Motion$/ })).toHaveCount(0);
   expect(problems).toEqual([]);
   await context.close();
@@ -85,4 +87,24 @@ test("the scene stays off pages that do not use it", async ({ page }) => {
   await page.goto("/evidence/");
   await expect(page.getByRole("heading", { level: 1 }).first()).toBeVisible();
   await expect(page.locator("canvas.scene")).toHaveCount(0);
+});
+
+test("a portrait screen keeps the level 1 background and mounts no canvas", async ({ browser }) => {
+  const context = await browser.newContext({ viewport: { width: 390, height: 800 } });
+  const page = await context.newPage();
+  const problems = watch(page);
+  await page.goto("/");
+  await expect(page.getByRole("heading", { level: 1 }).first()).toBeVisible();
+  await page.waitForTimeout(1500);
+  await expect(page.locator("canvas.scene")).toHaveCount(0);
+  expect(problems).toEqual([]);
+  await context.close();
+});
+
+test("static frame of the contact section (scene S5)", async ({ page }) => {
+  await page.goto("/");
+  const section = page.locator('section[aria-labelledby="contact-h"]');
+  await expect(section).toBeVisible();
+  mkdirSync(evidence, { recursive: true });
+  await section.screenshot({ path: `${evidence}/contact.png` });
 });

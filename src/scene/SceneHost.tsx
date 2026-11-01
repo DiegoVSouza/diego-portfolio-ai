@@ -14,6 +14,9 @@ function onIdle(run: () => void): () => void {
   return () => window.clearTimeout(id);
 }
 
+/** Portrait screens keep the level 1 background: the city needs width, and phones should not pay for it. */
+const portrait = (): boolean => typeof matchMedia === "function" && matchMedia("(max-aspect-ratio: 1/1)").matches;
+
 const saveData = (): boolean => {
   const connection = (navigator as Navigator & { connection?: { saveData?: boolean } }).connection;
   return Boolean(connection?.saveData);
@@ -33,7 +36,7 @@ export function SceneHost({ mode, slugs, focusSlug, pulseKey }: { mode: Backgrou
   const focus = focusSlug === undefined ? undefined : slugs.indexOf(focusSlug);
 
   useEffect(() => {
-    if (!mounted || mode === "2d" || saveData() || !canvas.current) return undefined;
+    if (!mounted || mode === "2d" || saveData() || portrait() || !canvas.current) return undefined;
     const element = canvas.current;
     let cancelled = false;
     const cancelIdle = onIdle(() => {
@@ -91,7 +94,7 @@ export function SceneHost({ mode, slugs, focusSlug, pulseKey }: { mode: Backgrou
     controller.current?.setMotion(!motion);
   };
 
-  if (!mounted || mode === "2d") return null;
+  if (!mounted || mode === "2d" || portrait()) return null;
   return (
     <>
       <canvas ref={canvas} className={running ? "scene on" : "scene"} aria-hidden="true" />

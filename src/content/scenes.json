@@ -1,0 +1,95 @@
+{
+  "story": "In one minute a visitor understands that I am an AI engineer, sees a real run, and can reach the architecture of a project.",
+  "scenes": [
+    {
+      "id": "S0-arrival",
+      "kind": "load",
+      "status": "built",
+      "proof": "Name, role, three evidence-backed results, a demo button and a WhatsApp button, all as HTML text",
+      "trigger": { "type": "load" },
+      "staticFrame": "artifacts/evidence/portfolio-w7/home-1280.png",
+      "reducedMotion": "Same hero. The background is a single rendered frame, or the level 1 layers",
+      "mobile": "Same HTML. Portrait screens keep the level 1 background",
+      "focus": "Skip link first, then the header, then the first call to action"
+    },
+    {
+      "id": "S1-flight",
+      "kind": "scroll",
+      "status": "built",
+      "proof": "The project card list and the symbol object of the active project, chosen by scroll position",
+      "trigger": { "type": "scroll", "range": [0, 1], "per": "project" },
+      "staticFrame": "artifacts/evidence/portfolio-w7b/home-3d.png",
+      "reducedMotion": "No flight: the camera jumps to the active project's station and stops",
+      "mobile": "Project cards in the page. No canvas on portrait screens",
+      "focus": "Links inside the cards, in page order. The canvas never takes focus"
+    },
+    {
+      "id": "S2-descent",
+      "kind": "action",
+      "status": "planned",
+      "proof": "Choosing a project card opens its case page, and the camera holds at that project",
+      "trigger": { "type": "action", "events": ["click", "enter"] },
+      "staticFrame": "artifacts/evidence/portfolio-w7b/case-agents-3d.png",
+      "reducedMotion": "Plain navigation, no wipe",
+      "mobile": "Plain navigation",
+      "focus": "The case heading receives focus after navigation"
+    },
+    {
+      "id": "S3-case",
+      "kind": "stepper",
+      "status": "built",
+      "proof": "Problem, decisions with the rejected option, measured results, failure gallery and the diagram with its text list, in a fixed order",
+      "trigger": { "type": "action", "events": ["link", "side-index"] },
+      "staticFrame": "artifacts/evidence/portfolio-w7b/case-agents-3d.png",
+      "reducedMotion": "The diagram walkthrough changes scenes with no travelling token",
+      "mobile": "Sections stacked. Side index hidden on narrow screens",
+      "focus": "Case heading first, then the sections in order"
+    },
+    {
+      "id": "S4-line",
+      "kind": "action",
+      "status": "built",
+      "proof": "The side index lists all eight projects and marks the open one",
+      "trigger": { "type": "action", "events": ["click", "tab"] },
+      "staticFrame": "artifacts/evidence/portfolio-w7b/case-agents-3d.png",
+      "reducedMotion": "Identical",
+      "mobile": "The index is not shown on narrow screens; the home project list is the way between projects",
+      "focus": "Index links in order, current project marked with aria-current"
+    },
+    {
+      "id": "S5-contact",
+      "kind": "scroll",
+      "status": "built",
+      "proof": "WhatsApp button, phone, e-mail, LinkedIn and GitHub, in a normal section",
+      "trigger": { "type": "scroll", "range": [0.9, 1], "per": "page" },
+      "staticFrame": "artifacts/evidence/portfolio-w7b/contact.png",
+      "reducedMotion": "Identical",
+      "mobile": "Same section, buttons full width",
+      "focus": "WhatsApp button first"
+    },
+    {
+      "id": "S6-demo",
+      "kind": "stepper",
+      "status": "built",
+      "proof": "Stack status, budget left, and the model, tokens, latency and cost of each step of a real run",
+      "trigger": { "type": "data", "events": ["run-step"] },
+      "staticFrame": "artifacts/evidence/portfolio-w7b/demo-live.png",
+      "reducedMotion": "The scene events are not sent; the run log shows the same numbers",
+      "mobile": "Status, budget and log stacked; start button above the accounts",
+      "focus": "Start button, then the account list, then the log"
+    }
+  ],
+  "states": [
+    { "situation": "Stack asleep", "shown": "Asleep. Opening the page did not wake anything", "action": "Start button after the challenge, or the last recorded run" },
+    { "situation": "Waking", "shown": "Services starting, elapsed seconds", "action": "Wait, or leave: nothing else is needed" },
+    { "situation": "Wake failed or timed out", "shown": "A plain failure message", "action": "Try again later; the last recorded run stays visible" },
+    { "situation": "Status unavailable", "shown": "Status unavailable, with no substitute data", "action": "Reload" },
+    { "situation": "Budget exhausted", "shown": "The limit is reached and the demo says so", "action": "Read the recorded run and the evidence page" },
+    { "situation": "No run recorded", "shown": "No live run is recorded yet, no invented steps", "action": "Start the demo" },
+    { "situation": "No WebGL", "shown": "Level 1 background, no error", "action": "None needed" },
+    { "situation": "Reduced motion", "shown": "One rendered frame, no moving instance", "action": "None needed" },
+    { "situation": "Portrait or save-data", "shown": "Level 1 background", "action": "None needed" },
+    { "situation": "Unknown route", "shown": "Not-found page with the project list", "action": "Pick a project" },
+    { "situation": "JavaScript off", "shown": "Every page's text, the diagram and its list", "action": "None needed" }
+  ]
+}

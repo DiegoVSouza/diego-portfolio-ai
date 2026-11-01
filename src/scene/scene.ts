@@ -275,6 +275,47 @@ export function start(canvas: HTMLCanvasElement, options: SceneOptions): SceneCo
   let dead = false;
   let dirty = true;
 
+  // Every moving instance is positioned once at build time. Without this the light trails and paper scraps would
+  // stay stacked at the origin in the static modes, where the loop never runs.
+  const placeMoving = (now: number) => {
+    for (let i = 0; i < trailCount; i += 1) {
+      const t = trailState[i]!;
+      dummy.position.set(t.x, -1.9, t.z);
+      dummy.scale.set(1, 1, 1);
+      dummy.rotation.set(0, 0, 0);
+      dummy.updateMatrix();
+      trails.setMatrixAt(i, dummy.matrix);
+    }
+    trails.instanceMatrix.needsUpdate = true;
+    for (let i = 0; i < scrapCount; i += 1) {
+      const s = scrapState[i]!;
+      dummy.position.set(s.x, s.y, s.z);
+      dummy.rotation.set(now * 0.0004 * s.spin, now * 0.0003 * s.spin, 0);
+      dummy.scale.set(1, 1, 1);
+      dummy.updateMatrix();
+      scraps.setMatrixAt(i, dummy.matrix);
+    }
+    scraps.instanceMatrix.needsUpdate = true;
+  };
+  placeMoving(0);
+  // SCENE-003: report how many instances still sit at the origin (the known stacking bug). It must be zero.
+  const countAtOrigin = (): number => {
+    let n = 0;
+    const m = new THREE.Matrix4();
+    const v = new THREE.Vector3();
+    scene.traverse((o) => {
+      if (!(o as THREE.InstancedMesh).isInstancedMesh) return;
+      const mesh = o as THREE.InstancedMesh;
+      for (let i = 0; i < mesh.count; i += 1) {
+        mesh.getMatrixAt(i, m);
+        v.setFromMatrixPosition(m);
+        if (v.lengthSq() < 1e-6) n += 1;
+      }
+    });
+    return n;
+  };
+  canvas.dataset.atOrigin = String(countAtOrigin());
+
   const measure = () => {
     maxScroll = Math.max(1, document.documentElement.scrollHeight - window.innerHeight);
     width = window.innerWidth;
