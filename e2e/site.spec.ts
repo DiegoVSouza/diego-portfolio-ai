@@ -81,6 +81,8 @@ test("the diagram walks through scenes and a failure scenario by keyboard, at bo
   for (const width of [1000, 360]) {
     await page.setViewportSize({ width, height: 800 });
     await page.goto("/projects/supportops/");
+    // The buttons only act once the page is hydrated; the palette button appears after hydration.
+    await page.locator("button.palette-open[data-ready]").waitFor();
     const next = page.getByRole("button", { name: "Next" }).first();
     await next.focus();
     await page.keyboard.press("Enter");
