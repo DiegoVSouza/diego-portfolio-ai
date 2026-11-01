@@ -56,3 +56,11 @@ The owner pointed out that sending the visitor to `/demo/` broke the single flow
 - `site.spec.ts`: the diagram test is scoped to `#flow`, since the demo's guided tour has its own Next button.
 - `check_full`: exit 0, 61 unit and 38 e2e tests, worst route 42.1 KB gzip.
 - Read in a browser at 1280 and 390 px with the status API stubbed. Not deployed; production still has the previous version.
+
+## Production check after the in-flow deploy (2026-11-01)
+
+Deploy `046c0af3` (commit `cf1042a`). Entering from the home page by the "Live demo" button: URL `/projects/supportops/#demo`, CSP allows the Turnstile origin, the challenge frame loads, the stack status reads from the API, the start button is disabled with the reason "Confirm that you are human", no page errors, no POST to our API (nothing woken, budget USD 5.00 of 5.00). Screenshot: `artifacts/evidence/portfolio-w8/demo-prod-in-flow.png`.
+
+Two things found on the way. (1) Reaching the page by in-place navigation kept the strict CSP of the home document and blocked the widget; the router now loads the document (`cf1042a`, covered by an e2e test). (2) The first load right after the deploy failed to fetch the `Case` chunk, and a second check minutes later was fine; the asset answers 200. Treated as edge propagation, not reproduced.
+
+Not done: a human click on the challenge and a real Start. Those wake the Fly stack and spend the budget.
