@@ -25,3 +25,11 @@
 ## 2026-10-31: the contact phone is published
 
 The owner reversed the earlier rule and asked for the phone number and a WhatsApp button on the portfolio. The number is in `src/content/profile.ts` only (a test keeps it out of every other source). The CV `.docx` stays out of Git. An earlier commit contained partial digits inside a test regex; since the number is now public on purpose, history is not rewritten.
+
+## 2026-11-01: the shipped build uses Preact's compatibility layer
+
+- **Why:** Lighthouse mobile on the live site scored performance 69 with TBT 1,330 ms and LCP 2.6 s. The cost was React hydration: one 1.3 s task under 4x CPU slowdown, in a 207 KB raw index chunk. The page is mostly static, so the work is overhead.
+- **Decision:** `vite build` aliases `react`, `react-dom` and the JSX runtime to `preact/compat`, and `colagem-ui` is bundled into the SSR build so it shares the alias. Dev server and unit tests stay on React 19.
+- **Measured:** worst-route first-load JavaScript 96.6 KB gzip with React, 37.9 KB with Preact. Local Lighthouse mobile on the Preact build: performance 85, LCP 2.0 s, TBT 500 ms (a local run, not the same network as the live run). The full e2e suite (22 tests: axe, CSP, hydration errors, no JavaScript, keyboard, scene, palette) passes against the Preact build.
+- **Cost and risk:** unit tests do not exercise Preact, so a behavior difference would show only in e2e. `REACT_BUILD=1 npm run build` builds with React for comparison. Preact 10.29.2 and preact-render-to-string 6.6.1 are pinned.
+- **Rejected:** deferring hydration to idle (it moves the long task, it does not remove it), and lazy Suspense boundaries around sections (they need the lazy chunk resolved at prerender and add boundaries without cutting the shared React cost).
