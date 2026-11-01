@@ -25,6 +25,9 @@ export function parsePath(pathname: string): Route {
   return { lang, page: "not-found" };
 }
 
+/** Pages that hold the live demo and may load Turnstile: they carry the looser policy (scripts/prerender.mjs). */
+export const needsChallenge = (path: string): boolean => /^(\/pt)?\/(demo|projects\/supportops)\/?$/.test((path.split(/[?#]/)[0] ?? ""));
+
 export function hrefFor(route: Pick<Route, "page" | "slug">, lang: Lang): string {
   const prefix = lang === "pt" ? "/pt" : "";
   switch (route.page) {
@@ -59,6 +62,13 @@ export function RouterProvider({ initial, children }: { initial: string; childre
     return () => window.removeEventListener("popstate", onPop);
   }, []);
   const go = useCallback((to: string) => {
+    // The Content-Security-Policy is a <meta> in the document that was loaded first, and navigating in place does not
+    // replace it. A page that needs the Turnstile origin must therefore be loaded as a document, or the script is
+    // blocked and the widget never appears (found in production, 2026-11-01).
+    if (needsChallenge(to) && !needsChallenge(window.location.pathname)) {
+      window.location.assign(to);
+      return;
+    }
     // Load the page's chunk first, then switch, so the old page stays up instead of a blank one.
     const target = parsePath(to);
     void preload(target).then(() => {

@@ -1,2 +1,2 @@
 🌎 Deploying...
-✨ Deployment complete! Take a peek over at https://4889af3e.diego-portfolio-ai.pages.dev
+✨ Deployment complete! Take a peek over at https://7c133154.diego-portfolio-ai.pages.dev

@@ -32,6 +32,19 @@ test.describe("case stops", () => {
     await expect(page).toHaveURL(/#readme$/);
   });
 
+  test("arriving at the live demo from another page loads the document that may use Turnstile", async ({ page }) => {
+    // The policy is a <meta> in the first document. Navigating in place would keep the strict one and block the widget.
+    await page.goto("/");
+    await ready(page);
+    await page.getByRole("main").getByRole("link", { name: "Live demo" }).first().click();
+    await expect(page).toHaveURL(/\/projects\/supportops\/#demo$/);
+    const policy = await page.locator('meta[http-equiv="Content-Security-Policy"]').getAttribute("content");
+    expect(policy).toContain("https://challenges.cloudflare.com");
+    // Other cases keep the strict policy.
+    await page.goto("/projects/agents/");
+    expect(await page.locator('meta[http-equiv="Content-Security-Policy"]').getAttribute("content")).not.toContain("challenges.cloudflare.com");
+  });
+
   test("old anchors land on their section: a link to #numbers shows Results", async ({ page }) => {
     await page.goto("/projects/supportops/#numbers");
     await ready(page);
