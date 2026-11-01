@@ -70,10 +70,12 @@ const HALFTONE_VERTEX = `varying vec2 vUv; void main(){ vUv = uv; gl_Position = 
 
 /** Grid at 45 degrees, three tones (ink, accent, paper), dot radius grows with luminance, paper outline on edges. */
 const HALFTONE_FRAGMENT = `
-  uniform sampler2D tDiffuse; uniform vec2 res; uniform float cell; uniform vec3 cInk; uniform vec3 cRed; uniform vec3 cPaper; varying vec2 vUv;
+  uniform sampler2D tDiffuse; uniform vec2 res; uniform float cell; uniform vec3 cInk; uniform vec3 cRed; uniform vec3 cPaper; uniform float split; varying vec2 vUv;
   float lum(vec3 c){ return sqrt(dot(c, vec3(.2126,.7152,.0722))); }
   void main(){
-    vec3 c = texture2D(tDiffuse, vUv).rgb;
+    // RGB split only while the selection settles: red and blue are read from opposite sides of the pixel.
+    vec2 sp = vec2(split * 0.006, 0.);
+    vec3 c = vec3(texture2D(tDiffuse, vUv + sp).r, texture2D(tDiffuse, vUv).g, texture2D(tDiffuse, vUv - sp).b);
     float l = lum(c);
     vec2 px = 1.5/res;
     float e = abs(lum(texture2D(tDiffuse, vUv+vec2(px.x,0.)).rgb) - lum(texture2D(tDiffuse, vUv-vec2(px.x,0.)).rgb))
@@ -84,6 +86,8 @@ const HALFTONE_FRAGMENT = `
     vec3 col = mix(cInk, cRed, step(d, smoothstep(0.,.5,l)*.75));
     col = mix(col, cPaper, step(d, clamp((l-.5)*2.,0.,1.)*.75));
     col = mix(col, cPaper, step(.34, e));
+    // Left vignette: the side where the text sits stays calm.
+    col = mix(col, cInk, smoothstep(.55, 0., vUv.x) * .45);
     gl_FragColor = vec4(col, 1.);
   }`;
 
@@ -131,6 +135,7 @@ export function start(canvas: HTMLCanvasElement, options: SceneOptions): SceneCo
       cInk: { value: tokenVec("--ink") },
       cRed: { value: tokenVec("--red") },
       cPaper: { value: tokenVec("--paper") },
+      split: { value: 0 },
     },
     vertexShader: HALFTONE_VERTEX,
     fragmentShader: HALFTONE_FRAGMENT,
@@ -329,6 +334,7 @@ export function start(canvas: HTMLCanvasElement, options: SceneOptions): SceneCo
   let raf = 0;
   let settleTimer = 0;
   let pulseAt = -1;
+  let splitAt = -1;
   let dead = false;
   let dirty = true;
 
@@ -420,7 +426,10 @@ export function start(canvas: HTMLCanvasElement, options: SceneOptions): SceneCo
       window.clearTimeout(settleTimer);
       // Shatter only once the selection has settled, never for items that are passing by.
       settleTimer = window.setTimeout(() => {
-        if (motion && symbols[active]) symbols[active]!.shatterAt = performance.now();
+        if (motion && symbols[active]) {
+          symbols[active]!.shatterAt = performance.now();
+          splitAt = performance.now();
+        }
       }, SETTLE_MS);
       dirty = true;
     }
@@ -485,6 +494,10 @@ export function start(canvas: HTMLCanvasElement, options: SceneOptions): SceneCo
     } else if (!dirty) {
       return;
     }
+    // The split lives 320 ms after a settle and is exactly zero otherwise, including under reduced motion.
+    const splitK = motion && splitAt > 0 ? Math.max(0, 1 - (now - splitAt) / 320) : 0;
+    halftonePass.uniforms.split!.value = splitK;
+    if (splitK > 0 && canvas.dataset.splitSeen !== "1") canvas.dataset.splitSeen = "1";
     place(current, now);
     renderer.info.reset();
     if (useHalftone) composer.render();

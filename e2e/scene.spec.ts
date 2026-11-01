@@ -129,3 +129,20 @@ test("the half-tone pass is on by default, the h key and the button turn it off,
   await expect(page.locator("canvas.scene")).toHaveAttribute("data-halftone", "on");
   expect(problems).toEqual([]);
 });
+
+test("SCENE-003: the RGB split fires only after a selection settles, and never under reduced motion", async ({ page, browser }) => {
+  await page.goto("/");
+  const canvas = page.locator("canvas.scene");
+  await expect(canvas).toHaveAttribute("data-scene", "3d", { timeout: 20_000 });
+  await page.waitForTimeout(600);
+  await page.evaluate(() => window.scrollTo(0, document.documentElement.scrollHeight));
+  await expect(canvas).toHaveAttribute("data-split-seen", "1", { timeout: 10_000 });
+  const context = await browser.newContext({ reducedMotion: "reduce" });
+  const calm = await context.newPage();
+  await calm.goto("/");
+  await expect(calm.locator("canvas.scene")).toHaveAttribute("data-scene", "3d-static", { timeout: 20_000 });
+  await calm.evaluate(() => window.scrollTo(0, document.documentElement.scrollHeight));
+  await calm.waitForTimeout(800);
+  await expect(calm.locator("canvas.scene")).not.toHaveAttribute("data-split-seen", "1");
+  await context.close();
+});
