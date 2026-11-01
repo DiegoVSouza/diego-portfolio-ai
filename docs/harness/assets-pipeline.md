@@ -11,21 +11,25 @@ repository (the building pack alone is 254 MB); only the prepared GLB files are,
 | `car-r7.glb` | `A_R7.zip`, `Body/A_R7_Body_1.fbx` | **CC0** (`licence.txt`); author not named | 83 KB; 3.8k |
 | `car-s64.glb` | `S64Compact_v1_C.zip`, `Body/S64Compact_Body_1.fbx` | **CC0** (`licence.txt`); author not named | 35 KB; 1.6k |
 | `building-sample.glb` | `Free Sample.zip`, `Building_06.fbx` | **OWNER-DECLARED** (no licence file) | 256 KB; 23k |
-| `metro-station.glb` | `ModularUndergroundMetro.zip`, 8 pieces assembled by `scripts/build_station.mjs` | **OWNER-DECLARED** (no licence file) | 29 KB; 2.9k |
+| `metro-station.glb` | **loafbrr**, Modular Underground Metro (itch.io, https://loafbrr.itch.io/modular-underground-metro), 8 pieces assembled by `scripts/build_station.mjs` | **CC BY 1.0** (credit required: footer and `assets/CREDITS.md`) | 29 KB; 2.9k |
 | `train-subway-a.glb`, `train-subway-b.glb`, `train-subway-c.glb` | Kenney Train Kit 1.1: `train-electric-subway-a/b/c` (head, middle, tail), credit also to Guus Vermeulen and Tony Schaer | **CC0** (`License.txt`) | 69 to 81 KB; 1.5k, 1.3k, 1.6k |
 | `truck.glb`, `moto.glb` | Kenney | **CC0** | already in the repository |
 
-### What OWNER-DECLARED means
+### What OWNER-DECLARED means (one file)
 
-`Free Sample.zip` and `ModularUndergroundMetro.zip` ship no licence file. On 2026-11-01 the owner stated that both were free to download and use,
-and asked for them to be used. They are recorded as exactly that: `license: OWNER-DECLARED`, with the decision written in the ledger entry,
-a warning from `node tools/assets.mjs audit` for every such file, and a separate section in `assets/CREDITS.md`. They are **not** recorded as CC0,
-because nobody granted CC0, and the site's footer says they come from free packs without a licence file.
+`Free Sample.zip` (the `Building_06` model) ships no licence file and its origin page was not found. On 2026-11-01 the owner stated that it was free to download and use.
+It is recorded as exactly that: `license: OWNER-DECLARED`, with the decision in the ledger entry, a warning from `node tools/assets.mjs audit`, and a separate section in
+`assets/CREDITS.md`. It is **not** recorded as CC0, because nobody granted CC0, and the site's footer says it comes from a free pack without a licence file.
 
-What this does not settle: "free to download" is not the same as "free to redistribute". The site serves these two GLB files to every visitor,
-so if either pack's author objects, the file must come out. Removal is local: delete the file and its ledger entry, and the scene falls back on
-its own (`building-sample`: three of the twelve towers fall back to boxes; `metro-station`: no stations). The owner can lift the warning by finding
-the packs' pages and licence terms and re-registering them with a real licence.
+What this does not settle: "free to download" is not "free to redistribute". If the author objects, delete the file and its ledger entry; three of the twelve skyline towers
+fall back to boxes by themselves.
+
+### The metro station is CC BY 1.0, not unlicensed
+
+The Modular Underground Metro pack looked unlicensed because the zip has no licence file. Its itch.io page names the author (loafbrr) and the licence
+(Creative Commons Attribution 1.0 International; the page also says it can be used commercially and modified). It is therefore registered as `CC-BY-1.0`
+(`tools/assets.mjs` accepts it with `--allow-cc-by`), the credit is shown in the footer of every page (`Shell.tsx`, with links to the pack and to the licence),
+and it is listed under "Atribuição obrigatória" in `assets/CREDITS.md`. The station is a modified work (eight pieces assembled), which the licence allows.
 
 ## Rebuild
 
@@ -51,7 +55,7 @@ node scripts/build_station.mjs "<extracted>/Objects" station.glb   # metro stati
 python -I scripts/glb_bake_palette.py "<kit>/Models/GLB format/train-electric-subway-a.glb" baked.glb
 npx --yes @gltf-transform/cli@4.5.1 prune baked.glb pruned.glb && npx --yes @gltf-transform/cli@4.5.1 weld pruned.glb train-subway-a.glb
 
-# 4. register and audit
+# 4. register and audit (CC BY needs --allow-cc-by and shows a credit)
 node tools/assets.mjs register assets/game/models/<file>.glb --author ... --license CC0 --url ...
 node tools/assets.mjs register assets/game/models/<file>.glb --author ... --license none --url ... --owner-declared "reason"
 node tools/assets.mjs credits && node tools/assets.mjs audit

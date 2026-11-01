@@ -2,10 +2,13 @@
 
 _Gerado por tools/assets.mjs a partir de assets/ledger.json. Não edite à mão._
 
+## Atribuição obrigatória
+
+- `assets/game/models/metro-station.glb` — "metro-station.glb" by loafbrr (Modular Underground Metro, itch.io); station assembled from its pieces by scripts/build_station.mjs (https://loafbrr.itch.io/modular-underground-metro), licensed under CC BY 1.0
+
 ## Sem licença verificável (decisão do dono; termos não verificados)
 
 - `assets/game/models/building-sample.glb` — Unknown author (Free Sample.zip, Building_06.fbx); converted by scripts/fbx_to_glb.mjs, simplified (local pack: Free Sample.zip (no licence file)). No licence file in the pack. Owner decision: owner stated on 2026-11-01 that the pack was free to download and use. Terms unverified.
-- `assets/game/models/metro-station.glb` — Unknown author (ModularUndergroundMetro.zip); station assembled by scripts/build_station.mjs (local pack: ModularUndergroundMetro.zip (no licence file)). No licence file in the pack. Owner decision: owner stated on 2026-11-01 that the pack was free to download and use. Terms unverified.
 
 ## CC0 (sem atribuição obrigatória; crédito é cortesia)
 

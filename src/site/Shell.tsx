@@ -87,6 +87,9 @@ export function Shell({ children, hud, ghost }: { children: ReactNode; hud?: str
       <main id="main" className="wrap" tabIndex={-1} data-page={route.page}>{children}</main>
       <AppFooter credits={t.credits}>
         <p>
+          {t.creditsStation} <a href="https://loafbrr.itch.io/modular-underground-metro" rel="noopener noreferrer">Modular Underground Metro</a> {t.creditsStationBy} loafbrr, <a href="https://creativecommons.org/licenses/by/1.0/" rel="noopener noreferrer">CC BY</a>.
+        </p>
+        <p>
           <Link to={hrefFor({ page: "evidence" }, lang)}>{t.navEvidence}</Link> · <Link to={hrefFor({ page: "method" }, lang)}>{t.navMethod}</Link> · <Link to={hrefFor({ page: "experience" }, lang)}>{t.navExperience}</Link> · <Link to={hrefFor({ page: "design-system" }, lang)}>{t.navDesign}</Link> · <a href="/llms.txt">llms.txt</a> · <a href="/resume.md">{t.resume}</a>
         </p>
         <p><LazyPalette /></p>

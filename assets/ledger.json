@@ -57,13 +57,13 @@
     },
     {
       "path": "assets/game/models/metro-station.glb",
-      "author": "Unknown author (ModularUndergroundMetro.zip); station assembled by scripts/build_station.mjs",
-      "license": "OWNER-DECLARED",
-      "url": "local pack: ModularUndergroundMetro.zip (no licence file)",
-      "attribution": "Unknown author (ModularUndergroundMetro.zip); station assembled by scripts/build_station.mjs (local pack: ModularUndergroundMetro.zip (no licence file)). No licence file in the pack. Owner decision: owner stated on 2026-11-01 that the pack was free to download and use. Terms unverified.",
+      "author": "loafbrr (Modular Underground Metro, itch.io); station assembled from its pieces by scripts/build_station.mjs",
+      "license": "CC-BY-1.0",
+      "url": "https://loafbrr.itch.io/modular-underground-metro",
+      "attribution": "\"metro-station.glb\" by loafbrr (Modular Underground Metro, itch.io); station assembled from its pieces by scripts/build_station.mjs (https://loafbrr.itch.io/modular-underground-metro), licensed under CC BY 1.0",
       "source": "manual",
       "sha256": "3304a6d02e8b4c2189b2583eec68e3c4c6413b09f18923a07a09af1d54e77ed4",
-      "fetchedAt": "2026-11-01T18:42:53.204Z"
+      "fetchedAt": "2026-11-01T21:23:22.066Z"
     },
     {
       "path": "assets/game/models/moto.glb",

@@ -399,3 +399,10 @@ a:not(.btn):hover { color: var(--paper); text-decoration-thickness: 3px; }
 /* The generic panel rule for direct children of the page column must not box a chapter: the chapter has its own banner and body. */
 .wrap > section.step { background: none; border: 0; padding: 0; margin: 104px 0 0; max-width: none; }
 @media (max-width: 700px) { .wrap > section.step { margin-top: 72px; } }
+/* The flow's labels: a little smaller, so a long name stays inside its box. */
+.flow-stage-wrap .flow-label { font-size: 18px; letter-spacing: 0; }
+/* On a wide screen the hero card waits on the right of the page, where the scene will hang it, so it does not jump when the scene starts. */
+@media (min-width: 1200px) {
+  [data-page="home"] .stop-card { margin-left: auto; margin-right: 7vw; }
+  [data-page="home"].wrap > section.stop:first-of-type { padding-top: 9vh; }
+}

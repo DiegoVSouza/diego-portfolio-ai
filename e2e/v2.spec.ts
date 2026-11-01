@@ -233,12 +233,23 @@ test("the scene is built from the real downloaded models, not the fallbacks (ass
   await expect.poll(async () => Number(await canvas.getAttribute("data-vehicle-kinds")), { timeout: 15_000 }).toBe(4);
   // The platform district has its metro station, built from the Modular Underground Metro pieces.
   await expect.poll(async () => Number(await canvas.getAttribute("data-stations")), { timeout: 15_000 }).toBe(1);
-  // The metro on the viaduct is the Kenney Train Kit (CC0), not the generated fallback.
-  await expect.poll(async () => canvas.getAttribute("data-train"), { timeout: 15_000 }).toBe("kenney");
+  // The metro on the viaduct is the Kenney Train Kit (CC0), not the generated fallback.
+  await expect.poll(async () => canvas.getAttribute("data-train"), { timeout: 15_000 }).toBe("kenney");
   // The city stays inside its draw-call budget (phase 005: at most 100 on the first frame).
   expect(Number(await canvas.getAttribute("data-draws"))).toBeLessThanOrEqual(100);
   // No model fell back to a generated one: a fallback logs a warning.
   expect(problems.filter((p) => /did not load/.test(p))).toEqual([]);
   // Nothing sits at the origin (the known stacking bug) and the scene is not empty.
   await expect(canvas).toHaveAttribute("data-at-origin", "0");
+});
+
+test("the CC BY credit for the metro station is on every page, with links to the pack and to the licence", async ({ page }) => {
+  await mockApi(page);
+  for (const path of ["/", "/pt/", "/projects/agents/"]) {
+    await page.goto(path);
+    const footer = page.locator("footer");
+    await expect(footer.getByRole("link", { name: "Modular Underground Metro" })).toHaveAttribute("href", "https://loafbrr.itch.io/modular-underground-metro");
+    await expect(footer.getByRole("link", { name: "CC BY" })).toHaveAttribute("href", "https://creativecommons.org/licenses/by/1.0/");
+    await expect(footer).toContainText("loafbrr");
+  }
 });

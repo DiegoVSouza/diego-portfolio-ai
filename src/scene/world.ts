@@ -503,6 +503,26 @@ export async function buildWorld(c: WorldContext): Promise<World> {
     solid(5, 7, 1, 7, lx, 38, lz, 0, p.red, false);
     solid(5, 3.4, 4, 3.4, lx, 39, lz, 0, p.paper, false);
     beacon(lx, 44, lz, 2);
+    // Lamp posts along both edges of the quay.
+    for (let i = 0; i < 8; i += 1) {
+      for (const side of [-1, 1]) {
+        const lampZ = shoreZ - 8 - i * 17;
+        strut(5, V3(f.p.x + side * 21, 0, lampZ), V3(f.p.x + side * 21, 9, lampZ), 0.3, grey(0.4));
+        beacon(f.p.x + side * 21, 9.4, lampZ, 0.7);
+      }
+    }
+    // A cargo ship at the left of the quay: a hull, a bridge, a funnel and a deck of containers.
+    const shipX = f.p.x - 40;
+    const shipZ = shoreZ - 70;
+    solid(5, 13, 5, 44, shipX, -1.5, shipZ, 0, grey(0.18), false);
+    solid(5, 13.4, 0.8, 44.4, shipX, 3.4, shipZ, 0, p.red, false);
+    solid(5, 10, 8, 9, shipX, 4.2, shipZ + 16, 0, grey(0.3));
+    solid(5, 3, 4, 3, shipX, 12.2, shipZ + 16, 0, p.red, false);
+    beacon(shipX, 16.6, shipZ + 16, 0.8);
+    const deck = [p.red, p.paper, grey(0.32), p.dred];
+    for (let row = 0; row < 4; row += 1) for (let col = 0; col < 2; col += 1) {
+      solid(5, 5, 3, 7, shipX + (col ? 3 : -3), 4.2 + (row % 2 ? 3 : 0), shipZ - 14 + row * 8, 0, deck[(row + col) % deck.length]!, false);
+    }
   }
 
   /* ---------- one billboard per stop: the card's place in the city ---------- */

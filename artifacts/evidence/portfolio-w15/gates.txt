@@ -1,0 +1,11 @@
+tsc exit 0
+> eslint src e2e scripts functions
+
+ Test Files  7 passed (7)
+      Tests  64 passed (64)
+   Start at  18:30:24
+   Duration  3.20s (environment 73%, setup 13%, tests 9%, transform 3%, import 2%)
+
+aviso: assets/game/models/building-sample.glb é OWNER-DECLARED (sem licença verificável)
+audit: OK (14 arquivos)
+budget: PASS (worst route /projects/supportops/index.html: 50.1 KB gzip of 100 KB; scene chunk 165.0 KB of 500 KB)

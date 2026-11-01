@@ -49,6 +49,7 @@ try {
 const LICENSES = {
   'cc0': 'CC0', 'cc0 1.0': 'CC0', 'cc0 1.0 universal': 'CC0', 'cc0 public domain': 'CC0', 'public domain (cc0)': 'CC0',
   'cc-by 4.0': 'CC-BY-4.0', 'cc by 4.0': 'CC-BY-4.0', 'cc-by-4.0': 'CC-BY-4.0', 'cc attribution': 'CC-BY-4.0',
+  'cc-by 1.0': 'CC-BY-1.0', 'cc by 1.0': 'CC-BY-1.0', 'cc-by-1.0': 'CC-BY-1.0', 'creative commons attribution 1.0 international': 'CC-BY-1.0',
 };
 function resolveLicense(raw, { author, title, url }) {
   let norm = LICENSES[String(raw ?? '').trim().toLowerCase()];
@@ -63,9 +64,9 @@ function resolveLicense(raw, { author, title, url }) {
     return { author, license: 'OWNER-DECLARED', url, attribution: `${author} (${url}). No licence file in the pack. Owner decision: ${flags['owner-declared']}. Terms unverified.` };
   }
   if (!norm) die(`licença não reconhecida/permitida: "${raw}". Verifique na página oficial (${url}); só CC0 (ou CC-BY-4.0 com --allow-cc-by). Se confirmou, repita com --accept-licence CC0.`);
-  if (norm === 'CC-BY-4.0' && !flags['allow-cc-by']) die(`"${title}" é CC-BY-4.0 (exige crédito). Repita com --allow-cc-by se for aceitável.`);
+  if (/^CC-BY-/.test(norm) && !flags['allow-cc-by']) die(`"${title}" é ${norm} (exige crédito). Repita com --allow-cc-by se for aceitável.`);
   const meta = { author, license: norm, url };
-  if (norm === 'CC-BY-4.0') meta.attribution = `"${title}" by ${author} (${url}), licensed under CC BY 4.0`;
+  if (/^CC-BY-/.test(norm)) meta.attribution = `"${title}" by ${author} (${url}), licensed under CC BY ${norm.slice(6)}`;
   return meta;
 }
 
@@ -391,8 +392,8 @@ async function cmdAudit() {
     const rel = posix(path.relative(root, f)), e = byPath.get(rel);
     if (!e) { problems.push(`sem registro no ledger: ${rel}`); continue; }
     if (e.license === 'OWNER-DECLARED') { if (!e.attribution?.includes('Owner decision')) problems.push(`OWNER-DECLARED sem a decisão registrada: ${rel}`); else console.warn(`aviso: ${rel} é OWNER-DECLARED (sem licença verificável)`); }
-    else if (!['CC0', 'CC-BY-4.0'].includes(e.license)) problems.push(`licença não permitida (${e.license}): ${rel}`);
-    if (e.license === 'CC-BY-4.0' && !e.attribution) problems.push(`CC-BY sem atribuição: ${rel}`);
+    else if (!['CC0', 'CC-BY-4.0', 'CC-BY-1.0'].includes(e.license)) problems.push(`licença não permitida (${e.license}): ${rel}`);
+    if (/^CC-BY-/.test(e.license) && !e.attribution) problems.push(`CC-BY sem atribuição: ${rel}`);
     if (e.sha256 && e.sha256 !== await sha256File(f)) problems.push(`hash divergente: ${rel}`);
   }
   const present = new Set(files.map(f => posix(path.relative(root, f))));
@@ -450,7 +451,7 @@ const HELP = `assets.mjs — assets 3D gratuitos (CC0 por padrão)
   credits | audit                        regenera CREDITS.md | valida ledger vs. arquivos
 
 fontes: polyhaven, ambientcg (sem chave) · polypizza (POLY_PIZZA_API_KEY) · sketchfab (SKETCHFAB_TOKEN)
-flags úteis: --allow-cc-by (aceita CC-BY-4.0) · --accept-licence CC0 (licença desconhecida já conferida à mão)
+flags úteis: --allow-cc-by (aceita CC-BY-4.0 e CC-BY-1.0, ambos com crédito) · --accept-licence CC0 (licença desconhecida já conferida à mão)
              --owner-declared "motivo" (sem arquivo de licença; decisão do dono, registrada como OWNER-DECLARED, nunca como CC0)
              --max-mb 300 · --root <dir> · env ASSET_UA="SeuApp/1.0 (email)"
 exit: 0 ok · 1 erro · 3 ação manual pendente`;

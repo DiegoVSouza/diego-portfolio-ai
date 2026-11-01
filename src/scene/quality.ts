@@ -1,18 +1,18 @@
 export type Quality = "auto" | "high" | "low";
 
 export const SCALES = [1, 0.8, 0.65, 0.5];
-const WARM_UP = 90;
+const WARM_UP = 60;
 const WINDOW = 45;
 const SLOW = 0.027;
 const FAST = 0.0175;
 const RAISE_LOCK_MS = 6000;
 
 /**
- * Adaptive resolution. After 90 warm-up frames (shader compile, first load) it averages 45 frames: slow drops one step
+ * Adaptive resolution. It starts one step down on a device that looks weak (few cores, little memory, a touch screen), so the first seconds are smooth. After 60 warm-up frames (shader compile, first load) it averages 45 frames: slow drops one step
  * at once, fast raises one step only after a lock, so it does not oscillate.
  */
-export function createQuality(onChange: () => void) {
-  let level = 0;
+export function createQuality(onChange: () => void, initial = 0) {
+  let level = initial;
   let mode: Quality = "auto";
   let warm = 0;
   let acc = 0;

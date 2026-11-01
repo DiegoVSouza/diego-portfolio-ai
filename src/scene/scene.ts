@@ -174,11 +174,14 @@ export async function start(canvas: HTMLCanvasElement, options: SceneOptions): P
     post.halftone.uniforms.res!.value.set(width * dpr, height * dpr);
     post.halftone.uniforms.cell!.value = 5 * dpr;
   };
+  // A device that looks weak starts a step down; the adaptive loop then raises or lowers it from the real frame time.
+  const nav = navigator as Navigator & { deviceMemory?: number };
+  const weak = (nav.hardwareConcurrency ?? 8) <= 4 || (nav.deviceMemory ?? 8) <= 4 || (typeof matchMedia === "function" && matchMedia("(pointer: coarse)").matches);
   const quality = createQuality(() => {
     applyScale();
     options.onQuality?.(quality.scale);
     dirty = true;
-  });
+  }, weak ? 1 : 0);
 
   /** Where each district's section sits on the page, measured once and when the layout changes, never per frame. */
   const measure = () => {

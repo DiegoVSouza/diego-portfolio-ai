@@ -139,7 +139,7 @@ test.describe("descent, simple version and back to the surface", () => {
     await expect(page.locator("#project-toolkit")).toBeInViewport();
     const canvas = page.locator("canvas.scene");
     await expect(canvas).toHaveAttribute("data-scene", "3d", { timeout: 20_000 });
-    await expect(canvas).toHaveAttribute("data-active", "2"); // the AI core district
+    await expect(canvas).toHaveAttribute("data-active", "4"); // the toolkit stop (the fifth)
   });
 });
 
