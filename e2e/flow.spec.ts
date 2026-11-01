@@ -175,15 +175,17 @@ test.describe("metro line", () => {
     await expect(page).toHaveURL(/\/projects\/agents\/$/);
   });
 
-  test("on the home the active station follows the card in the middle of the screen, and a station scrolls to its card", async ({ page }) => {
+  test("the home has no project sidebar; j moves to the next card and the move is announced", async ({ page }) => {
     await page.setViewportSize({ width: 1280, height: 800 });
     await page.goto("/");
     await ready(page);
-    const line = page.getByRole("navigation", { name: "Project line" });
-    await line.getByRole("link", { name: /Production AI toolkit/ }).click();
-    await expect(page.locator("#project-toolkit")).toBeInViewport();
-    await expect(line.getByRole("link", { name: /Production AI toolkit/ })).toHaveAttribute("aria-current", "location");
-    await expect(line.locator("[role=status]")).toContainText(/Project 4 of 8/);
+    await expect(page.getByRole("navigation", { name: "Project line" })).toHaveCount(0);
+    await expect(page.locator(".metro-stations")).toHaveCount(0);
+    await page.evaluate(() => document.getElementById("project-supportops")!.scrollIntoView({ block: "center" }));
+    await expect(page.locator(".metro [role=status]")).toContainText(/Project 1 of 8/);
+    await page.keyboard.press("j");
+    await expect(page.locator("#project-foundation")).toBeInViewport();
+    await expect(page.locator(".metro [role=status]")).toContainText(/Project 2 of 8/);
   });
 
   test("the line passes axe on the home and on a case, at both widths", async ({ page }) => {

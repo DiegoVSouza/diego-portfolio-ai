@@ -295,3 +295,6 @@ a:not(.btn):hover { color: var(--paper); text-decoration-thickness: 3px; }
   .flow-hint-dot, .flow-svg .flow-node .flow-box, .flow-svg .flow-node .flow-shadow, .flow-svg .flow-edge path, .flow-detail { animation: none !important; }
   .btn-big, .cw, .card-link, .account, .disclosure-mark::before, .disclosure-mark::after { transition: none; }
 }
+.metro.metro-quiet { display: contents; }
+/* Panels slide in from the sides; what is still off-screen must not widen the page. */
+[data-page="home"].wrap { overflow-x: clip; }

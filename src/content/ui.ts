@@ -30,6 +30,7 @@ export interface Strings {
   band: string[];
   heroSteps: string[];
   openDemo: string;
+  tryNow: string;
   copy: string;
   copied: string;
   accountsReady: string;
@@ -204,6 +205,7 @@ const en: Strings = {
   heroCtaSecond: "Read the flagship case",
   band: ["verify", "evidence", "pending stays pending", "trace every step"],
   openDemo: "Open live demo",
+  tryNow: "Try it now",
   copy: "Copy",
   copied: "Copied",
   accountsReady: "Ready to use. Sign in with one of these accounts.",
@@ -393,6 +395,7 @@ const pt: Strings = {
   heroCtaSecond: "Ler o case principal",
   band: ["verificar", "evidência", "pendente continua pendente", "rastreie cada passo"],
   openDemo: "Abrir demo ao vivo",
+  tryNow: "Teste agora",
   copy: "Copiar",
   copied: "Copiado",
   accountsReady: "Pronto para usar. Entre com uma destas contas.",

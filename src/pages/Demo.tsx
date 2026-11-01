@@ -155,7 +155,7 @@ export function DemoPanel({ embedded = false }: { embedded?: boolean }) {
   return (
     <>
       <section aria-labelledby="live-h" className="demo-hero">
-        <H id="live-h" className={hClass}>{t.linkDemo}</H>
+        <H id="live-h" className={hClass}>{t.tryNow}</H>
         <p role="status" className="demo-state">
           <StatusSeal kind={state === "awake" ? "full" : state === "asleep" ? "none" : "partial"} label={!loaded ? "…" : state === "awake" ? t.demoAwake : state === "asleep" ? t.demoAsleep : t.demoUnknown} />
         </p>
@@ -231,7 +231,7 @@ export function DemoPanel({ embedded = false }: { embedded?: boolean }) {
           )}
           <p className="sub">{t.demoLimitNote}</p>
         </Disclosure>
-        <Disclosure summary={t.demoRuns} hint={latest ? latest.at : undefined}>
+        <Disclosure summary={t.demoRuns} hint={latest ? latest.at : undefined} defaultOpen={!embedded}>
           {latest ? (
             <>
               <RunLog

@@ -127,6 +127,8 @@ export async function start(canvas: HTMLCanvasElement, options: SceneOptions): P
   let px = 0;
   let py = 0;
   let dead = false;
+  let vel = 0; // stations per second, smoothed: how fast the visitor is travelling
+  let fov = 58;
   let dirty = true;
   let firstDraw = true;
 
@@ -220,12 +222,27 @@ export async function start(canvas: HTMLCanvasElement, options: SceneOptions): P
     const ys = options.slugs.map((s) => found.get(s)).filter((y): y is number => y !== undefined);
     const maxScroll = Math.max(1, document.documentElement.scrollHeight - height);
     if (ys.length === count) {
-      // One station per card, at the card's own position. Each is at least a pixel below the one before it.
+      // One station per card, at the card's own position. Cards that share a row (two columns on a wide screen) would
+      // share one scroll position, so their stations are spread across the row instead: the camera still visits
+      // every project, one after the other, as the page scrolls through that row.
       centers = [];
-      for (const y of ys) centers.push(Math.max(y, (centers.at(-1) ?? -Infinity) + 1));
+      const step = Math.max(160, height * 0.3);
+      let i = 0;
+      while (i < ys.length) {
+        let j = i;
+        while (j + 1 < ys.length && Math.abs(ys[j + 1]! - ys[i]!) < 80) j += 1;
+        const n = j - i + 1;
+        for (let k = 0; k < n; k += 1) centers.push(Math.max(ys[i]! + (k - (n - 1) / 2) * step, (centers.at(-1) ?? -Infinity) + 1));
+        i = j + 1;
+      }
     } else {
       centers = options.slugs.map((_, i) => height / 2 + (maxScroll * 0.92 * i) / Math.max(1, count - 1));
     }
+    // Where each project's station is on the page, for keyboard travel (j and k) to scroll to.
+    options.slugs.forEach((slug, k) => {
+      const el = document.querySelector<HTMLElement>(`[data-scene-case="${slug}"]`);
+      if (el && centers[k] !== undefined) el.dataset.stationY = String(Math.round(centers[k]!));
+    });
     dirty = true;
   };
 
@@ -294,15 +311,45 @@ export async function start(canvas: HTMLCanvasElement, options: SceneOptions): P
     });
   };
 
+  /**
+   * The camera travels the curve and turns as it goes. Between two stations it swings out around the scene and back
+   * (the swing is zero at a station, so the project is always seen head-on), banks into the turn and, when the visitor
+   * scrolls fast, rolls a little more and widens the lens. Alternate legs swing to alternate sides. Under reduced
+   * motion `motion` is false: no swing, no bank, no lens change.
+   */
+  const ORBIT = 0.62;
+  const BANK = 0.3;
   const poseCamera = () => {
     const cp = at(tCur, V3(0, 0, 0));
     const ca = at(tCur + 0.35, V3(0, 0, 0));
     const sx = motion ? (Math.random() - 0.5) * shake * 0.35 : 0;
     const sy = motion ? (Math.random() - 0.5) * shake * 0.35 : 0;
-    camera.position.set(cp.x - 1.6 + px * 0.7 + sx, cp.y + 1.8 + py * 0.4 + sy, cp.z + 7.5);
-    camera.up.set(-Math.sin(0.2), Math.cos(0.2), 0);
-    camera.lookAt(ca.x + 1, ca.y - 0.2, ca.z - 3);
+    const leg = Math.floor(tCur);
+    const dir = ((leg % 2) + 2) % 2 === 0 ? 1 : -1;
+    const swing = motion ? Math.sin((tCur - leg) * Math.PI) : 0;
+    const orbit = swing * dir * ORBIT;
+    const target = V3(ca.x + 1, ca.y - 0.2, ca.z - 3);
+    const pos = V3(cp.x - 1.6 + px * 0.7 + sx, cp.y + 1.8 + py * 0.4 + sy, cp.z + 7.5);
+    // Orbit the position around the look-at point, about the vertical axis.
+    const dx = pos.x - target.x;
+    const dz = pos.z - target.z;
+    pos.x = target.x + dx * Math.cos(orbit) - dz * Math.sin(orbit);
+    pos.z = target.z + dx * Math.sin(orbit) + dz * Math.cos(orbit);
+    camera.position.copy(pos);
+    const speedRoll = motion ? Math.max(-0.2, Math.min(0.2, vel * 0.1)) : 0;
+    const roll = 0.2 + swing * dir * BANK + speedRoll;
+    camera.up.set(-Math.sin(roll), Math.cos(roll), 0);
+    camera.lookAt(target);
+    const wide = 58 + (motion ? Math.min(9, Math.abs(vel) * 5) : 0);
+    fov += (wide - fov) * 0.2;
+    if (Math.abs(camera.fov - fov) > 0.05) {
+      camera.fov = fov;
+      camera.updateProjectionMatrix();
+    }
     redLight.position.copy(camera.position).add(V3(3, 2, -2));
+    // The page's panels turn with the camera (src/pages/Home.tsx listens); the attribute is what the e2e suite reads.
+    canvas.dataset.travel = orbit.toFixed(3);
+    if (motion && !fixed) window.dispatchEvent(new CustomEvent("scene:travel", { detail: { yaw: orbit, roll: roll - 0.2 } }));
   };
 
   function frame(now: number) {
@@ -314,7 +361,9 @@ export async function start(canvas: HTMLCanvasElement, options: SceneOptions): P
     if (motion) {
       quality.sample(rawDt, now);
       time += dt;
+      const before = tCur;
       tCur += (flightT() - tCur) * (1 - Math.exp(-4.5 * dt));
+      if (dt > 0) vel += ((tCur - before) / dt - vel) * (1 - Math.exp(-10 * dt));
       px += (pxT - px) * (1 - Math.exp(-4 * dt));
       py += (pyT - py) * (1 - Math.exp(-4 * dt));
       glitch *= Math.exp(-6 * dt);
@@ -324,7 +373,7 @@ export async function start(canvas: HTMLCanvasElement, options: SceneOptions): P
     } else if (!dirty) {
       return;
     }
-    post.finish.uniforms.uVel!.value = motion ? glitch * 2.5 : 0;
+    post.finish.uniforms.uVel!.value = motion ? glitch * 2.5 + Math.min(0.6, Math.abs(vel) * 0.08) : 0;
     post.finish.uniforms.uTime!.value = motion ? time : 0;
     if (glitch > 0.05 && canvas.dataset.splitSeen !== "1") canvas.dataset.splitSeen = "1";
     poseSolids();

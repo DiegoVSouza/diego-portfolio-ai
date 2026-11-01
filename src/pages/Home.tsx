@@ -29,10 +29,20 @@ function useTravel() {
             const side = i % 2 ? 1 : -1;
             gsap.fromTo(
               panel,
-              { x: side * 90, rotate: side * 1.4, opacity: 0.001 },
-              { x: 0, rotate: 0, opacity: 1, ease: "power2.out", scrollTrigger: { trigger: panel, start: "top 96%", end: "top 62%", scrub: 0.6 } },
+              { x: side * 90, rotate: side * 1.4 },
+              { x: 0, rotate: 0, ease: "power2.out", scrollTrigger: { trigger: panel, start: "top 96%", end: "top 62%", scrub: 0.6 } },
             );
           });
+          // The panels turn with the camera: the scene reports its swing, the panels lean into it (a different
+          // transform property from the one the scroll tween drives, so the two add up).
+          gsap.set(panels, { transformPerspective: 1100 });
+          const lean = panels.map((panel) => gsap.quickSetter(panel, "rotationY", "deg") as (v: number) => void);
+          const onTravel = (event: Event) => {
+            const yaw = (event as CustomEvent<{ yaw: number }>).detail.yaw * 11;
+            for (const set of lean) set(yaw);
+          };
+          window.addEventListener("scene:travel", onTravel);
+          return () => window.removeEventListener("scene:travel", onTravel);
         });
       }, main);
       revert = () => ctx.revert();
