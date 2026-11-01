@@ -178,7 +178,7 @@ export function DemoPage() {
           </p>
         )}
         <div ref={widget} />
-        <Button onClick={() => void start()} disabled={!canStart} disabledReason={canStart ? undefined : t.demoNoWake}>{t.demoStart}</Button>
+        <Button onClick={() => void start()} disabled={!canStart} disabledReason={canStart ? undefined : !status?.startAvailable ? t.demoNoWake : !token ? t.demoNeedChallenge : undefined}>{t.demoStart}</Button>
         <p className="sub">{t.demoStartWhy}</p>
         {status?.budget && (
           <>

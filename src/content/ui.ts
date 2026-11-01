@@ -97,6 +97,7 @@ export interface Strings {
   demoStart: string;
   demoStartWhy: string;
   demoNoWake: string;
+  demoNeedChallenge: string;
   demoAccounts: string;
   sceneLabel: string;
   metroLabel: string;
@@ -264,6 +265,7 @@ const en: Strings = {
   demoStart: "Start live demo",
   demoStartWhy: "Starting wakes the services in order and takes a short while.",
   demoNoWake: "Waking is available once the demo is deployed.",
+  demoNeedChallenge: "Confirm that you are human above to enable the button.",
   demoAccounts: "Demo accounts",
   sceneLabel: "Background scene",
   metroLabel: "Project line",
@@ -438,6 +440,7 @@ const pt: Strings = {
   demoStart: "Iniciar demo ao vivo",
   demoStartWhy: "Iniciar acorda os serviços em ordem e leva um tempo curto.",
   demoNoWake: "Acordar fica disponível quando o demo estiver publicado.",
+  demoNeedChallenge: "Confirme acima que você é humano para habilitar o botão.",
   demoAccounts: "Contas de demo",
   sceneLabel: "Cena de fundo",
   metroLabel: "Linha dos projetos",
