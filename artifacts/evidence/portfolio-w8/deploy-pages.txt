@@ -1,4 +1,2 @@
-✨ Uploading Functions bundle
-✨ Uploading _routes.json
 🌎 Deploying...
-✨ Deployment complete! Take a peek over at https://79c03f64.diego-portfolio-ai.pages.dev
+✨ Deployment complete! Take a peek over at https://4889af3e.diego-portfolio-ai.pages.dev
