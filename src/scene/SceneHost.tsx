@@ -1,6 +1,8 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { BackgroundMode } from "colagem-ui";
-import { districtOf, districts } from "../content/districts";
+import { caseCards } from "../content/caseIndex";
+import { districts, stopOf, stops } from "../content/districts";
+import { profile } from "../content/profile";
 import { useLang } from "../site/Shell";
 import { useSimple } from "../site/simple";
 import { onPulse } from "./pulse";
@@ -55,7 +57,7 @@ export function SceneHost({ mode, focusSlug, pulseKey }: { mode: BackgroundMode;
   const [motion, setMotion] = useState(true);
   const [halftone, setHalftone] = useState(true);
   useEffect(() => setHalftone(readHalftone()), []);
-  const focus = focusSlug === undefined ? undefined : districtOf(focusSlug);
+  const focus = focusSlug === undefined ? undefined : stopOf(focusSlug);
 
   useEffect(() => {
     if (!mounted || simple || mode === "2d" || saveData() || portrait() || !canvas.current) return undefined;
@@ -67,7 +69,17 @@ export function SceneHost({ mode, focusSlug, pulseKey }: { mode: BackgroundMode;
           if (cancelled) return;
           try {
             const started = await start(element, {
-              districts: districts.map((d) => ({ id: d.id, slugs: d.slugs, sign: d.name[lang] })),
+              stops: stops.map((stop) => {
+                const card = stop.slug ? caseCards.find((c) => c.slug === stop.slug) : undefined;
+                return {
+                  id: stop.id,
+                  district: stop.district,
+                  wide: Boolean(stop.wide),
+                  title: card ? card.name[lang] : stop.id === "arrival" ? profile.name.split(" ").slice(0, 1).concat(profile.name.split(" ").slice(-1)).join(" ") : t.contactTitle,
+                  tag: card ? card.hook[lang] : stop.id === "arrival" ? "AI Engineer" : "WhatsApp, e-mail",
+                };
+              }),
+              districtCount: districts.length,
               headline: "AI ENGINEER",
               mode,
               models: { truck: truckUrl, moto: motoUrl, buildings: [buildingLarge, buildingMedium, buildingSmall, buildingSample], cars: [carR7, carS64], station: metroStation },
@@ -82,6 +94,7 @@ export function SceneHost({ mode, focusSlug, pulseKey }: { mode: BackgroundMode;
               onFail: () => {
                 controller.current = null;
                 setRunning(false);
+                delete document.documentElement.dataset.stage;
                 document.documentElement.dataset.bg = "2d";
               },
             });
@@ -91,6 +104,8 @@ export function SceneHost({ mode, focusSlug, pulseKey }: { mode: BackgroundMode;
             }
             controller.current = started;
             element.dataset.scene = mode;
+            // The home hangs its cards in the city only while the scene runs (CSS reads this; the cards are in the page flow otherwise).
+            if (focus === undefined) document.documentElement.dataset.stage = "3d";
             setRunning(true);
           } catch {
             document.documentElement.dataset.bg = "2d";
@@ -103,6 +118,7 @@ export function SceneHost({ mode, focusSlug, pulseKey }: { mode: BackgroundMode;
     return () => {
       cancelled = true;
       cancelIdle();
+      delete document.documentElement.dataset.stage;
       controller.current?.dispose();
       controller.current = null;
       setRunning(false);

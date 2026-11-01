@@ -31,3 +31,36 @@ export function districtOf(slug: string): number {
   const i = districts.findIndex((d) => d.slugs.includes(slug));
   return i < 0 ? 0 : i;
 }
+
+/**
+ * The journey has one stop per card: the camera parks at each, and the card hangs in that part of the city. A district is a part of the
+ * city that holds one or more stops; the menu lists districts, the keys step through stops.
+ */
+export interface Stop {
+  id: string;
+  /** Index into `districts`. */
+  district: number;
+  /** The project this stop shows; none for the arrival and the terminal. */
+  slug?: string;
+  /** A wider card (the hero and the terminal). */
+  wide?: boolean;
+}
+
+export const stops: Stop[] = [
+  { id: "arrival", district: 0, wide: true },
+  { id: "supportops", district: 1, slug: "supportops" },
+  { id: "foundation", district: 2, slug: "foundation" },
+  { id: "agents", district: 2, slug: "agents" },
+  { id: "toolkit", district: 2, slug: "toolkit" },
+  { id: "observability", district: 3, slug: "observability" },
+  { id: "async", district: 3, slug: "async" },
+  { id: "design-system", district: 4, slug: "design-system" },
+  { id: "harness", district: 4, slug: "harness" },
+  { id: "terminal", district: 5, wide: true },
+];
+
+/** Index of the stop that shows a project (the first stop when there is none). */
+export function stopOf(slug: string): number {
+  const i = stops.findIndex((s) => s.slug === slug);
+  return i < 0 ? 0 : i;
+}

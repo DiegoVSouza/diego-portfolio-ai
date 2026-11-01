@@ -21,6 +21,7 @@ The home is a scroll journey through six districts of one city (`.planning/phase
 | 5 | Craft | Design system, Harness | Low rooftops with billboards, scaffolding, a crane |
 | 6 | Terminal | About, contact | Harbour: water, container stacks, cranes, a lighthouse |
 
+- **Revision:** one stop per card (ten), with the card hung on a billboard in the city; see the phase 005 spec. The text below describes the district view.
 - **Camera as transition.** Each district is a tall section; the camera rests at its stop for the middle of the section and flies the rail to the next
   one, swinging across the avenue, panning and banking (zero at a stop) and widening the lens with speed. Native scroll only.
 - **Game menu.** Left: the district list, the active one on a red shard, a description box, the keys (`j`, `k`, number keys). Right: the panel of the

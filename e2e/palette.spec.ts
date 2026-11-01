@@ -50,12 +50,12 @@ test("the footer button opens the palette for a mouse user", async ({ page }) =>
   await expect(page.getByRole("dialog", { name: "Go to" })).toBeVisible();
 });
 
-test("the home announces the active district when the scroll changes it", async ({ page }) => {
+test("the home announces the active stop when the scroll changes it", async ({ page }) => {
   await page.goto("/");
   const status = page.locator(".districts [role=status]");
   await expect(page.locator("canvas.scene")).toHaveAttribute("data-scene", "3d", { timeout: 20_000 });
-  await page.evaluate(() => document.getElementById("d-ops")!.scrollIntoView({ block: "center" }));
-  await expect(status).toContainText(/District 2 of 6/);
-  await page.evaluate(() => document.getElementById("d-terminal")!.scrollIntoView({ block: "center" }));
-  await expect(status).toContainText(/District 6 of 6/);
+  await page.evaluate(() => document.getElementById("s-supportops")!.scrollIntoView({ block: "center" }));
+  await expect(status).toContainText(/Stop 2 of 10/);
+  await page.evaluate(() => document.getElementById("s-terminal")!.scrollIntoView({ block: "center" }));
+  await expect(status).toContainText(/Stop 10 of 10/);
 });

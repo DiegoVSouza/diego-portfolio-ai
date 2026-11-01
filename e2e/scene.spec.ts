@@ -73,12 +73,12 @@ test("a case page holds the camera at its own project and does not scroll the sc
   await page.goto("/projects/agents/");
   const canvas = page.locator("canvas.scene");
   await expect(canvas).toHaveAttribute("data-scene", "3d", { timeout: 20_000 });
-  await expect(canvas).toHaveAttribute("data-active", "2");
+  await expect(canvas).toHaveAttribute("data-active", "3"); // the agents stop
   await page.waitForTimeout(300);
   mkdirSync(evidence, { recursive: true });
   await page.screenshot({ path: `${evidence}/case-agents-3d.png` });
   await page.evaluate(() => window.scrollTo(0, document.documentElement.scrollHeight));
-  await expect(canvas).toHaveAttribute("data-active", "2");
+  await expect(canvas).toHaveAttribute("data-active", "3");
   await expect(page.getByRole("button", { name: /^Motion$/ })).toHaveCount(0);
   expect(problems).toEqual([]);
 });

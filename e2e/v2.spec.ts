@@ -88,20 +88,22 @@ test("under reduced motion the diagram does not play itself and nothing pulses",
   await context.close();
 });
 
-test("the home is a wide stage: the menu on the left, the panel on the right, the city between, the tests in an accordion", async ({ page }) => {
+test("the home is a wide stage: the menu on the left, the card on the right, the city between, the tests in an accordion", async ({ page }) => {
   await mockApi(page);
   await page.setViewportSize({ width: 1440, height: 900 });
   await page.goto("/");
+  await expect(page.locator("canvas.scene")).toHaveAttribute("data-scene", "3d", { timeout: 20_000 });
+  await expect(page.locator("#s-arrival .stop-card")).toHaveAttribute("data-near", "1");
   await expect(page.locator(".metro-stations")).toHaveCount(0);
   const menu = await page.locator(".districts-list").boundingBox();
-  const panel = await page.locator("#d-arrival .district-panel").boundingBox();
+  const panel = await page.locator("#s-arrival .stop-card").boundingBox();
   expect(menu!.x + menu!.width).toBeLessThan(400);
   expect(panel!.x).toBeGreaterThan(1440 * 0.5);
   // Between them the city is visible: nothing opaque stands in the middle third.
-  const covered = await page.evaluate(() => Boolean(document.elementFromPoint(window.innerWidth * 0.5, window.innerHeight * 0.5)?.closest(".district-panel, .districts")));
+  const covered = await page.evaluate(() => Boolean(document.elementFromPoint(window.innerWidth * 0.5, window.innerHeight * 0.5)?.closest(".stop-card, .districts")));
   expect(covered).toBe(false);
   // The tests of a project are tucked in an accordion that opens on click.
-  await page.evaluate(() => document.getElementById("d-ops")!.scrollIntoView({ block: "center" }));
+  await page.evaluate(() => document.getElementById("s-supportops")!.scrollIntoView({ block: "center" }));
   const tests = page.locator(".disclosure", { hasText: "Tests and evidence" }).first();
   await expect(tests).not.toHaveAttribute("open", "");
   await tests.locator("summary").click();
@@ -109,35 +111,38 @@ test("the home is a wide stage: the menu on the left, the panel on the right, th
   await expect(tests.locator(".proof-mini li").first()).toBeVisible();
 });
 
-test("travelling: the camera swings between two districts, is head-on at a stop, and the panels lean with it", async ({ page }) => {
+test("travelling: the camera parks on each card, swings between stops, and each card hangs in its own part of the city", async ({ page }) => {
   await mockApi(page);
   await page.setViewportSize({ width: 1280, height: 800 });
   await page.goto("/");
   const canvas = page.locator("canvas.scene");
   await expect(canvas).toHaveAttribute("data-scene", "3d", { timeout: 20_000 });
   const travel = async () => Math.abs(Number(await canvas.getAttribute("data-travel")));
-  // The scene's own stop for a district: the middle of its section.
-  const stop = (id: string) => page.evaluate((s) => Number(document.getElementById(`d-${s}`)!.dataset.stationY) - window.innerHeight / 2, id);
-  await page.evaluate((y) => window.scrollTo(0, y), await stop("ops"));
+  // The scene's own stop for a card: the middle of its section.
+  const stop = (id: string) => page.evaluate((s) => Number(document.getElementById(`s-${s}`)!.dataset.stationY) - window.innerHeight / 2, id);
+  const first = page.locator("#s-supportops .stop-card");
+  const second = page.locator("#s-foundation .stop-card");
+  await page.evaluate((y) => window.scrollTo(0, y), await stop("supportops"));
   await expect.poll(travel, { timeout: 8000 }).toBeLessThan(0.1);
-  const from = await stop("ops");
-  const to = await stop("core");
-  await page.evaluate(() => {
-    (window as unknown as { __turns: number[] }).__turns = [];
-    window.addEventListener("scene:travel", (e) => (window as unknown as { __turns: number[] }).__turns.push((e as CustomEvent<{ yaw: number }>).detail.yaw));
-  });
+  await expect(first).toHaveAttribute("data-near", "1");
+  // At its stop the card is on the right of the screen, full size, and the next one is only a preview (not interactive).
+  await expect.poll(async () => { const b = await first.boundingBox(); return b!.x + b!.width / 2; }, { timeout: 8000 }).toBeGreaterThan(1280 * 0.62);
+  expect(await second.evaluate((el) => (el as HTMLElement & { inert: boolean }).inert)).toBe(true);
+  // Half way to the next stop the camera has swung out and no card is the near one.
+  const from = await stop("supportops");
+  const to = await stop("foundation");
   await page.evaluate((y) => window.scrollTo(0, y), (from + to) / 2);
-  await expect.poll(travel, { timeout: 8000 }).toBeGreaterThan(0.25);
-  // A panel leans (rotationY) while the camera is swung out.
-  const lean = await page.locator("#d-core .district-panel").evaluate((el) => getComputedStyle(el).transform);
-  expect(lean).not.toBe("none");
-  expect(await page.evaluate(() => (window as unknown as { __turns: number[] }).__turns.length)).toBeGreaterThan(0);
-  // And it settles again at the next stop.
+  await expect.poll(travel, { timeout: 8000 }).toBeGreaterThan(0.2);
+  await expect(first).not.toHaveAttribute("data-near", "1");
+  await expect(second).not.toHaveAttribute("data-near", "1");
+  expect(Number(await canvas.getAttribute("data-cards"))).toBeGreaterThanOrEqual(1);
+  // And it settles again, with the next card now the near one.
   await page.evaluate((y) => window.scrollTo(0, y), to);
   await expect.poll(travel, { timeout: 8000 }).toBeLessThan(0.1);
+  await expect(second).toHaveAttribute("data-near", "1");
 });
 
-test("travelling under reduced motion: no swing, no events, the scroll still reaches every district", async ({ browser }) => {
+test("travelling under reduced motion: no swing, no events, the scroll still reaches every stop", async ({ browser }) => {
   const context = await browser.newContext({ reducedMotion: "reduce", viewport: { width: 1280, height: 800 } });
   const page = await context.newPage();
   await mockApi(page);
@@ -147,8 +152,8 @@ test("travelling under reduced motion: no swing, no events, the scroll still rea
   await page.evaluate(() => {
     (window as unknown as { __turns: number }).__turns = 0;
     window.addEventListener("scene:travel", () => ((window as unknown as { __turns: number }).__turns += 1));
-    const a = document.getElementById("d-ops")!.getBoundingClientRect().top + window.scrollY;
-    const b = document.getElementById("d-core")!.getBoundingClientRect().top + window.scrollY;
+    const a = document.getElementById("s-supportops")!.getBoundingClientRect().top + window.scrollY;
+    const b = document.getElementById("s-foundation")!.getBoundingClientRect().top + window.scrollY;
     window.scrollTo(0, (a + b) / 2);
   });
   await page.waitForTimeout(1200);

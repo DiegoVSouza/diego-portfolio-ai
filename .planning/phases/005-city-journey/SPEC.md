@@ -42,3 +42,19 @@ Practices taken from `emalorenzo/three-agent-skills` (`three-best-practices`, re
 
 - `dingdongkkk/portfolio-persona`: game-menu structure (slanted list, description box, HUD crumb, scenes).
 - `billpwchan/neon-zenith` and `connect-world-1985-ai/2026-10-20-city3d-demo`: districts with their own identity, merged chunks, instancing, quality tiers.
+
+## Revision (2026-11-01): one stop per card, hung in the city
+
+Owner feedback after the first journey: the objects that spin and float are not needed; the cars are too small and the train too plain; the scroll felt stuck;
+each card should already appear in a part of the city, and each scroll scene should leave the camera on it.
+
+- **Stops.** Ten stops, one per card (arrival, eight projects, terminal); six districts group them (the menu lists districts, `j`/`k` step stops, the active
+  district lists its projects). `src/content/districts.ts` holds both.
+- **Cards hang in the city.** Each stop has a billboard in its part of the avenue (right side, ahead of the stop). The scene projects the billboard to the screen
+  and writes `--x`, `--y`, `--s`, `--o` on the card, so the card grows out of the city as the camera comes and drifts behind it. Only the card at the camera's stop
+  is interactive (`data-near`); the others are previews (`inert`). Without the scene (no WebGL, portrait, simple, narrow) the cards are plain sections in order.
+- **Nothing spins or floats.** The project symbols, the burst effect, the lean of the panels and the lighthouse beam are gone.
+- **Scroll.** No inner scrolling panels (they captured the wheel), no sticky elements, shorter rest at a stop (12 %), faster follow, pixel ratio capped at 1.25;
+  the JavaScript cost per frame is published as `canvas[data-cpu-ms]` (0.7 ms measured while scrolling in Edge). GPU cost on a real phone is still unmeasured.
+- **Vehicles.** Truck 9, car 7.4, moto 5.2 units (they were 3.8 and 3.4); two trains of five cars with bogies, wheels, window band, doors, air-conditioning and cabs.
+- **Models.** The Kenney Train Kit (CC0) would replace the procedural train, but its download is manual (kenney.nl blocks the kit's tool): pending the owner.

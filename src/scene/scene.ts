@@ -4,27 +4,26 @@
  * widening the lens with speed. It is a lazy chunk: the page never depends on it, and any failure leaves the level 1 background.
  */
 import * as THREE from "three";
-import { burstGeo, burstMaterial, type BurstUniforms } from "./burst";
-import { V3, fit, rng, tick } from "./geometry";
+import { V3, rng } from "./geometry";
 import { createPost } from "./post";
 import { createQuality, type Quality } from "./quality";
 import { createRail } from "./rail";
-import { SYMBOLS, fallbackSymbol } from "./symbols";
 import { readPalette } from "./tokens";
-import { buildWorld } from "./world";
+import { BILLBOARD_WIDTH, BILLBOARD_WIDTH_WIDE, buildWorld } from "./world";
 
 export type { Quality } from "./quality";
 export type SceneMode = "3d" | "3d-static";
 
 export interface SceneOptions {
-  /** One entry per district, in journey order. `sign` is the word on its neon sign. */
-  districts: { id: string; slugs: string[]; sign: string }[];
+  /** One entry per stop (one per card), in journey order. `title` and `tag` are painted on the stop's billboard. */
+  stops: { id: string; district: number; title: string; tag: string; wide: boolean }[];
+  districtCount: number;
   mode: SceneMode;
   /** The line over the arrival gate. */
   headline: string;
   /** Half-tone screen pass (the identity of the design system). On by default. */
   halftone?: boolean;
-  /** Case pages: hold the camera at this district's stop. Nothing moves and the page does not scroll the scene. */
+  /** Case pages: hold the camera at this stop. Nothing moves and the page does not scroll the scene. */
   focus?: number;
   /** Real models, served by the site (Kenney, Quaternius and the owner's packs: see docs/harness/assets-pipeline.md). */
   models: { truck: string; moto: string; buildings?: string[]; cars?: string[]; station?: string };
@@ -45,16 +44,16 @@ export interface SceneController {
 
 const SETTLE_MS = 140;
 /** Fraction of a leg the camera rests at each end: the stop is a place, not a point. */
-const DWELL = 0.2;
+const DWELL = 0.12;
 /** Swing between stops: sideways shift on the avenue (units), pan (radians) and bank (radians). All are zero at a stop. */
-const SWING_SHIFT = 6;
+const SWING_SHIFT = 5;
 const SWING_PAN = 0.4;
 const BANK = 0.28;
 const smooth = (x: number) => x * x * (3 - 2 * x);
 
 export async function start(canvas: HTMLCanvasElement, options: SceneOptions): Promise<SceneController> {
   const p = readPalette();
-  const count = Math.max(1, options.districts.length);
+  const count = Math.max(2, options.stops.length);
   const fixed = options.focus !== undefined;
 
   const renderer = new THREE.WebGLRenderer({ canvas, antialias: false, alpha: false, powerPreference: "high-performance" });
@@ -77,33 +76,10 @@ export async function start(canvas: HTMLCanvasElement, options: SceneOptions): P
 
   const rnd = rng(11);
 
-  // The project symbols: one solid per project, standing beside the avenue in its district; it breaks into its triangles when it takes the focus.
-  interface Solid {
-    group: THREE.Group;
-    u: BurstUniforms;
-    burst: number;
-    district: number;
-  }
-  const solids: Solid[] = [];
-  const spot = V3(0, 0, 0);
-  const frame = { p: V3(0, 0, 0), T: V3(0, 0, 0), R: V3(0, 0, 0) };
-  for (let d = 0; d < options.districts.length; d += 1) {
-    const slugs = options.districts[d]!.slugs;
-    for (let j = 0; j < slugs.length; j += 1) {
-      const group = new THREE.Group();
-      const material = burstMaterial(p);
-      const build = SYMBOLS[slugs[j]!] ?? fallbackSymbol;
-      group.add(new THREE.Mesh(burstGeo(fit(build(), 5.4), rnd), material));
-      // Ahead of the stop, left of the avenue (the menu is on the left of the screen, the panel on the right, the city between).
-      const ahead = slugs.length === 1 ? 0.26 : 0.14 + (j * 0.26) / (slugs.length - 1);
-      rail.frameAt(rail.u(d, ahead), frame);
-      spot.copy(frame.p).addScaledVector(frame.R, slugs.length === 1 ? -11 : -13 + (j % 2) * 3);
-      group.position.set(spot.x, 8 + (j % 2) * 2.2, spot.z);
-      scene.add(group);
-      solids.push({ group, u: material.userData.u as BurstUniforms, burst: 0, district: d });
-      await tick();
-    }
-  }
+  const anchor = V3(0, 0, 0);
+  const projected = V3(0, 0, 0);
+  const cards: (HTMLElement | null)[] = [];
+  const cardWidth: number[] = [];
 
   // State.
   let motion = options.mode === "3d" && !fixed;
@@ -162,7 +138,8 @@ export async function start(canvas: HTMLCanvasElement, options: SceneOptions): P
     p,
     rnd,
     rail,
-    signs: options.districts.map((d) => d.sign),
+    stops: options.stops,
+    districtCount: options.districtCount,
     headline: options.headline,
     models: options.models,
     onModels: () => {
@@ -188,7 +165,7 @@ export async function start(canvas: HTMLCanvasElement, options: SceneOptions): P
 
   const applyScale = () => {
     // The dot cell follows the pixel ratio actually in use, so adaptive quality does not change the dot's look.
-    const dpr = Math.min(window.devicePixelRatio || 1, 1.5) * quality.scale;
+    const dpr = Math.min(window.devicePixelRatio || 1, 1.25) * quality.scale;
     renderer.setPixelRatio(dpr);
     renderer.setSize(width, height, false);
     post.composer.setPixelRatio(dpr);
@@ -210,19 +187,24 @@ export async function start(canvas: HTMLCanvasElement, options: SceneOptions): P
     camera.updateProjectionMatrix();
     applyScale();
     const found = new Map<string, number>();
-    document.querySelectorAll<HTMLElement>("[data-district]").forEach((el) => {
+    cards.length = 0;
+    document.querySelectorAll<HTMLElement>("[data-stop]").forEach((el) => {
       const r = el.getBoundingClientRect();
       const y = r.top + window.scrollY + r.height / 2;
-      found.set(el.dataset.district ?? "", y);
+      found.set(el.dataset.stop ?? "", y);
       el.dataset.stationY = String(Math.round(y));
     });
-    const ys = options.districts.map((d) => found.get(d.id)).filter((y): y is number => y !== undefined);
+    options.stops.forEach((stop, k) => {
+      cards[k] = document.querySelector<HTMLElement>(`[data-stop="${stop.id}"] .stop-card`);
+      cardWidth[k] = stop.wide ? 640 : 520;
+    });
+    const ys = options.stops.map((d) => found.get(d.id)).filter((y): y is number => y !== undefined);
     const maxScroll = Math.max(1, document.documentElement.scrollHeight - height);
     if (ys.length === count) {
       centers = [];
       for (const y of ys) centers.push(Math.max(y, (centers.at(-1) ?? -Infinity) + 1));
     } else {
-      centers = options.districts.map((_, i) => height / 2 + (maxScroll * 0.92 * i) / Math.max(1, count - 1));
+      centers = options.stops.map((_, i) => height / 2 + (maxScroll * 0.92 * i) / Math.max(1, count - 1));
     }
     dirty = true;
   };
@@ -261,7 +243,6 @@ export async function start(canvas: HTMLCanvasElement, options: SceneOptions): P
     // Break the objects, shake and split only once the selection has settled, never for districts that are passing by.
     settleTimer = window.setTimeout(() => {
       if (!motion) return;
-      for (const s of solids) if (s.district === active) s.burst = 1;
       shake = 1;
       glitch = 1;
     }, SETTLE_MS);
@@ -276,19 +257,6 @@ export async function start(canvas: HTMLCanvasElement, options: SceneOptions): P
       dirty = true;
     }
     schedule();
-  };
-
-  const poseSolids = () => {
-    for (const s of solids) {
-      const d = cCur - s.district;
-      const near = Math.exp(-d * d * 2.2);
-      s.group.scale.setScalar(0.5 + 0.6 * near);
-      s.u.uAct.value = Math.min(1, near * 1.3);
-      s.u.uExp.value = motion ? near * 0.015 + s.burst * 1.2 : 0;
-      s.group.rotation.x = 0.14;
-      s.group.rotation.z = -0.08;
-      s.group.rotation.y = motion ? time * (0.12 + near * 0.7) : -0.4;
-    }
   };
 
   const camPos = V3(0, 0, 0);
@@ -334,9 +302,69 @@ export async function start(canvas: HTMLCanvasElement, options: SceneOptions): P
     if (motion && !fixed) window.dispatchEvent(new CustomEvent("scene:travel", { detail: { yaw: pan, roll } }));
   };
 
+  /**
+   * Each card hangs in its part of the city: its screen position and size are the projection of its billboard, so it grows out of the
+   * city as the camera comes and drifts away behind it. Only the card at the camera's stop is interactive; the others are previews.
+   * Transform and opacity only, written as custom properties on at most three elements per frame.
+   */
+  const updateCards = () => {
+    camera.updateMatrixWorld();
+    const tan = Math.tan((camera.fov * Math.PI) / 360);
+    let shown = 0;
+    for (let k = 0; k < cards.length; k += 1) {
+      const el = cards[k];
+      if (!el) continue;
+      const d = cCur - k;
+      const ad = Math.abs(d);
+      const visible = d > -1.15 && d < 0.55;
+      if (!visible) {
+        if (el.dataset.shown !== "0") {
+          el.dataset.shown = "0";
+          el.style.setProperty("--o", "0");
+          el.inert = true;
+        }
+        continue;
+      }
+      rail.cardAnchor(k, anchor);
+      projected.copy(anchor).applyMatrix4(camera.matrixWorldInverse);
+      const depth = -projected.z;
+      if (depth < 3) {
+        el.dataset.shown = "0";
+        el.style.setProperty("--o", "0");
+        el.inert = true;
+        continue;
+      }
+      projected.copy(anchor).project(camera);
+      const px = ((projected.x + 1) / 2) * width;
+      const py = ((1 - projected.y) / 2) * height;
+      const world = options.stops[k]!.wide ? BILLBOARD_WIDTH_WIDE : BILLBOARD_WIDTH;
+      const pxPerUnit = height / (2 * depth * tan);
+      const scale = Math.min(1.12, Math.max(0.08, (world * pxPerUnit) / cardWidth[k]!));
+      const near = ad < 0.22;
+      // Previews fade in from the distance; the card at its stop is fully there.
+      const o = near ? 1 : Math.max(0, 0.9 * (1 - (ad - 0.22) / 0.9));
+      el.style.setProperty("--x", px.toFixed(1));
+      el.style.setProperty("--y", py.toFixed(1));
+      el.style.setProperty("--s", scale.toFixed(3));
+      el.style.setProperty("--o", o.toFixed(2));
+      if (el.dataset.shown !== "1" || el.inert === near) {
+        el.dataset.shown = "1";
+        el.inert = !near;
+      }
+      if (near) el.dataset.near = "1";
+      else delete el.dataset.near;
+      shown += 1;
+    }
+    canvas.dataset.cards = String(shown);
+  };
+
+  // CPU time of one frame in milliseconds (our own JavaScript, not the GPU), averaged over sixty frames: the number to watch for a stuttering scroll.
+  let cpuSum = 0;
+  let cpuFrames = 0;
   function frameLoop(now: number) {
     raf = 0;
     if (dead) return;
+    const started = performance.now();
     const rawDt = (now - last) / 1000;
     last = now;
     const dt = Math.min(0.05, rawDt);
@@ -344,13 +372,12 @@ export async function start(canvas: HTMLCanvasElement, options: SceneOptions): P
       quality.sample(rawDt, now);
       time += dt;
       const before = cCur;
-      cCur += (flightC() - cCur) * (1 - Math.exp(-4.5 * dt));
+      cCur += (flightC() - cCur) * (1 - Math.exp(-7 * dt));
       if (dt > 0) vel += ((cCur - before) / dt - vel) * (1 - Math.exp(-10 * dt));
       px += (pxT - px) * (1 - Math.exp(-4 * dt));
       py += (pyT - py) * (1 - Math.exp(-4 * dt));
       glitch *= Math.exp(-6 * dt);
       shake *= Math.exp(-5 * dt);
-      for (const s of solids) s.burst *= Math.exp(-2.6 * dt);
       world.place(time, false);
     } else if (!dirty) {
       return;
@@ -358,8 +385,8 @@ export async function start(canvas: HTMLCanvasElement, options: SceneOptions): P
     post.finish.uniforms.uVel!.value = motion ? glitch * 2.5 + Math.min(0.6, Math.abs(vel) * 0.08) : 0;
     post.finish.uniforms.uTime!.value = motion ? time : 0;
     if (glitch > 0.05 && canvas.dataset.splitSeen !== "1") canvas.dataset.splitSeen = "1";
-    poseSolids();
     poseCamera();
+    updateCards();
     renderer.info.reset();
     post.composer.render();
     if (firstDraw) {
@@ -367,6 +394,13 @@ export async function start(canvas: HTMLCanvasElement, options: SceneOptions): P
       firstDraw = false;
     }
     dirty = false;
+    cpuSum += performance.now() - started;
+    cpuFrames += 1;
+    if (cpuFrames >= 60) {
+      canvas.dataset.cpuMs = (cpuSum / cpuFrames).toFixed(2);
+      cpuSum = 0;
+      cpuFrames = 0;
+    }
     schedule();
   }
 
@@ -457,7 +491,6 @@ export async function start(canvas: HTMLCanvasElement, options: SceneOptions): P
         time = 0;
         vel = 0;
         world.place(0, true);
-        for (const s of solids) s.burst = 0;
         glitch = 0;
         shake = 0;
       }
@@ -472,7 +505,6 @@ export async function start(canvas: HTMLCanvasElement, options: SceneOptions): P
     },
     pulse() {
       if (!motion || active < 0) return;
-      for (const s of solids) if (s.district === active) s.burst = 1;
       glitch = Math.max(glitch, 0.6);
       schedule();
     },

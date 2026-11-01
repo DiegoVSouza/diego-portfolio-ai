@@ -79,6 +79,7 @@ test.describe("descent, simple version and back to the surface", () => {
   test("opening a project plays the stripes, and reduced motion changes the page at once", async ({ page, browser }) => {
     await page.goto("/");
     await ready(page);
+    await expect(page.locator("canvas.scene")).toHaveAttribute("data-scene", "3d", { timeout: 20_000 });
     await page.evaluate(() => {
       const wipe = document.getElementById("wipe")!;
       (window as unknown as { __wiped: boolean }).__wiped = false;
@@ -86,6 +87,8 @@ test.describe("descent, simple version and back to the surface", () => {
         if (wipe.classList.contains("go")) (window as unknown as { __wiped: boolean }).__wiped = true;
       }).observe(wipe, { attributes: true, attributeFilter: ["class"] });
     });
+    await page.evaluate(() => document.getElementById("s-foundation")!.scrollIntoView({ block: "center" }));
+    await expect(page.locator("#s-foundation .stop-card")).toHaveAttribute("data-near", "1", { timeout: 10_000 });
     await page.getByRole("main").getByRole("link", { name: "Foundation and live evals" }).first().click();
     await expect(page).toHaveURL(/\/projects\/foundation\/$/);
     expect(await page.evaluate(() => (window as unknown as { __wiped: boolean }).__wiped)).toBe(true);
@@ -94,6 +97,7 @@ test.describe("descent, simple version and back to the surface", () => {
     const calm = await context.newPage();
     await calm.goto("/");
     await calm.locator("button.palette-open[data-ready]").waitFor();
+    await expect(calm.locator("canvas.scene")).toHaveAttribute("data-scene", /3d/, { timeout: 20_000 });
     await calm.evaluate(() => {
       const wipe = document.getElementById("wipe")!;
       (window as unknown as { __wiped: boolean }).__wiped = false;
@@ -101,6 +105,8 @@ test.describe("descent, simple version and back to the surface", () => {
         if (wipe.classList.contains("go")) (window as unknown as { __wiped: boolean }).__wiped = true;
       }).observe(wipe, { attributes: true, attributeFilter: ["class"] });
     });
+    await calm.evaluate(() => document.getElementById("s-foundation")!.scrollIntoView({ block: "center" }));
+    await expect(calm.locator("#s-foundation .stop-card")).toHaveAttribute("data-near", "1", { timeout: 10_000 });
     await calm.getByRole("main").getByRole("link", { name: "Foundation and live evals" }).first().click();
     await expect(calm).toHaveURL(/\/projects\/foundation\/$/);
     expect(await calm.evaluate(() => (window as unknown as { __wiped: boolean }).__wiped)).toBe(false);
@@ -175,25 +181,32 @@ test.describe("metro line", () => {
     await expect(page).toHaveURL(/\/projects\/agents\/$/);
   });
 
-  test("the home is a game menu of six districts: a click, j and k and the number keys fly to each, and each is announced", async ({ page }) => {
+  test("the home is a game menu: a click, j and k and the number keys fly to each stop, and each is announced", async ({ page }) => {
     await page.setViewportSize({ width: 1440, height: 900 });
     await page.goto("/");
     await ready(page);
+    await expect(page.locator("canvas.scene")).toHaveAttribute("data-scene", "3d", { timeout: 20_000 });
     const menu = page.getByRole("navigation", { name: "Districts" });
-    await expect(menu.getByRole("link")).toHaveCount(6);
+    await expect(menu.locator(".districts-list > li")).toHaveCount(6);
     await expect(page.locator(".metro-stations")).toHaveCount(0);
     await expect(menu.getByRole("link", { name: /Arrival/ })).toHaveAttribute("aria-current", "location");
     await page.keyboard.press("j");
-    await expect(menu.getByRole("link", { name: /SupportOps/ })).toHaveAttribute("aria-current", "location", { timeout: 10_000 });
-    await expect(menu.locator("[role=status]")).toContainText("District 2 of 6: SupportOps");
+    await expect(menu.getByRole("link", { name: /SupportOps/ }).first()).toHaveAttribute("aria-current", "location", { timeout: 10_000 });
+    await expect(menu.locator("[role=status]")).toContainText("Stop 2 of 10: SupportOps");
+    await expect(page.locator("#s-supportops .stop-card")).toHaveAttribute("data-near", "1", { timeout: 10_000 });
+    // The active district lists its projects; choosing one flies to it.
+    await menu.getByRole("link", { name: /AI core/ }).click();
+    await expect(menu.getByRole("link", { name: /Production AI toolkit/ })).toBeVisible({ timeout: 10_000 });
+    await menu.getByRole("link", { name: /Production AI toolkit/ }).click();
+    await expect(menu.locator("[role=status]")).toContainText("Stop 5 of 10: Production AI toolkit", { timeout: 10_000 });
+    await expect(page.locator("#s-toolkit .stop-card")).toHaveAttribute("data-near", "1", { timeout: 10_000 });
     await menu.getByRole("link", { name: /Platform/ }).click();
-    await expect(menu.getByRole("link", { name: /Platform/ })).toHaveAttribute("aria-current", "location", { timeout: 10_000 });
-    await expect(menu.locator("[role=status]")).toContainText("District 4 of 6: Platform");
-    await expect(page.locator("#d-platform .district-panel")).toBeInViewport();
+    await expect(menu.getByRole("link", { name: /Platform/ }).first()).toHaveAttribute("aria-current", "location", { timeout: 10_000 });
     await page.keyboard.press("6");
     await expect(menu.getByRole("link", { name: /Terminal/ })).toHaveAttribute("aria-current", "location", { timeout: 10_000 });
+    await expect(menu.locator("[role=status]")).toContainText("Stop 10 of 10");
     await page.keyboard.press("k");
-    await expect(menu.getByRole("link", { name: /Craft/ })).toHaveAttribute("aria-current", "location", { timeout: 10_000 });
+    await expect(menu.getByRole("link", { name: /Craft/ }).first()).toHaveAttribute("aria-current", "location", { timeout: 10_000 });
     // The description box follows the active district.
     await expect(menu.locator(".districts-desc")).toContainText("This site, its design system");
   });

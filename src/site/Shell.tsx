@@ -64,7 +64,13 @@ export function Shell({ children, hud, ghost }: { children: ReactNode; hud?: str
     // any other change starts at the top.
     const id = decodeURIComponent(window.location.hash.slice(1));
     const target = id ? document.getElementById(id) : null;
-    if (target) target.scrollIntoView({ block: route.page === "home" ? "center" : "start" });
+    // On the home a card can hang in the city (fixed on screen), so the page scrolls to the middle of its stop; the camera follows.
+    const stop = route.page === "home" ? target?.closest<HTMLElement>("[data-stop]") : null;
+    if (stop) {
+      const station = Number(stop.dataset.stationY);
+      const middle = Number.isFinite(station) && station > 0 ? station : stop.getBoundingClientRect().top + window.scrollY + stop.offsetHeight / 2;
+      window.scrollTo(0, Math.max(0, middle - window.innerHeight / 2));
+    } else if (target) target.scrollIntoView({ block: route.page === "home" ? "center" : "start" });
     else window.scrollTo(0, 0);
   }, [route.page, route.slug]);
   return (
