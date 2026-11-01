@@ -1,6 +1,7 @@
 import { SceneHost } from "../scene/SceneHost";
 import { lazy, Suspense, useEffect, useState, type ReactNode } from "react";
 import { AppFooter, AppHeader, Hud, Layers, SkipLink, useBackgroundMode, type Lang } from "colagem-ui";
+import { DistrictMenu } from "./DistrictMenu";
 import { MetroLine } from "./MetroLine";
 import { caseCards } from "../content/caseIndex";
 import { strings, type Strings } from "../content/ui";
@@ -71,10 +72,11 @@ export function Shell({ children, hud, ghost }: { children: ReactNode; hud?: str
       <Layers ghost={ghost ?? "07"} />
       <div className="screen-dots" aria-hidden="true" />
       <div className="wipe" id="wipe" aria-hidden="true"><i /><i /><i /><i /></div>
-      {(route.page === "home" || route.page === "demo" || route.page === "case") && <SceneHost mode={mode} slugs={caseCards.map((c) => c.slug)} focusSlug={route.page === "case" ? route.slug : undefined} />}
+      {(route.page === "home" || route.page === "demo" || route.page === "case") && <SceneHost mode={mode} focusSlug={route.page === "case" ? route.slug : undefined} />}
       <SkipLink>{t.skip}</SkipLink>
       <Header />
       <MetroLine />
+      {route.page === "home" && <DistrictMenu />}
       {hud && <Hud>{hud}</Hud>}
       <main id="main" className="wrap" tabIndex={-1} data-page={route.page}>{children}</main>
       <AppFooter credits={t.credits}>

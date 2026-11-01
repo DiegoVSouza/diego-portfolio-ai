@@ -58,15 +58,14 @@ Not simplified below 23k triangles: `Building_06` (29 separate meshes; the simpl
 
 `src/scene/city.ts` loads the files from the site's own origin (CSP `connect-src 'self'`).
 
-- **Buildings:** every third tower of the skyline is one of four building models, scaled to a height of 24 to 46, turned to face the avenue
-  (the front is assumed to be +Z), and merged into one mesh. The other towers stay boxes with lit windows.
+- **Buildings:** in the four towered districts every third (or fourth) tower is one of four building models, scaled to its own height, turned to face the
+  avenue (the front is assumed to be +Z), and merged per district. The other towers stay boxes with lit windows.
 - **Cars:** the truck, the moto and the two cars share one 13-instance fleet. The cars' front is +X (clear for A_R7, assumed for S64Compact) and is
   turned to +Z.
-- **Stations:** one per project, 24 m long, hung 9.5 units to the left of the flight curve with the track side facing the avenue and the platform
-  along the curve. It is the site's metro line made solid.
+- **Station:** one, 24 m long, on the viaduct of the platform district, with the platform along the avenue. Two trains shuttle past it.
 - `KHR_mesh_quantization` attributes are widened to float before any matrix is applied.
 - A model that fails to load logs `did not load` and a generated one takes its place. `canvas[data-landmarks]`, `[data-vehicle-kinds]` and
-  `[data-stations]` say which path ran, and `e2e/v2.spec.ts` fails if a fallback was used.
+  `[data-stations]` (one) say which path ran, and `e2e/v2.spec.ts` fails if a fallback was used.
 - The files total about 0.6 MB and load after the page is interactive, only where the 3D scene runs (not in portrait or under the simple version).
 
 ## Not used

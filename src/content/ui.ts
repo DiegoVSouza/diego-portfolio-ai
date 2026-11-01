@@ -42,6 +42,13 @@ export interface Strings {
   openProject: string;
   flowHint: string;
   stackStatus: string;
+  districtsLabel: string;
+  menuPrompt: string;
+  districtAnnounce: string;
+  scrollHint: string;
+  menuKeys: string;
+  menuPrev: string;
+  menuNext: string;
   heroStepsLabel: string;
   proofTitle: string;
   mapTitle: string;
@@ -217,6 +224,13 @@ const en: Strings = {
   openProject: "View project",
   flowHint: "Press Play, or click any box to see what it does. The pulse follows the current step.",
   stackStatus: "Stack status and start",
+  districtsLabel: "Districts",
+  menuPrompt: "Where to?",
+  districtAnnounce: "District {n} of {total}: {name}",
+  scrollHint: "Scroll, or pick a district",
+  menuKeys: "to move, or",
+  menuPrev: "Previous district",
+  menuNext: "Next district",
   heroStepsLabel: "How to read this site",
   heroSteps: ["Try the live demo of one project", "Follow the guided tour: run it, see the flow, read the README", "Check the evidence: every number links to a commit"],
   proofTitle: "What you can check here",
@@ -407,6 +421,13 @@ const pt: Strings = {
   openProject: "Ver projeto",
   flowHint: "Aperte Play, ou clique em qualquer caixa para ver o que ela faz. O pulso acompanha o passo atual.",
   stackStatus: "Estado da stack e início",
+  districtsLabel: "Distritos",
+  menuPrompt: "Para onde?",
+  districtAnnounce: "Distrito {n} de {total}: {name}",
+  scrollHint: "Role, ou escolha um distrito",
+  menuKeys: "para mover, ou",
+  menuPrev: "Distrito anterior",
+  menuNext: "Próximo distrito",
   heroStepsLabel: "Como ler este site",
   heroSteps: ["Teste a demo ao vivo de um projeto", "Siga o tour guiado: rode, veja o fluxo, leia o README", "Confira as evidências: cada número aponta para um commit"],
   proofTitle: "O que você pode conferir aqui",

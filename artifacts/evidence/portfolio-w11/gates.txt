@@ -1,0 +1,11 @@
+tsc exit 0
+> eslint src e2e scripts functions
+
+lint exit 0
+ Test Files  6 passed (6)
+      Tests  61 passed (61)
+   Start at  16:56:26
+   Duration  2.94s (environment 72%, setup 13%, tests 10%, import 2%, transform 2%)
+
+audit: OK (11 arquivos)
+budget: PASS (worst route /projects/supportops/index.html: 45.2 KB gzip of 100 KB; scene chunk 165.4 KB of 500 KB)

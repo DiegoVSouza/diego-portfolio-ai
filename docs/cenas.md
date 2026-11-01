@@ -8,6 +8,29 @@ Source of truth for the contracts is `src/content/scenes.json`. `src/scenes.test
 
 A scene that does not serve this sentence is removed.
 
+## Phase 005: the city journey (supersedes the one-station-per-project flight on the home)
+
+The home is a scroll journey through six districts of one city (`.planning/phases/005-city-journey/SPEC.md`), in the style of a game menu:
+
+| # | District | Holds | Built form |
+| --- | --- | --- | --- |
+| 1 | Arrival | Hero | Avenue, a gate with the headline, towers on both sides |
+| 2 | SupportOps | The flagship | A control tower with setbacks and a beacon |
+| 3 | AI core | Foundation, Agents, Toolkit | Dense towers joined by sky bridges |
+| 4 | Platform | Observability, Async | Elevated viaduct, the metro station, two trains |
+| 5 | Craft | Design system, Harness | Low rooftops with billboards, scaffolding, a crane |
+| 6 | Terminal | About, contact | Harbour: water, container stacks, cranes, a lighthouse |
+
+- **Camera as transition.** Each district is a tall section; the camera rests at its stop for the middle of the section and flies the rail to the next
+  one, swinging across the avenue, panning and banking (zero at a stop) and widening the lens with speed. Native scroll only.
+- **Game menu.** Left: the district list, the active one on a red shard, a description box, the keys (`j`, `k`, number keys). Right: the panel of the
+  district, held in view while its section passes. Between them, the city. Choosing an entry scrolls to its district, so the camera flies there.
+  Under 1200 px the menu is a bar with previous and next and the panels are full width.
+- **Fallbacks.** No WebGL, portrait, save-data, the simple version: level 1 background, same content, working menu or bar. Reduced motion: a static frame
+  per district, no swing, no events.
+- **Case pages** hold the camera at the stop of the district that holds the project.
+- Contracts in `scenes.json` describe the earlier station flight; the e2e suite (`v2.spec.ts`, `flow.spec.ts`, `scene.spec.ts`) is the source of truth for the journey until they are rewritten.
+
 ## Rhythm
 
 | Time | Scene | The visitor can |

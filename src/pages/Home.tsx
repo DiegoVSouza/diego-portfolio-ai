@@ -1,6 +1,7 @@
 import { Card, Command, GhostNumber, Headline, Lead, Plate, StatusSeal } from "colagem-ui";
-import { useEffect } from "react";
+import { useEffect, type ReactNode } from "react";
 import { caseCards, type CaseCard } from "../content/caseIndex";
+import { districts, type District } from "../content/districts";
 import { evidence, modeLabel, permalink } from "../content/evidence";
 import { profile } from "../content/profile";
 import { Disclosure } from "../site/Disclosure";
@@ -8,42 +9,28 @@ import { Link, hrefFor } from "../site/router";
 import { useLang } from "../site/Shell";
 
 /**
- * The page is a street the cards drive along: each panel slides in from its side as the city moves under it.
- * GSAP and ScrollTrigger load after the page is interactive, in their own chunk, so first load stays small and the
- * page reads fine before (and without) them. gsap.context() reverts every tween and trigger when the page is left.
+ * The panels lean with the camera. GSAP loads after the page is interactive, in its own chunk, so first load stays small and
+ * the page reads fine before (and without) it. The scene reports its pan in `scene:travel`; each panel turns about the vertical
+ * axis by a few degrees, which is a different transform property from anything else on the page.
  */
-function useTravel() {
+function useLean() {
   useEffect(() => {
     const main = document.getElementById("main");
-    if (!main || typeof matchMedia !== "function") return undefined;
+    if (!main || typeof matchMedia !== "function" || matchMedia("(prefers-reduced-motion: reduce)").matches) return undefined;
     let revert = () => undefined as void;
     let alive = true;
-    void Promise.all([import("gsap"), import("gsap/ScrollTrigger")]).then(([{ gsap }, { ScrollTrigger }]) => {
+    void import("gsap").then(({ gsap }) => {
       if (!alive) return;
-      gsap.registerPlugin(ScrollTrigger);
       const ctx = gsap.context(() => {
-        const media = gsap.matchMedia();
-        media.add("(prefers-reduced-motion: no-preference)", () => {
-          const panels = Array.from(main.querySelectorAll<HTMLElement>(":scope > section, :scope > .cta, [data-travel]"));
-          panels.forEach((panel, i) => {
-            const side = i % 2 ? 1 : -1;
-            gsap.fromTo(
-              panel,
-              { x: side * 90, rotate: side * 1.4 },
-              { x: 0, rotate: 0, ease: "power2.out", scrollTrigger: { trigger: panel, start: "top 96%", end: "top 62%", scrub: 0.6 } },
-            );
-          });
-          // The panels turn with the camera: the scene reports its swing, the panels lean into it (a different
-          // transform property from the one the scroll tween drives, so the two add up).
-          gsap.set(panels, { transformPerspective: 1100 });
-          const lean = panels.map((panel) => gsap.quickSetter(panel, "rotationY", "deg") as (v: number) => void);
-          const onTravel = (event: Event) => {
-            const yaw = (event as CustomEvent<{ yaw: number }>).detail.yaw * 11;
-            for (const set of lean) set(yaw);
-          };
-          window.addEventListener("scene:travel", onTravel);
-          return () => window.removeEventListener("scene:travel", onTravel);
-        });
+        const panels = Array.from(main.querySelectorAll<HTMLElement>(".district-panel"));
+        gsap.set(panels, { transformPerspective: 1200 });
+        const lean = panels.map((panel) => gsap.quickSetter(panel, "rotationY", "deg") as (v: number) => void);
+        const onTravel = (event: Event) => {
+          const yaw = (event as CustomEvent<{ yaw: number }>).detail.yaw * 9;
+          for (const set of lean) set(yaw);
+        };
+        window.addEventListener("scene:travel", onTravel);
+        return () => window.removeEventListener("scene:travel", onTravel);
       }, main);
       revert = () => ctx.revert();
     });
@@ -83,31 +70,85 @@ function ProjectExtras({ card }: { card: CaseCard }) {
   );
 }
 
+/** One project as a compact entry, for the districts that hold several: the call to action and the tests sit on one line. */
+function ProjectRow({ card }: { card: CaseCard }) {
+  const { lang, t } = useLang();
+  const n = String(caseCards.findIndex((c) => c.slug === card.slug) + 1).padStart(2, "0");
+  const rows = evidence.filter((e) => e.project === card.slug);
+  return (
+    <article className="proj" data-scene-case={card.slug} id={`project-${card.slug}`}>
+      <p className="proj-head">
+        <span className="proj-n">{n}</span>
+        <StatusSeal kind={card.seal.kind} label={card.seal.label[lang]} />
+      </p>
+      <h3 className="proj-title">
+        <Link className="card-link" to={hrefFor({ page: "case", slug: card.slug }, lang)}>{card.name[lang]}</Link>
+      </h3>
+      <p className="proj-sum">{card.outcome[lang]}</p>
+      <div className="proj-actions">
+        <Link className="btn" to={hrefFor({ page: "case", slug: card.slug }, lang)}>{t.openProject} →</Link>
+        <Disclosure summary={t.testsEvidence}>
+          {rows.length > 0 ? (
+            <ul className="proof-mini">
+              {rows.map((e) => (
+                <li key={e.id}>
+                  <strong>{e.value}</strong> <span>{e.label[lang]}</span>
+                  <span className="proof-mini-meta">
+                    {modeLabel(e.mode, lang)} · <a href={permalink(e)} rel="noopener noreferrer">{t.commit} {e.commit.slice(0, 7)}</a>
+                  </span>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p className="sub">{t.pending}</p>
+          )}
+        </Disclosure>
+      </div>
+    </article>
+  );
+}
+
+/** A district of the home: a tall section the camera crosses, with its panel held in view while it does. */
+function DistrictSection({ d, children }: { d: District; children: ReactNode }) {
+  const { lang } = useLang();
+  return (
+    <section data-district={d.id} id={`d-${d.id}`} className={`district district-${d.id}`} aria-labelledby={`${d.id}-h`}>
+      <div className="district-panel">
+        <p className="district-n" aria-hidden="true">{String(districts.indexOf(d) + 1).padStart(2, "0")}</p>
+        <h2 id={`${d.id}-h`} className="section-h">{d.name[lang]}</h2>
+        {children}
+      </div>
+    </section>
+  );
+}
+
 export function Home() {
   const { lang, t } = useLang();
   const flagship = caseCards[0]!;
-  useTravel();
+  useLean();
+  const by = (id: District["id"]) => districts.find((d) => d.id === id)!;
+  const rows = (id: District["id"]) => by(id).slugs.map((slug) => caseCards.find((c) => c.slug === slug)!);
   return (
     <>
-      <Plate text="AI Engineer" label={profile.name} />
-      <Headline>{t.heroTitle}</Headline>
-      <Lead>{t.heroLead}</Lead>
-      <p className="cta">
-        <Link className="btn btn-big" to={hrefFor({ page: "case", slug: flagship.slug }, lang)}>{t.heroCta} →</Link>
-        <Link className="btn btn-secondary btn-big" to={`${hrefFor({ page: "case", slug: flagship.slug }, lang)}#demo`}>{t.navDemo}</Link>
-      </p>
-      <ol className="hero-steps" aria-label={t.heroStepsLabel}>
-        {t.heroSteps.map((step) => <li key={step}>{step}</li>)}
-      </ol>
-
-      <section aria-labelledby="portfolio-h" className="portfolio-intro">
-        <h2 id="portfolio-h" className="section-h">{t.portfolioTitle}</h2>
-        <p className="surface-text">{t.portfolioLead}</p>
-        <p className="portfolio-count">{caseCards.length} <span>{t.projectsTitle}</span></p>
+      <section data-district="arrival" id="d-arrival" className="district district-arrival" aria-labelledby="arrival-h">
+        <div className="district-panel">
+          <h2 id="arrival-h" className="sr">{by("arrival").name[lang]}</h2>
+          <Plate text="AI Engineer" label={profile.name} />
+          <Headline>{t.heroTitle}</Headline>
+          <Lead>{t.heroLead}</Lead>
+          <p className="cta">
+            <Link className="btn btn-big" to={hrefFor({ page: "case", slug: flagship.slug }, lang)}>{t.heroCta} →</Link>
+            <Link className="btn btn-secondary btn-big" to={`${hrefFor({ page: "case", slug: flagship.slug }, lang)}#demo`}>{t.navDemo}</Link>
+          </p>
+          <ol className="hero-steps" aria-label={t.heroStepsLabel}>
+            {t.heroSteps.map((step) => <li key={step}>{step}</li>)}
+          </ol>
+          <p className="scroll-hint" aria-hidden="true">{t.scrollHint}</p>
+        </div>
       </section>
 
-      <section aria-labelledby="flag-h">
-        <h2 id="flag-h" className="section-h">{t.flagshipTitle}</h2>
+      <DistrictSection d={by("ops")}>
+        <p className="surface-text">{by("ops").blurb[lang]}</p>
         <div data-scene-case={flagship.slug} id={`project-${flagship.slug}`}>
           <Card
             variant="focus"
@@ -124,52 +165,40 @@ export function Home() {
           />
         </div>
         <ProjectExtras card={flagship} />
-      </section>
+      </DistrictSection>
 
-      <section aria-labelledby="projects-h">
-        <h2 id="projects-h" className="section-h">{t.projectsTitle}</h2>
-        <ul className="grid">
-          {caseCards.slice(1).map((c, i) => (
-            <li key={c.slug} data-scene-case={c.slug} data-travel id={`project-${c.slug}`}>
-              <Card
-                index={i}
-                numeral={String(i + 2).padStart(2, "0")}
-                label={`${c.ids}: ${c.name[lang]}`}
-                headingLevel={3}
-                title={<Link className="card-link" to={hrefFor({ page: "case", slug: c.slug }, lang)}>{c.name[lang]}</Link>}
-                summary={c.outcome[lang]}
-                meta={`${c.ids} · ${c.group[lang]}`}
-                tag={c.hook[lang]}
-                seal={<StatusSeal kind={c.seal.kind} label={c.seal.label[lang]} />}
-              />
-              <ProjectExtras card={c} />
-            </li>
-          ))}
-        </ul>
-      </section>
+      {(["core", "platform", "craft"] as const).map((id) => (
+        <DistrictSection key={id} d={by(id)}>
+          <div className="projs">
+            {rows(id).map((card) => <ProjectRow key={card.slug} card={card} />)}
+          </div>
+        </DistrictSection>
+      ))}
 
-      <section aria-labelledby="about-h">
-        <h2 id="about-h" className="section-h">{t.aboutTitle}</h2>
-        <p className="surface-text">{profile.summary[lang]}</p>
-        <ul className="plain">
-          {profile.career.slice(0, 2).map((j) => (
-            <li key={j.id}><strong>{j.role}</strong>, {j.org}. <span className="sub">{j.from} to {j.to} · {t.careerNote}</span></li>
-          ))}
-        </ul>
-        <p><Link to={hrefFor({ page: "experience" }, lang)}>{t.navExperience}</Link></p>
-      </section>
-
-      <section aria-labelledby="contact-h">
-        <h2 id="contact-h" className="section-h">{t.contactTitle}</h2>
-        <p className="surface-text">{t.contactLead}</p>
-        <p className="cta"><a className="btn btn-big" href={profile.whatsapp} rel="noopener noreferrer">{t.contactWhatsapp}</a></p>
-        <ul className="contact">
-          <li>{t.contactPhone}: <a href={`tel:${profile.phone.split(" ").join("")}`}>{profile.phone}</a></li>
-          <li><a href={`mailto:${profile.email}`}>{profile.email}</a></li>
-          <li><a href={profile.linkedin} rel="noopener noreferrer">LinkedIn</a></li>
-          <li><a href={profile.github} rel="noopener noreferrer">GitHub</a></li>
-        </ul>
-      </section>
+      <DistrictSection d={by("terminal")}>
+        <p className="surface-text">{by("terminal").blurb[lang]}</p>
+        <section aria-labelledby="about-h" className="terminal-block">
+          <h2 id="about-h" className="sub-h">{t.aboutTitle}</h2>
+          <p className="surface-text">{profile.summary[lang]}</p>
+          <ul className="plain">
+            {profile.career.slice(0, 2).map((j) => (
+              <li key={j.id}><strong>{j.role}</strong>, {j.org}. <span className="sub">{j.from} to {j.to} · {t.careerNote}</span></li>
+            ))}
+          </ul>
+          <p><Link to={hrefFor({ page: "experience" }, lang)}>{t.navExperience}</Link></p>
+        </section>
+        <section aria-labelledby="contact-h" className="terminal-block">
+          <h2 id="contact-h" className="sub-h">{t.contactTitle}</h2>
+          <p className="surface-text">{t.contactLead}</p>
+          <p className="cta"><a className="btn btn-big" href={profile.whatsapp} rel="noopener noreferrer">{t.contactWhatsapp}</a></p>
+          <ul className="contact">
+            <li>{t.contactPhone}: <a href={`tel:${profile.phone.split(" ").join("")}`}>{profile.phone}</a></li>
+            <li><a href={`mailto:${profile.email}`}>{profile.email}</a></li>
+            <li><a href={profile.linkedin} rel="noopener noreferrer">LinkedIn</a></li>
+            <li><a href={profile.github} rel="noopener noreferrer">GitHub</a></li>
+          </ul>
+        </section>
+      </DistrictSection>
       <GhostNumber n="01" />
     </>
   );

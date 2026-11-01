@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { BackgroundMode } from "colagem-ui";
+import { districtOf, districts } from "../content/districts";
 import { useLang } from "../site/Shell";
 import { useSimple } from "../site/simple";
 import { onPulse } from "./pulse";
@@ -41,10 +42,10 @@ const saveData = (): boolean => {
   return Boolean(connection?.saveData);
 };
 
-export function SceneHost({ mode, slugs, focusSlug, pulseKey }: { mode: BackgroundMode; slugs: string[]; focusSlug?: string; pulseKey?: number }) {
+export function SceneHost({ mode, focusSlug, pulseKey }: { mode: BackgroundMode; focusSlug?: string; pulseKey?: number }) {
   const canvas = useRef<HTMLCanvasElement | null>(null);
   const controller = useRef<SceneController | null>(null);
-  const { t } = useLang();
+  const { lang, t } = useLang();
   const simple = useSimple();
   const [running, setRunning] = useState(false);
   // The server renders no canvas, so the client adds it only after hydration. Nothing can mismatch.
@@ -54,8 +55,7 @@ export function SceneHost({ mode, slugs, focusSlug, pulseKey }: { mode: Backgrou
   const [motion, setMotion] = useState(true);
   const [halftone, setHalftone] = useState(true);
   useEffect(() => setHalftone(readHalftone()), []);
-  const slugKey = slugs.join(",");
-  const focus = focusSlug === undefined ? undefined : slugs.indexOf(focusSlug);
+  const focus = focusSlug === undefined ? undefined : districtOf(focusSlug);
 
   useEffect(() => {
     if (!mounted || simple || mode === "2d" || saveData() || portrait() || !canvas.current) return undefined;
@@ -67,11 +67,12 @@ export function SceneHost({ mode, slugs, focusSlug, pulseKey }: { mode: Backgrou
           if (cancelled) return;
           try {
             const started = await start(element, {
-              slugs: slugKey.split(","),
+              districts: districts.map((d) => ({ id: d.id, slugs: d.slugs, sign: d.name[lang] })),
+              headline: "AI ENGINEER",
               mode,
               models: { truck: truckUrl, moto: motoUrl, buildings: [buildingLarge, buildingMedium, buildingSmall, buildingSample], cars: [carR7, carS64], station: metroStation },
               halftone: readHalftone(),
-              focus: focus === undefined || focus < 0 ? undefined : focus,
+              focus,
               onActive: (index) => {
                 element.dataset.active = String(index);
               },
@@ -106,7 +107,7 @@ export function SceneHost({ mode, slugs, focusSlug, pulseKey }: { mode: Backgrou
       controller.current = null;
       setRunning(false);
     };
-  }, [mounted, simple, mode, slugKey, focus]);
+  }, [mounted, simple, mode, lang, focus]);
 
   useEffect(() => {
     if (pulseKey) controller.current?.pulse();

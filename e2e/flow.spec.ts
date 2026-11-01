@@ -133,7 +133,7 @@ test.describe("descent, simple version and back to the surface", () => {
     await expect(page.locator("#project-toolkit")).toBeInViewport();
     const canvas = page.locator("canvas.scene");
     await expect(canvas).toHaveAttribute("data-scene", "3d", { timeout: 20_000 });
-    await expect(canvas).toHaveAttribute("data-active", "3");
+    await expect(canvas).toHaveAttribute("data-active", "2"); // the AI core district
   });
 });
 
@@ -175,17 +175,27 @@ test.describe("metro line", () => {
     await expect(page).toHaveURL(/\/projects\/agents\/$/);
   });
 
-  test("the home has no project sidebar; j moves to the next card and the move is announced", async ({ page }) => {
-    await page.setViewportSize({ width: 1280, height: 800 });
+  test("the home is a game menu of six districts: a click, j and k and the number keys fly to each, and each is announced", async ({ page }) => {
+    await page.setViewportSize({ width: 1440, height: 900 });
     await page.goto("/");
     await ready(page);
-    await expect(page.getByRole("navigation", { name: "Project line" })).toHaveCount(0);
+    const menu = page.getByRole("navigation", { name: "Districts" });
+    await expect(menu.getByRole("link")).toHaveCount(6);
     await expect(page.locator(".metro-stations")).toHaveCount(0);
-    await page.evaluate(() => document.getElementById("project-supportops")!.scrollIntoView({ block: "center" }));
-    await expect(page.locator(".metro [role=status]")).toContainText(/Project 1 of 8/);
+    await expect(menu.getByRole("link", { name: /Arrival/ })).toHaveAttribute("aria-current", "location");
     await page.keyboard.press("j");
-    await expect(page.locator("#project-foundation")).toBeInViewport();
-    await expect(page.locator(".metro [role=status]")).toContainText(/Project 2 of 8/);
+    await expect(menu.getByRole("link", { name: /SupportOps/ })).toHaveAttribute("aria-current", "location", { timeout: 10_000 });
+    await expect(menu.locator("[role=status]")).toContainText("District 2 of 6: SupportOps");
+    await menu.getByRole("link", { name: /Platform/ }).click();
+    await expect(menu.getByRole("link", { name: /Platform/ })).toHaveAttribute("aria-current", "location", { timeout: 10_000 });
+    await expect(menu.locator("[role=status]")).toContainText("District 4 of 6: Platform");
+    await expect(page.locator("#d-platform .district-panel")).toBeInViewport();
+    await page.keyboard.press("6");
+    await expect(menu.getByRole("link", { name: /Terminal/ })).toHaveAttribute("aria-current", "location", { timeout: 10_000 });
+    await page.keyboard.press("k");
+    await expect(menu.getByRole("link", { name: /Craft/ })).toHaveAttribute("aria-current", "location", { timeout: 10_000 });
+    // The description box follows the active district.
+    await expect(menu.locator(".districts-desc")).toContainText("This site, its design system");
   });
 
   test("the line passes axe on the home and on a case, at both widths", async ({ page }) => {

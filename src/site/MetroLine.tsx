@@ -15,7 +15,7 @@ export function MetroLine() {
   const [homeActive, setHomeActive] = useState(-1);
   const [announcement, setAnnouncement] = useState("");
   const last = useRef(-2);
-  const onHome = route.page === "home";
+  const onHome = false; // the home has its own menu (DistrictMenu)
   const onCase = route.page === "case";
   const active = onCase ? caseCards.findIndex((c) => c.slug === route.slug) : homeActive;
   const total = caseCards.length;
@@ -86,9 +86,7 @@ export function MetroLine() {
     return () => window.removeEventListener("keydown", onKey);
   }, [onHome, onCase, goTo, active]);
 
-  if (!onHome && !onCase) return null;
-  // The home has no sidebar: only the live region stays, so a screen reader still hears which project the scroll reached.
-  if (onHome) return <div className="metro metro-quiet"><span className="sr" role="status" aria-live="polite">{announcement}</span></div>;
+  if (!onCase) return null;
   const current = active >= 0 ? caseCards[active]! : null;
   return (
     <nav className="metro" aria-label={t.metroLabel} data-ready="true">
