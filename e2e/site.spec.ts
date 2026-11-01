@@ -115,3 +115,15 @@ test("the home page has the role in the first screen, and a squint screenshot is
   await page.goto("/projects/supportops/");
   await page.screenshot({ path: `${evidence}/case-360.png`, fullPage: false });
 });
+
+test("the demo page passes axe when a real run lights nodes in the diagram (accessible names include the measurement)", async ({ page }) => {
+  const run = { runs: [{ id: "r1", at: "2026-10-31T10:00:00", steps: ["classifier", "kb_researcher", "billing_agent", "responder"].map((agent, i) => ({ id: String(i), agent, project: "P01", model: "m", latencyMs: 400 + i, tokens: 600 + i, costUsd: 0.00006 })) }] };
+  await page.route("**/api/runs/latest", (route) => route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify(run) }));
+  for (const path of ["/demo/", "/pt/demo/"]) {
+    await page.goto(path);
+    await expect(page.locator(".flow-node.live").first()).toBeVisible();
+    const result = await new AxeBuilder({ page }).analyze();
+    expect(result.violations.map((v) => `${path} ${v.id}: ${v.nodes[0]?.target}`), path).toEqual([]);
+  }
+});
+

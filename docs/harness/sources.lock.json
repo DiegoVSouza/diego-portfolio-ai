@@ -1,10 +1,10 @@
 {
   "colagem-ui": {
-    "version": "0.4.1",
-    "tarball": "vendor/colagem-ui-0.4.1.tgz",
-    "sha256": "e836af27e29bd32e84cbebe2b1d3784e404aabe0e064dc8b77a705778bf3b5d3",
-    "source_commit": "69f8bc5c51445dc4c18a758cdcd924ebc8259e12",
+    "version": "0.4.4",
+    "tarball": "vendor/colagem-ui-0.4.4.tgz",
+    "sha256": "a192356c6343edcc415ef17af87fb0ce25ab53d41c4cddfef44abf9f01a8d773",
+    "source_commit": "5292dc6561d4c321df766b7d342fd2683d752bc0",
     "source_repo": "projects/p08 (local, not published)",
-    "consumer_command": "npm install file:vendor/colagem-ui-0.4.1.tgz"
+    "consumer_command": "npm install file:vendor/colagem-ui-0.4.4.tgz"
   }
 }
