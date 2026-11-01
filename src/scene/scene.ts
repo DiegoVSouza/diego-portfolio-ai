@@ -147,6 +147,16 @@ export async function start(canvas: HTMLCanvasElement, options: SceneOptions): P
     canvas.dataset.atOrigin = String(n);
   };
 
+  // The vehicle models load while the city is still being built in small tasks. If they arrive first, the callback waits
+  // until the city exists; calling it earlier read `city` before it was assigned (a TDZ error seen on the live site).
+  let ready = false;
+  let vehiclesWaiting = false;
+  const vehiclesLoaded = () => {
+    city.place(time, !motion);
+    refreshOrigin();
+    dirty = true;
+    schedule();
+  };
   const city = await buildCity({
     scene,
     p,
@@ -159,10 +169,8 @@ export async function start(canvas: HTMLCanvasElement, options: SceneOptions): P
     signs: options.slugs.map((s) => s.replace(/-/g, " ")),
     models: options.models,
     onVehicles: () => {
-      city.place(time, !motion);
-      refreshOrigin();
-      dirty = true;
-      schedule();
+      if (ready) vehiclesLoaded();
+      else vehiclesWaiting = true;
     },
   });
   if (document.fonts?.load) {
@@ -374,6 +382,8 @@ export async function start(canvas: HTMLCanvasElement, options: SceneOptions): P
   }
   city.place(0, !motion);
   refreshOrigin();
+  ready = true;
+  if (vehiclesWaiting) vehiclesLoaded();
   frame(performance.now());
 
   function dispose() {
