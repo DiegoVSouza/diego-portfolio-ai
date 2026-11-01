@@ -17,7 +17,7 @@ export interface CityContext {
   /** Short words for the vertical neon signs, one per project. */
   signs: string[];
   /** URLs of the real models (Kenney, CC0). If one fails to load, a generated model takes its place. */
-  models: { truck: string; moto: string; /** Downtown buildings (Quaternius, CC0), simplified. Without them the skyline is boxes. */ buildings?: string[]; /** Cars (CC0), length along X with the front at +X. */ cars?: string[] };
+  models: { truck: string; moto: string; /** Downtown buildings (Quaternius, CC0), simplified. Without them the skyline is boxes. */ buildings?: string[]; /** Cars (CC0), length along X with the front at +X. */ cars?: string[]; /** One metro station per project (Modular Underground Metro pieces, built by scripts/build_station.mjs). */ station?: string };
   onVehicles(): void;
 }
 
@@ -29,6 +29,8 @@ export interface City {
   landmarks: number;
   /** How many kinds of vehicle are in the fleet once the models have loaded (truck, moto, cars). */
   vehicleKinds(): number;
+  /** How many metro stations stand beside the avenue once their model has loaded. */
+  stations(): number;
   /** Ghost numbers are painted again once the display font is ready. */
   repaintGhosts(): void;
 }
@@ -361,6 +363,31 @@ export async function buildCity(c: CityContext): Promise<City> {
     c.onVehicles();
   });
 
+  // One metro station per project, beside the avenue: the line the site's index draws, made solid. The model's +x runs along the
+  // platform and +z is the track side, so +x is turned along the flight curve and the track faces the avenue.
+  let stationCount = 0;
+  if (c.models.station) {
+    void loadModel(c.models.station).then((g) => {
+      if (!g) return;
+      g.translate(-12, 0, 0); // centre the 24 m platform on its own origin
+      const mesh = new THREE.InstancedMesh(g, new THREE.MeshStandardMaterial({ flatShading: true, roughness: 0.8, metalness: 0.1 }), NC);
+      mesh.frustumCulled = false;
+      const along = new THREE.Quaternion();
+      for (let i = 0; i < NC; i += 1) {
+        const f = c.frameAt(i);
+        dummy.position.set(f.p.x - f.R.x * 9.5, f.p.y - 3.4, f.p.z - f.R.z * 9.5);
+        dummy.quaternion.copy(along.setFromUnitVectors(V3(1, 0, 0), f.T.clone().normalize()));
+        dummy.scale.setScalar(1.3);
+        dummy.updateMatrix();
+        mesh.setMatrixAt(i, dummy.matrix);
+        mesh.setColorAt(i, col.copy(i % 3 === 0 ? p.paper : grey(i % 2 ? 0.34 : 0.22)));
+      }
+      scene.add(mesh);
+      stationCount = NC;
+      c.onVehicles();
+    });
+  }
+
   await tick();
   /* ---------- FRENTE: overhead cables ---------- */
   {
@@ -468,6 +495,7 @@ export async function buildCity(c: CityContext): Promise<City> {
     ghosts,
     landmarks: landmarkParts.length,
     vehicleKinds: () => kindsLoaded,
+    stations: () => stationCount,
     repaintGhosts: () => {
       paintGhosts();
       for (const m of signMats) (m.map!.userData as { paint?: () => void }).paint?.();

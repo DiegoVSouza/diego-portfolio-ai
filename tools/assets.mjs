@@ -56,6 +56,12 @@ function resolveLicense(raw, { author, title, url }) {
     console.warn(`aviso: licença "${raw}" desconhecida; aceita manualmente como ${flags['accept-licence']} (você verificou na página oficial).`);
     norm = flags['accept-licence'];
   }
+  // Owner decision: the owner says the pack is free to use but it ships no licence file. It is recorded as exactly that,
+  // never as CC0, and it is listed apart in the credits. The terms are unverified, so redistribution rights are unknown.
+  if (!norm && typeof flags['owner-declared'] === 'string' && flags['owner-declared'].trim()) {
+    console.warn(`aviso: "${raw}" sem licença verificável; registrado como OWNER-DECLARED por decisão do dono (${flags['owner-declared']}).`);
+    return { author, license: 'OWNER-DECLARED', url, attribution: `${author} (${url}). No licence file in the pack. Owner decision: ${flags['owner-declared']}. Terms unverified.` };
+  }
   if (!norm) die(`licença não reconhecida/permitida: "${raw}". Verifique na página oficial (${url}); só CC0 (ou CC-BY-4.0 com --allow-cc-by). Se confirmou, repita com --accept-licence CC0.`);
   if (norm === 'CC-BY-4.0' && !flags['allow-cc-by']) die(`"${title}" é CC-BY-4.0 (exige crédito). Repita com --allow-cc-by se for aceitável.`);
   const meta = { author, license: norm, url };
@@ -130,9 +136,11 @@ async function loadLedger() {
 const sha256File = async f => crypto.createHash('sha256').update(await fs.readFile(f)).digest('hex');
 async function writeCredits(ledger) {
   const cc0 = ledger.assets.filter(a => a.license === 'CC0');
-  const by = ledger.assets.filter(a => a.license !== 'CC0');
+  const owner = ledger.assets.filter(a => a.license === 'OWNER-DECLARED');
+  const by = ledger.assets.filter(a => a.license !== 'CC0' && a.license !== 'OWNER-DECLARED');
   const lines = ['# Credits', '', '_Gerado por tools/assets.mjs a partir de assets/ledger.json. Não edite à mão._', ''];
   if (by.length) { lines.push('## Atribuição obrigatória', ''); for (const a of by) lines.push(`- \`${a.path}\` — ${a.attribution ?? `${a.author} (${a.url}) — ${a.license}`}`); lines.push(''); }
+  if (owner.length) { lines.push('## Sem licença verificável (decisão do dono; termos não verificados)', ''); for (const a of owner) lines.push(`- \`${a.path}\` — ${a.attribution}`); lines.push(''); }
   lines.push('## CC0 (sem atribuição obrigatória; crédito é cortesia)', '');
   for (const a of cc0) lines.push(`- \`${a.path}\` — ${a.author} — ${a.url}`);
   await fs.mkdir(path.dirname(P.credits), { recursive: true });
@@ -382,7 +390,8 @@ async function cmdAudit() {
   for (const f of files) {
     const rel = posix(path.relative(root, f)), e = byPath.get(rel);
     if (!e) { problems.push(`sem registro no ledger: ${rel}`); continue; }
-    if (!['CC0', 'CC-BY-4.0'].includes(e.license)) problems.push(`licença não permitida (${e.license}): ${rel}`);
+    if (e.license === 'OWNER-DECLARED') { if (!e.attribution?.includes('Owner decision')) problems.push(`OWNER-DECLARED sem a decisão registrada: ${rel}`); else console.warn(`aviso: ${rel} é OWNER-DECLARED (sem licença verificável)`); }
+    else if (!['CC0', 'CC-BY-4.0'].includes(e.license)) problems.push(`licença não permitida (${e.license}): ${rel}`);
     if (e.license === 'CC-BY-4.0' && !e.attribution) problems.push(`CC-BY sem atribuição: ${rel}`);
     if (e.sha256 && e.sha256 !== await sha256File(f)) problems.push(`hash divergente: ${rel}`);
   }
@@ -442,6 +451,7 @@ const HELP = `assets.mjs — assets 3D gratuitos (CC0 por padrão)
 
 fontes: polyhaven, ambientcg (sem chave) · polypizza (POLY_PIZZA_API_KEY) · sketchfab (SKETCHFAB_TOKEN)
 flags úteis: --allow-cc-by (aceita CC-BY-4.0) · --accept-licence CC0 (licença desconhecida já conferida à mão)
+             --owner-declared "motivo" (sem arquivo de licença; decisão do dono, registrada como OWNER-DECLARED, nunca como CC0)
              --max-mb 300 · --root <dir> · env ASSET_UA="SeuApp/1.0 (email)"
 exit: 0 ok · 1 erro · 3 ação manual pendente`;
 

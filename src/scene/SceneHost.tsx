@@ -8,6 +8,8 @@ import truckUrl from "../../assets/game/models/truck.glb?url";
 import buildingLarge from "../../assets/game/models/building-large.glb?url";
 import buildingMedium from "../../assets/game/models/building-medium.glb?url";
 import buildingSmall from "../../assets/game/models/building-small.glb?url";
+import buildingSample from "../../assets/game/models/building-sample.glb?url";
+import metroStation from "../../assets/game/models/metro-station.glb?url";
 import carR7 from "../../assets/game/models/car-r7.glb?url";
 import carS64 from "../../assets/game/models/car-s64.glb?url";
 import type { Quality, SceneController } from "./scene";
@@ -67,7 +69,7 @@ export function SceneHost({ mode, slugs, focusSlug, pulseKey }: { mode: Backgrou
             const started = await start(element, {
               slugs: slugKey.split(","),
               mode,
-              models: { truck: truckUrl, moto: motoUrl, buildings: [buildingLarge, buildingMedium, buildingSmall], cars: [carR7, carS64] },
+              models: { truck: truckUrl, moto: motoUrl, buildings: [buildingLarge, buildingMedium, buildingSmall, buildingSample], cars: [carR7, carS64], station: metroStation },
               halftone: readHalftone(),
               focus: focus === undefined || focus < 0 ? undefined : focus,
               onActive: (index) => {

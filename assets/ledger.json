@@ -2,36 +2,46 @@
   "assets": [
     {
       "path": "assets/game/models/building-large.glb",
-      "author": "Quaternius (Downtown City MegaKit, Standard); simplified and stripped of textures by gltf-transform 4.5.1",
+      "author": "Quaternius (Downtown City MegaKit, Standard); no normals, simplified, no textures (gltf-transform 4.5.1)",
       "license": "CC0",
       "url": "https://quaternius.com",
       "source": "manual",
-      "sha256": "4234a4065f9100386f7654f50c02946062a9e50f853a367a662dfef1d5cb208c",
-      "fetchedAt": "2026-11-01T17:50:42.733Z"
+      "sha256": "1eab7d9376fce48cede0e289e76d5a464825db5633fa4af6836922848a2c48fb",
+      "fetchedAt": "2026-11-01T18:42:52.820Z"
     },
     {
       "path": "assets/game/models/building-medium.glb",
-      "author": "Quaternius (Downtown City MegaKit, Standard); simplified and stripped of textures by gltf-transform 4.5.1",
+      "author": "Quaternius (Downtown City MegaKit, Standard); no normals, simplified, no textures (gltf-transform 4.5.1)",
       "license": "CC0",
       "url": "https://quaternius.com",
       "source": "manual",
-      "sha256": "eea7e6192dda5cfdfd5e58e8a2dcf825ef01ba2d5ba4d371522aa5fa26967775",
-      "fetchedAt": "2026-11-01T17:50:42.823Z"
+      "sha256": "4867615984dd3dd1a1be1d142d43c88c8673e8751615d9be842a1e411fb622ee",
+      "fetchedAt": "2026-11-01T18:42:52.910Z"
+    },
+    {
+      "path": "assets/game/models/building-sample.glb",
+      "author": "Unknown author (Free Sample.zip, Building_06.fbx); converted by scripts/fbx_to_glb.mjs, simplified",
+      "license": "OWNER-DECLARED",
+      "url": "local pack: Free Sample.zip (no licence file)",
+      "attribution": "Unknown author (Free Sample.zip, Building_06.fbx); converted by scripts/fbx_to_glb.mjs, simplified (local pack: Free Sample.zip (no licence file)). No licence file in the pack. Owner decision: owner stated on 2026-11-01 that the pack was free to download and use. Terms unverified.",
+      "source": "manual",
+      "sha256": "455faea5a4b3986220922388a1a37d09725b3a57092d0dfaa0fd4e2f2ca2dc83",
+      "fetchedAt": "2026-11-01T18:42:53.106Z"
     },
     {
       "path": "assets/game/models/building-small.glb",
-      "author": "Quaternius (Downtown City MegaKit, Standard); simplified and stripped of textures by gltf-transform 4.5.1",
+      "author": "Quaternius (Downtown City MegaKit, Standard); no normals, simplified, no textures (gltf-transform 4.5.1)",
       "license": "CC0",
       "url": "https://quaternius.com",
       "source": "manual",
-      "sha256": "08b0863ea42da58bffe555619bcc804df5c132fbeb53b0d7b1f9b0cbfc559113",
-      "fetchedAt": "2026-11-01T17:50:42.918Z"
+      "sha256": "649792d041f02a1efa802fd7a3c1e24d2aa71af243b42fdf28626ad4300bc810",
+      "fetchedAt": "2026-11-01T18:42:53.010Z"
     },
     {
       "path": "assets/game/models/car-r7.glb",
       "author": "Unknown author (A_R7 pack; licence.txt in the pack says CC0); converted from FBX by scripts/fbx_to_glb.mjs",
       "license": "CC0",
-      "url": "https://github.com/DiegoVSouza (local pack A_R7.zip, licence.txt: CC0)",
+      "url": "local pack: A_R7.zip (licence.txt: CC0)",
       "source": "manual",
       "sha256": "aad87b49852dd790b470e6dd1a9537c8f90c58513ae52d56c913d3f62e4a854d",
       "fetchedAt": "2026-11-01T17:50:42.997Z"
@@ -40,10 +50,20 @@
       "path": "assets/game/models/car-s64.glb",
       "author": "Unknown author (S64Compact_v1_C pack; licence.txt in the pack says CC0); converted from FBX by scripts/fbx_to_glb.mjs",
       "license": "CC0",
-      "url": "https://github.com/DiegoVSouza (local pack S64Compact_v1_C.zip, licence.txt: CC0)",
+      "url": "local pack: S64Compact_v1_C.zip (licence.txt: CC0)",
       "source": "manual",
       "sha256": "15a21b08087064749a29c59defb50f55b8164ca28d88d62871ae6011b7c7b532",
       "fetchedAt": "2026-11-01T17:50:43.101Z"
+    },
+    {
+      "path": "assets/game/models/metro-station.glb",
+      "author": "Unknown author (ModularUndergroundMetro.zip); station assembled by scripts/build_station.mjs",
+      "license": "OWNER-DECLARED",
+      "url": "local pack: ModularUndergroundMetro.zip (no licence file)",
+      "attribution": "Unknown author (ModularUndergroundMetro.zip); station assembled by scripts/build_station.mjs (local pack: ModularUndergroundMetro.zip (no licence file)). No licence file in the pack. Owner decision: owner stated on 2026-11-01 that the pack was free to download and use. Terms unverified.",
+      "source": "manual",
+      "sha256": "3304a6d02e8b4c2189b2583eec68e3c4c6413b09f18923a07a09af1d54e77ed4",
+      "fetchedAt": "2026-11-01T18:42:53.204Z"
     },
     {
       "path": "assets/game/models/moto.glb",

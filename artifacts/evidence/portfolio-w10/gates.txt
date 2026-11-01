@@ -1,0 +1,14 @@
+tsc exit 0
+> eslint src e2e scripts functions
+
+lint exit 0
+ Test Files  6 passed (6)
+      Tests  61 passed (61)
+   Start at  15:45:08
+   Duration  2.99s (environment 72%, setup 13%, tests 10%, import 2%, transform 2%, worker 1%)
+
+aviso: assets/game/models/building-sample.glb é OWNER-DECLARED (sem licença verificável)
+aviso: assets/game/models/metro-station.glb é OWNER-DECLARED (sem licença verificável)
+audit: OK (11 arquivos)
+audit exit 0
+budget: PASS (worst route /projects/supportops/index.html: 44.3 KB gzip of 100 KB; scene chunk 172.0 KB of 500 KB)
