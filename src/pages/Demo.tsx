@@ -208,7 +208,7 @@ export function DemoPanel({ embedded = false }: { embedded?: boolean }) {
         <ol className="tour">
           {t.demoSteps.map(([title, body], i) => (
             <li key={title}>
-              <Disclosure hover className="tour-step" summary={<><span className="tour-n">{i + 1}</span> {title}</>}>
+              <Disclosure className="tour-step" summary={<><span className="tour-n">{i + 1}</span> {title}</>}>
                 <p>{body}</p>
               </Disclosure>
             </li>

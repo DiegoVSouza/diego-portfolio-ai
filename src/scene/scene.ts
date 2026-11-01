@@ -159,7 +159,7 @@ export async function start(canvas: HTMLCanvasElement, options: SceneOptions): P
       .catch(() => undefined);
   }
 
-  const post = createPost(renderer, scene, camera, p, fixed ? 0.62 : 0.14);
+  const post = createPost(renderer, scene, camera, p, fixed ? 0.8 : 0.14);
   post.halftone.enabled = options.halftone !== false;
   canvas.dataset.halftone = post.halftone.enabled ? "on" : "off";
 

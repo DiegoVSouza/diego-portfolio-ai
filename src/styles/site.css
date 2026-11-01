@@ -368,3 +368,49 @@ a:not(.btn):hover { color: var(--paper); text-decoration-thickness: 3px; }
   .scroll-hint::after, .districts-desc { animation: none; }
   .districts-list a, .d-sub a { transition: none; }
 }
+
+/* ================= project pages: chapters, a wider column, the flow on its own ================= */
+/* A project page is three chapters. Each opens on a banner (number, step, title, what it is for), has its own body, and ends on one action;
+   a dotted line, like the metro line, joins one chapter to the next. */
+@media (min-width: 1200px) {
+  [data-page="case"].wrap { max-width: none; margin-left: 252px; margin-right: clamp(16px, 2.5vw, 40px); }
+}
+.step { position: relative; margin-top: 104px; scroll-margin-top: 96px; }
+.step + .step::before { content: ""; position: absolute; left: 48px; top: -88px; width: 4px; height: 72px; background: repeating-linear-gradient(to bottom, var(--red) 0 8px, transparent 8px 14px); }
+.chapter-head { display: flex; align-items: center; gap: 22px; padding: 16px 26px; background: var(--paper); color: var(--ink); box-shadow: 8px 8px 0 var(--red); }
+.chapter-n { flex: none; min-width: 60px; text-align: center; font-family: var(--f-display); font-size: 84px; line-height: 0.9; color: transparent; -webkit-text-stroke: 2.5px var(--ink); }
+.chapter-kicker { margin: 0; font: 700 12px/1.2 var(--f-body); letter-spacing: 0.18em; text-transform: uppercase; color: var(--ink); }
+.chapter-title { margin: 2px 0 0; font-size: clamp(32px, 4vw, 48px); color: var(--ink); }
+.chapter-blurb { margin: 6px 0 0; font-weight: 600; color: var(--ink); max-width: 60ch; }
+.chapter-body { margin-top: 22px; padding: 26px 30px 12px; background: var(--ink); border-left: 8px solid var(--red); }
+.chapter-body > :first-child { margin-top: 0; }
+.chapter-body .sub-h { margin: 38px 0 12px; padding-top: 22px; border-top: 2px dashed var(--page-mut); font-size: clamp(24px, 2.6vw, 32px); scroll-margin-top: 96px; }
+.chapter-body > section:first-child > .sub-h:first-child, .chapter-body > .sub-nav + .surface-text { border-top: 0; }
+.chapter-body .surface-text { background: none; padding-left: 18px; }
+.step-next { margin: 22px 0 0; }
+.step-next .btn-big { width: 100%; justify-content: center; }
+.sub-nav { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 20px; }
+.sub-nav a { display: inline-flex; align-items: center; min-height: 44px; padding: 0 16px; background: var(--card); color: var(--paper); border: 2px solid var(--paper); text-decoration: none; font: 700 13px/1 var(--f-body); text-transform: uppercase; letter-spacing: 0.08em; transition: background-color 160ms, color 160ms, transform 160ms var(--ease-out); }
+.sub-nav a:hover, .sub-nav a:focus-visible { background: var(--paper); color: var(--ink); transform: translateY(-2px); }
+@media (max-width: 700px) {
+  .chapter-head { gap: 14px; padding: 12px 16px; }
+  .chapter-n { font-size: 56px; min-width: 40px; }
+  .chapter-body { padding: 18px 16px 8px; }
+  .step + .step::before { left: 30px; }
+}
+
+/* The flow: the navigation on one row, the scenarios and the failure paths on the row under it, then the diagram, then what the step says. */
+.flow-controls { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin-bottom: var(--space-4); }
+.flow-controls .flow-scenarios { flex: 1 0 100%; display: flex; flex-wrap: wrap; align-items: center; gap: 8px; padding-top: 12px; border-top: 2px dashed var(--page-mut); }
+.flow-controls .flow-scenarios::before { content: attr(aria-label); flex: none; margin-right: 6px; font: 700 12px/1 var(--f-body); letter-spacing: 0.16em; text-transform: uppercase; color: var(--mut); }
+.flow-stage-wrap .flow-stage { padding: var(--space-5); }
+.flow-stage-wrap .flow-caption { margin: var(--space-4) 0; padding: 16px 20px; font-size: 20px; line-height: 1.45; max-width: none; border-left-width: 12px; }
+.flow-stage-wrap .flow-step { display: inline-block; margin-right: 10px; padding: 2px 8px; background: var(--red); color: var(--on-red); }
+.flow-stage-wrap .flow-detail { max-width: none; padding: var(--space-5); display: grid; grid-template-columns: minmax(0, 1fr); gap: 8px; }
+.flow-stage-wrap .flow-detail h4 { font-size: 28px; margin: 0; }
+.flow-stage-wrap .flow-detail p { margin: 0; font-size: 17px; }
+.flow-stage-wrap .flow-detail .flow-links { display: flex; flex-wrap: wrap; gap: 8px 22px; }
+.flow-stage-wrap .flow-label { font-size: 20px; }
+/* The generic panel rule for direct children of the page column must not box a chapter: the chapter has its own banner and body. */
+.wrap > section.step { background: none; border: 0; padding: 0; margin: 104px 0 0; max-width: none; }
+@media (max-width: 700px) { .wrap > section.step { margin-top: 72px; } }

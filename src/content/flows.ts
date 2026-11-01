@@ -1,4 +1,5 @@
 import type { Flow, FlowLabels, FlowLayout, Lang } from "colagem-ui";
+import { wrapLayout } from "./wrapLayout";
 import generated from "../data/flows.generated.json";
 import { strings } from "./ui";
 
@@ -29,7 +30,7 @@ export async function loadFlows(ids: string[]): Promise<void> {
     if (flowCache.has(id)) continue;
     const [flow, layout] = await Promise.all([flowFiles[id]!(), layoutFiles[id]!()]);
     flowCache.set(id, (flow as { default: Flow }).default);
-    layoutCache.set(id, (layout as { default: FlowLayout }).default);
+    layoutCache.set(id, wrapLayout((layout as { default: FlowLayout }).default));
   }
 }
 

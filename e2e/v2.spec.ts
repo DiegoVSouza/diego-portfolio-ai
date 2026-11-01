@@ -32,22 +32,79 @@ test("the demo is ready on arrival: a clear call to action and the accounts with
   await expect(page.locator(".disclosure", { hasText: "Recent live runs" })).not.toHaveAttribute("open", "");
 });
 
-test("a guided-tour step opens on hover, smoothly, and by keyboard", async ({ page }) => {
+test("a guided-tour step opens on click and by keyboard, and never on hover", async ({ page }) => {
   test.skip(Boolean(process.env.PUBLIC_URL), "needs a mocked status");
   await mockApi(page);
   await page.goto("/projects/supportops/#demo");
   const step = page.locator(".tour-step").first();
   await step.scrollIntoViewIfNeeded();
   await expect(step).not.toHaveAttribute("open", "");
+  // Hovering does nothing: the step opens only when it is asked for.
   await step.hover();
+  await page.waitForTimeout(700);
+  await expect(step).not.toHaveAttribute("open", "");
+  await step.locator("summary").click();
   await expect(step).toHaveAttribute("open", "");
   await expect(step.locator(".disclosure-body")).toBeVisible();
-  await page.mouse.move(2, 2);
+  await step.locator("summary").click();
   await expect(step).not.toHaveAttribute("open", "", { timeout: 3000 });
-  // Keyboard: the summary toggles it, so nothing depends on hover.
+  // Keyboard: the summary toggles it.
   await step.locator("summary").focus();
   await page.keyboard.press("Enter");
   await expect(step).toHaveAttribute("open", "");
+});
+
+test("a project page is three separate chapters, each with a banner, a body and one action; the flow has its navigation and its scenarios on two rows", async ({ page }) => {
+  await mockApi(page);
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto("/projects/agents/");
+  const chapters = page.locator("section.step");
+  await expect(chapters).toHaveCount(3);
+  for (let i = 0; i < 3; i += 1) {
+    const chapter = chapters.nth(i);
+    await expect(chapter.locator(".chapter-head .chapter-kicker")).toContainText(`Step ${i + 1} of 3`);
+    await expect(chapter.locator(".chapter-body")).toBeVisible();
+    await expect(chapter.locator(".step-next .btn")).toHaveCount(1);
+  }
+  // Chapters do not touch: there is clear space between the end of one and the banner of the next.
+  const a = await chapters.nth(0).boundingBox();
+  const b = await chapters.nth(1).boundingBox();
+  expect(b!.y - (a!.y + a!.height)).toBeGreaterThanOrEqual(80);
+  // The README chapter opens with a sub-navigation to its parts.
+  const sub = page.getByRole("navigation", { name: "In this part" });
+  await expect(sub.getByRole("link")).toHaveCount(4);
+  // The flow: navigation buttons on the first row, scenarios under them, then the diagram.
+  const controls = page.locator("#flow .flow-controls");
+  await controls.scrollIntoViewIfNeeded();
+  const nav = await controls.locator(".flow-btn").first().boundingBox();
+  const next = await controls.locator(".flow-btn", { hasText: "Next" }).first().boundingBox();
+  expect(Math.abs(nav!.y - next!.y)).toBeLessThan(4);
+  const scenarios = controls.locator(".flow-scenarios");
+  if (await scenarios.count()) {
+    const row = await scenarios.boundingBox();
+    expect(row!.y).toBeGreaterThan(nav!.y + nav!.height);
+  }
+  const stage = await page.locator("#flow .flow-stage").boundingBox();
+  const bar = await controls.boundingBox();
+  expect(stage!.y).toBeGreaterThan(bar!.y + bar!.height - 2);
+});
+
+test("a wide diagram is folded into rows so its boxes are drawn large, and nothing is cut", async ({ page }) => {
+  await mockApi(page);
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto("/projects/supportops/");
+  const svg = page.locator("#flow .flow-h");
+  await svg.scrollIntoViewIfNeeded();
+  const size = await svg.evaluate((el) => {
+    const box = el.getBoundingClientRect();
+    const vb = (el as SVGSVGElement).viewBox.baseVal;
+    const node = el.querySelector(".flow-node .flow-box")!.getBoundingClientRect();
+    return { w: box.width, h: box.height, vbW: vb.width, nodeW: node.width, overflow: el.scrollWidth - el.clientWidth };
+  });
+  // The diagram is taller than a single row, and a node is drawn at least 110 px wide (it was about 114 px at best before, 85 on a 1000 px page).
+  expect(size.h).toBeGreaterThan(260);
+  expect(size.nodeW).toBeGreaterThan(110);
+  expect(size.overflow).toBeLessThanOrEqual(1);
 });
 
 test("a diagram fills its stop (no sideways scroll), says where to click, plays itself, and keeps its text version only for screen readers", async ({ page }) => {

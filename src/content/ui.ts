@@ -42,6 +42,12 @@ export interface Strings {
   openProject: string;
   flowHint: string;
   stackStatus: string;
+  stepKicker: string;
+  blurbDemo: string;
+  blurbRun: string;
+  blurbFlow: string;
+  blurbReadme: string;
+  subNavLabel: string;
   districtsLabel: string;
   menuPrompt: string;
   districtAnnounce: string;
@@ -216,7 +222,7 @@ const en: Strings = {
   copy: "Copy",
   copied: "Copied",
   accountsReady: "Ready to use. Sign in with one of these accounts.",
-  tourHint: "Hover a step to read it. On touch, tap.",
+  tourHint: "Click a step to read it.",
   techDetails: "Technical details",
   testsEvidence: "Tests and evidence",
   portfolioTitle: "An interactive portfolio",
@@ -224,6 +230,12 @@ const en: Strings = {
   openProject: "View project",
   flowHint: "Press Play, or click any box to see what it does. The pulse follows the current step.",
   stackStatus: "Stack status and start",
+  stepKicker: "Step {n} of {total}",
+  blurbDemo: "Open the live system and run it yourself.",
+  blurbRun: "Clone it and run one command to see it work.",
+  blurbFlow: "Follow one request through the system, step by step.",
+  blurbReadme: "Why it is built this way: decisions, failures and numbers.",
+  subNavLabel: "In this part",
   districtsLabel: "Districts",
   menuPrompt: "Where to?",
   districtAnnounce: "Stop {n} of {total}: {name}",
@@ -413,7 +425,7 @@ const pt: Strings = {
   copy: "Copiar",
   copied: "Copiado",
   accountsReady: "Pronto para usar. Entre com uma destas contas.",
-  tourHint: "Passe o mouse sobre um passo para ler. No toque, toque nele.",
+  tourHint: "Clique num passo para ler.",
   techDetails: "Detalhes técnicos",
   testsEvidence: "Testes e evidências",
   portfolioTitle: "Um portfólio interativo",
@@ -421,6 +433,12 @@ const pt: Strings = {
   openProject: "Ver projeto",
   flowHint: "Aperte Play, ou clique em qualquer caixa para ver o que ela faz. O pulso acompanha o passo atual.",
   stackStatus: "Estado da stack e início",
+  stepKicker: "Etapa {n} de {total}",
+  blurbDemo: "Abra o sistema ao vivo e rode você mesmo.",
+  blurbRun: "Clone e rode um comando para ver funcionando.",
+  blurbFlow: "Acompanhe um pedido pelo sistema, passo a passo.",
+  blurbReadme: "Por que foi construído assim: decisões, falhas e números.",
+  subNavLabel: "Nesta parte",
   districtsLabel: "Distritos",
   menuPrompt: "Para onde?",
   districtAnnounce: "Parada {n} de {total}: {name}",

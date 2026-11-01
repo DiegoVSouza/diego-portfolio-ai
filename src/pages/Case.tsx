@@ -1,4 +1,4 @@
-import { Command, DecisionCard, FailureCard, FlowDiagram, GhostNumber, Headline, Lead, LinkTrio, MetricTable, StatusSeal } from "colagem-ui";
+import { DecisionCard, FailureCard, FlowDiagram, GhostNumber, Headline, Lead, LinkTrio, MetricTable, StatusSeal } from "colagem-ui";
 import { cardBySlug, caseCards } from "../content/caseIndex";
 import { caseBySlug, type Case as CaseContent } from "../content/cases";
 import { ev, modeLabel, permalink, resolve } from "../content/evidence";
@@ -38,7 +38,6 @@ export function CasePage({ slug }: { slug: string }) {
       </p>
       <Headline>{c.name[lang]}</Headline>
       <Lead>{c.outcome[lang]}</Lead>
-      <Command verb="project open" object="" n={pos} />
       <p className="case-seal">
         <StatusSeal kind={c.seal.kind} label={c.seal.label[lang]} />
         <span className="sub">
@@ -77,6 +76,7 @@ export function CasePage({ slug }: { slug: string }) {
           {
             id: "demo",
             label: live ? t.stepDemo : t.demoReplay,
+            blurb: live ? t.blurbDemo : t.blurbRun,
             next: { label: t.nextToFlow, href: "#flow" },
             children: live ? (
               <section aria-labelledby="run-h">
@@ -100,6 +100,7 @@ ${c.validate.command}`}</code></pre>
           {
             id: "flow",
             label: t.stepFlow,
+            blurb: t.blurbFlow,
             next: { label: t.nextToReadme, href: "#readme" },
             children: (
               <section id="architecture" aria-labelledby="how-h">
@@ -120,9 +121,16 @@ ${c.validate.command}`}</code></pre>
           {
             id: "readme",
             label: t.stepReadme,
+            blurb: t.blurbReadme,
             next: nextStop,
             children: (
               <>
+                <nav className="sub-nav" aria-label={t.subNavLabel}>
+                  <a href="#dec-h">{t.decisions}</a>
+                  <a href="#fail-h">{t.failures}</a>
+                  <a href="#res-h">{t.results}</a>
+                  <a href="#diff-h">{t.differently}</a>
+                </nav>
                 <p className="surface-text">{t.readmeLead} <a href={pinnedLink(c.repoKey, "README.md")} rel="noopener noreferrer">{t.readmeOpen}</a></p>
                 <section id="decisions" aria-labelledby="dec-h">
                   <h3 id="dec-h" className="sub-h">{t.decisions}</h3>

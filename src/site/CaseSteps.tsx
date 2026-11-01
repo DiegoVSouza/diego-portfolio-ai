@@ -1,10 +1,13 @@
 import { useEffect, useState, type ReactNode } from "react";
+import { useLang } from "./Shell";
 import { Link } from "./router";
 
 export interface Step {
   /** Used in the hash: #demo, #flow, #readme. */
   id: string;
   label: string;
+  /** One line on what this stop is for. */
+  blurb: string;
   /** Ids inside the step that older links used (#architecture, #decisions, #numbers). A hash naming one scrolls there. */
   legacy?: string[];
   /** What the visitor does when this stop ends: the label and target of its primary action. */
@@ -19,6 +22,7 @@ export interface Step {
  */
 export function CaseSteps({ railLabel, labels, position, steps }: { railLabel: string; labels: string[]; position: string; steps: Step[] }) {
   const [current, setCurrent] = useState("");
+  const { t } = useLang();
 
   useEffect(() => {
     if (typeof IntersectionObserver === "undefined") return undefined;
@@ -56,12 +60,17 @@ export function CaseSteps({ railLabel, labels, position, steps }: { railLabel: s
       </nav>
       {steps.map((step, i) => (
         <section key={step.id} id={step.id} className="step" aria-labelledby={`${step.id}-h`}>
-          <h2 id={`${step.id}-h`} className="step-h">
-            <span className="step-n" aria-hidden="true">{i + 1}</span> {step.label}
-          </h2>
-          {step.children}
+          <header className="chapter-head">
+            <span className="chapter-n" aria-hidden="true">{i + 1}</span>
+            <div>
+              <p className="chapter-kicker">{t.stepKicker.replace("{n}", String(i + 1)).replace("{total}", String(steps.length))}</p>
+              <h2 id={`${step.id}-h`} className="chapter-title">{step.label}</h2>
+              <p className="chapter-blurb">{step.blurb}</p>
+            </div>
+          </header>
+          <div className="chapter-body">{step.children}</div>
           <p className="step-next">
-            {step.next.href.startsWith("#") ? <a className={i === steps.length - 1 ? "btn" : "btn btn-secondary"} href={step.next.href}>{step.next.label}</a> : <Link className={i === steps.length - 1 ? "btn" : "btn btn-secondary"} to={step.next.href}>{step.next.label}</Link>}
+            {step.next.href.startsWith("#") ? <a className={i === steps.length - 1 ? "btn btn-big" : "btn btn-secondary btn-big"} href={step.next.href}>{step.next.label}</a> : <Link className={i === steps.length - 1 ? "btn btn-big" : "btn btn-secondary btn-big"} to={step.next.href}>{step.next.label}</Link>}
           </p>
         </section>
       ))}
