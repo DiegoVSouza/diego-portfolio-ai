@@ -30,13 +30,24 @@ describe("prerendered HTML (SEO-001, SEC-001)", () => {
     }
   });
 
-  it("a case page has the fixed sections in order, with a Rejected line per decision", async () => {
+  it("a case page has the sections in the tab order, with a Rejected line per decision", async () => {
     const html = await renderToHtml("/projects/supportops/");
-    const order = ["tldr-h", "run-h", "how-h", "dec-h", "res-h", "fail-h", "val-h", "diff-h", "next-h"].map((id) => html.indexOf(`id="${id}"`));
+    // Four tab panels, each with its own headings: demo, architecture, decisions and failures, numbers.
+    const order = ["tldr-h", "run-h", "val-h", "how-h", "dec-h", "fail-h", "res-h", "diff-h", "next-h"].map((id) => html.indexOf(`id="${id}"`));
     expect(order.every((i) => i > 0)).toBe(true);
     expect([...order].sort((a, b) => a - b)).toEqual(order);
     expect((html.match(/class="rejected"/g) ?? []).length).toBeGreaterThanOrEqual(3);
     expect(html).toContain("Not measured, so not claimed");
+  });
+
+  it("the case tabs are an enhancement: in the HTML every panel is present and visible, and there is no tab bar", async () => {
+    const html = await renderToHtml("/projects/supportops/");
+    const panels = ["demo", "architecture", "decisions", "numbers"].map((id) => html.indexOf(`id="${id}"`));
+    expect(panels.every((i) => i > 0)).toBe(true);
+    expect([...panels].sort((a, b) => a - b)).toEqual(panels);
+    expect(html).not.toContain('role="tablist"');
+    expect(html).not.toMatch(/class="case-panel"[^>]*hidden/);
+    expect(html).toContain('href="#numbers"');
   });
 
   it("the diagram and its text version are in the HTML without JavaScript (FLOW-005)", async () => {

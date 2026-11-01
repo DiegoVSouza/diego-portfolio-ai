@@ -57,6 +57,7 @@ export function Home() {
 
       <section aria-labelledby="flag-h">
         <h2 id="flag-h" className="section-h">{t.flagshipTitle}</h2>
+        <div data-scene-case={flagship.slug} id={`project-${flagship.slug}`}>
         <Card
           variant="focus"
           index={1}
@@ -70,6 +71,7 @@ export function Home() {
           seal={<StatusSeal kind={flagship.seal.kind} label={flagship.seal.label[lang]} />}
           command={<Command verb="project open" object="" n={flagship.n} />}
         />
+        </div>
         <LinkTrio
           label={t.caseLinksLabel}
           links={[
@@ -84,7 +86,7 @@ export function Home() {
         <h2 id="projects-h" className="section-h">{t.projectsTitle}</h2>
         <ul className="grid">
           {caseCards.slice(1).map((c, i) => (
-            <li key={c.slug}>
+            <li key={c.slug} data-scene-case={c.slug} id={`project-${c.slug}`}>
               <Card
                 index={i}
                 numeral={c.n}

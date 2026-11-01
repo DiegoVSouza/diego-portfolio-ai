@@ -1,0 +1,148 @@
+{
+  "schemaVersion": 1,
+  "checkedAt": "2026-10-31",
+  "note": "Fatos marcados 'verified-live' foram testados com requisições reais em 2026-10-31. O resto vem de pesquisa herdada: reconfirme antes de depender. Referência de terceiros não é prova de licença: a prova é a página oficial do pacote/modelo.",
+  "providers": [
+    {
+      "id": "polyhaven",
+      "name": "Poly Haven",
+      "access": "api",
+      "license": "CC0",
+      "auth": "nenhuma; exige User-Agent próprio",
+      "api": "https://api.polyhaven.com (GET /assets?t=models|hdris|textures, /info/{id}, /files/{id})",
+      "status": "verified-live 2026-10-31",
+      "notes": "Modelos (gltf/fbx/blend com pasta 'include' de texturas+bin), HDRIs (hdr/exr) e texturas PBR. Todos CC0, sem atribuição. Use só em ferramenta de dev; nunca chame a API em runtime do jogo. Use 1k no MVP."
+    },
+    {
+      "id": "ambientcg",
+      "name": "ambientCG",
+      "access": "api",
+      "license": "CC0",
+      "auth": "nenhuma",
+      "api": "https://ambientcg.com/api/v2/full_json?q=&type=Material|HDRI|Decal&include=downloadData",
+      "status": "verified-live 2026-10-31 (v2 devolve downloadData; v3 só devolve ids sem include)",
+      "notes": "Texturas PBR, HDRIs e decals em ZIP (ex.: Bricks113A_1K-JPG.zip). O download redireciona para acg-download.struffelproductions.com. Não hardcode nomes de arquivo: consulte a API. Não há categoria de modelos 3D utilizável na API (filtro type=3DModel é ignorado)."
+    },
+    {
+      "id": "polypizza",
+      "name": "Poly Pizza",
+      "access": "api-key",
+      "license": "mista (CC0 / CC-BY / ...)",
+      "auth": "POLY_PIZZA_API_KEY (grátis em https://poly.pizza/settings/api), header X-Auth-Token",
+      "api": "https://api.poly.pizza/v1 (/search/{q}, /popular, /model/{id})",
+      "status": "unverified (site bloqueia leitura automática; não testado sem chave)",
+      "notes": "Low-poly GLB direto (campo Download, sem auth na CDN). Licenças mistas: o valor exato de 'Licence' para CC0 não foi confirmado. O CLI bloqueia valores desconhecidos; confirme na página do modelo e repita com --accept-licence CC0."
+    },
+    {
+      "id": "sketchfab",
+      "name": "Sketchfab",
+      "access": "api-token",
+      "license": "por modelo",
+      "auth": "SKETCHFAB_TOKEN (token pessoal) para baixar; a busca é pública",
+      "api": "https://api.sketchfab.com/v3 (/search?type=models&downloadable=true&license=cc0, /models/{uid}, /models/{uid}/download)",
+      "status": "search verified-live 2026-10-31; download não testado (precisa token)",
+      "notes": "Estilo inconsistente: valide modelo a modelo. O filtro license=cc0 não substitui conferir model.license.label ('CC0 Public Domain'). URL de download é assinada e expira: nunca logue nem guarde."
+    },
+    {
+      "id": "oga",
+      "name": "OpenGameArt",
+      "access": "direct",
+      "license": "por pacote",
+      "auth": "nenhuma; sem API",
+      "status": "6 URLs de pacotes Quaternius verified-live 2026-10-31 (HEAD 200 application/zip)",
+      "notes": "Arquivos em https://opengameart.org/sites/default/files/. Baixe uma vez, com cache e pausa de 1 s. Espelho pode ser versão mais antiga que a do itch.io: guarde SHA-256 e confira o conteúdo. Cuidado: há packs CC-BY e CC-BY-SA lá; confira a licença de cada página."
+    },
+    {
+      "id": "quaternius",
+      "name": "Quaternius (itch.io)",
+      "access": "manual",
+      "license": "CC0",
+      "auth": "nenhuma",
+      "status": "unverified",
+      "notes": "Base Characters, Modular Outfits etc. só no itch.io ('name your own price'). Baixe a mão e use 'pack <id>' ou 'register'. Não contorne o checkout."
+    },
+    {
+      "id": "kenney",
+      "name": "Kenney",
+      "access": "manual",
+      "license": "CC0",
+      "auth": "nenhuma",
+      "status": "unverified (link direto estável do zip não confirmado)",
+      "notes": "https://kenney.nl/assets (3D, UI, áudio, fontes). Baixe a mão. Confira a versão (ex.: Castle Kit v2.0; o espelho do OGA é provavelmente v1.0)."
+    },
+    {
+      "id": "kaykit",
+      "name": "KayKit",
+      "access": "manual",
+      "license": "CC0 (só o que for gratuito)",
+      "auth": "nenhuma",
+      "status": "unverified",
+      "notes": "Packs atuais maiores são pagos; só use o subconjunto gratuito, com licença conferida na página."
+    },
+    {
+      "id": "freesound",
+      "name": "Freesound (áudio)",
+      "access": "api-key",
+      "license": "filtrar 'Creative Commons 0'",
+      "auth": "chave grátis; original WAV/FLAC exige OAuth2",
+      "status": "unverified; sem adaptador neste kit",
+      "notes": "Fora do escopo 3D. Só mencionado porque jogos precisam de SFX."
+    }
+  ],
+  "packages": [
+    {
+      "id": "q-ual", "name": "Universal Animation Library [Standard]", "mode": "direct",
+      "author": "Quaternius", "license": "CC0", "page": "https://opengameart.org/node/174563",
+      "url": "https://opengameart.org/sites/default/files/universal_animation_librarystandard.zip",
+      "file": "universal_animation_librarystandard.zip", "approxMB": 14.5,
+      "caveat": "Espelho OGA pode ser versão antiga (itch.io re-exportou de 24 para 30 fps). Confira clipes com 'inspect'."
+    },
+    {
+      "id": "q-ual2", "name": "Universal Animation Library 2 [Standard]", "mode": "direct",
+      "author": "Quaternius", "license": "CC0", "page": "https://opengameart.org/content/universal-animation-library-2",
+      "url": "https://opengameart.org/sites/default/files/universal_animation_library_2standard.zip",
+      "file": "universal_animation_library_2standard.zip", "approxMB": 10.3
+    },
+    {
+      "id": "q-fantasy-props", "name": "Fantasy Props MegaKit [Standard]", "mode": "direct",
+      "author": "Quaternius", "license": "CC0", "page": "https://opengameart.org/content/fantasy-props-megakit",
+      "url": "https://opengameart.org/sites/default/files/fantasy_props_megakitstandard.zip",
+      "file": "fantasy_props_megakitstandard.zip", "approxMB": 73.7
+    },
+    {
+      "id": "q-medieval-village", "name": "Medieval Village MegaKit [Standard]", "mode": "direct",
+      "author": "Quaternius", "license": "CC0", "page": "https://opengameart.org/content/medieval-village-megakit",
+      "url": "https://opengameart.org/sites/default/files/medieval_village_megakitstandard.zip",
+      "file": "medieval_village_megakitstandard.zip", "approxMB": 100
+    },
+    {
+      "id": "q-guns", "name": "Low Poly Guns Pack (40 armas, FBX/OBJ/Blend: converter p/ GLB)", "mode": "direct",
+      "author": "Quaternius", "license": "CC0", "page": "https://opengameart.org/content/low-poly-guns-pack",
+      "url": "https://opengameart.org/sites/default/files/ultimate_gun_pack_by_quaternius.zip",
+      "file": "ultimate_gun_pack_by_quaternius.zip", "approxMB": 7.4
+    },
+    {
+      "id": "q-medieval-weapons", "name": "LowPoly Medieval Weapons 2018 (FBX/OBJ/Blend: converter p/ GLB)", "mode": "direct",
+      "author": "Quaternius", "license": "CC0", "page": "https://opengameart.org/node/88080",
+      "url": "https://opengameart.org/sites/default/files/Medieval%20Weapons%20Pack%20-%20Sept%202018.zip",
+      "file": "Medieval Weapons Pack - Sept 2018.zip", "approxMB": 3.7
+    },
+    {
+      "id": "q-base-characters", "name": "Universal Base Characters [Standard]", "mode": "manual",
+      "author": "Quaternius", "license": "CC0", "page": "https://quaternius.itch.io/universal-base-characters",
+      "file": "Universal Base Characters[Standard].zip", "approxMB": 122,
+      "caveat": "Conteúdo real do Standard (6 modelos anunciados vs. 2 por auditoria de terceiros) deve ser conferido ao abrir o zip."
+    },
+    {
+      "id": "q-outfits-fantasy", "name": "Modular Character Outfits - Fantasy [Standard]", "mode": "manual",
+      "author": "Quaternius", "license": "CC0", "page": "https://quaternius.itch.io/modular-character-outfits-fantasy",
+      "file": "Modular Character Outfits - Fantasy[Standard].zip", "approxMB": 270, "maxExtractMB": 2500,
+      "caveat": "Standard tem 4 outfits + ~20 peças; sem armadura pesada. O pacote Source é pago: ignore."
+    },
+    {
+      "id": "kenney-castle-kit", "name": "Kenney Castle Kit (usar v2.0)", "mode": "manual",
+      "author": "Kenney", "license": "CC0", "page": "https://kenney.nl/assets/castle-kit",
+      "file": "kenney_castle-kit.zip", "approxMB": 2.1
+    }
+  ]
+}

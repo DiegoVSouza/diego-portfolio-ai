@@ -90,8 +90,43 @@
 .cmd { display: inline-block; }
 
 /* Reading comes first. Every section of text sits on an opaque panel; the scene is the backdrop around and behind it. */
-.wrap > section { background: var(--ink); padding: 20px 24px; margin-block: 28px; border-left: 4px solid var(--red); }
-.wrap > section > :first-child { margin-top: 0; }
+.wrap > section, .case-panel > section { background: var(--ink); padding: 20px 24px; margin-block: 28px; border-left: 4px solid var(--red); }
+.wrap > section > :first-child, .case-panel > section > :first-child { margin-top: 0; }
 @media (max-width: 600px) { .wrap > section { padding: 16px; } }
 /* On a narrow screen the fixed HUD label would sit on top of the text. The page heading already says the same thing. */
 @media (max-width: 700px) { .hud { display: none; } }
+
+/* Case tabs: an enhancement. Without JavaScript the panels are stacked and there is no tab bar. */
+.tablist { display: flex; gap: 8px; overflow-x: auto; background: var(--ink); padding: 12px 16px; margin-top: 28px; border-left: 4px solid var(--red); }
+.tablist .tg { flex: none; white-space: nowrap; }
+.tablist [aria-selected="true"] { background: var(--red); border-color: var(--red); color: var(--on-red); }
+.case-panel[hidden] { display: none; }
+.case-tabs[data-enhanced="true"] .case-panel > section:first-child { margin-top: 0; }
+
+/* The descent: four stripes sweep the screen while a project opens. */
+.wipe { position: fixed; inset: 0; z-index: var(--z-wipe); pointer-events: none; overflow: hidden; visibility: hidden; }
+.wipe.go { visibility: visible; }
+.wipe i { position: absolute; top: -130%; height: 130%; width: 30vw; transform: skewX(-18deg); will-change: transform; }
+.wipe i:nth-child(1) { left: -6vw; background: var(--red); }
+.wipe i:nth-child(2) { left: 20vw; background: var(--paper); }
+.wipe i:nth-child(3) { left: 46vw; background: var(--ink-2); }
+.wipe i:nth-child(4) { left: 72vw; background: var(--red); }
+.wipe.go i { animation: sweep 500ms cubic-bezier(.7, 0, .3, 1) both; }
+.wipe.go i:nth-child(2) { animation-delay: 40ms; }
+.wipe.go i:nth-child(3) { animation-delay: 80ms; }
+.wipe.go i:nth-child(4) { animation-delay: 120ms; }
+@keyframes sweep { from { transform: translateY(0) skewX(-18deg); } to { transform: translateY(240%) skewX(-18deg); } }
+@media (prefers-reduced-motion: reduce) { .wipe.go i { animation: none; } .wipe { display: none; } }
+
+/* The simple version: text and diagrams only. */
+[data-simple="true"] .layers, [data-simple="true"] .screen-dots, [data-simple="true"] .scene, [data-simple="true"] .scene-controls, [data-simple="true"] .wipe { display: none !important; }
+.simple-toggle { margin-right: 8px; }
+.simple-toggle[aria-pressed="true"] { background: var(--red); border-color: var(--red); color: var(--on-red); }
+
+/* The project list on the home is one card per row: each card is a station of the flight, with its object beside it. */
+.wrap ul.grid { grid-template-columns: minmax(0, 640px); gap: 32px; }
+@media (max-width: 700px) { .wrap ul.grid { grid-template-columns: minmax(0, 1fr); } }
+
+/* On the home the panels leave the right side open, where each project's object stands. Wide content keeps its width. */
+[data-page="home"].wrap > section { max-width: 760px; }
+[data-page="home"].wrap > section[aria-labelledby="proof-h"], [data-page="home"].wrap > section[aria-labelledby="map-h"] { max-width: none; }

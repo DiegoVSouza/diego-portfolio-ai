@@ -60,7 +60,9 @@ test("English and Portuguese link to each other and set the document language", 
   expect(await page.evaluate(() => document.documentElement.lang)).toBe("en");
   await page.getByRole("link", { name: "PT" }).click();
   await expect(page).toHaveURL(/\/pt\/projects\/agents\/$/);
-  expect(await page.evaluate(() => document.documentElement.lang)).toBe("pt-BR");
+  await expect(page.locator("html")).toHaveAttribute("lang", "pt-BR");
+  // The failure gallery is in the Decisions tab.
+  await page.getByRole("tab", { name: "Decisões" }).click();
   await expect(page.getByRole("heading", { level: 2, name: /Galeria de falhas/i })).toBeVisible();
 });
 
@@ -83,6 +85,7 @@ test("the diagram walks through scenes and a failure scenario by keyboard, at bo
     await page.goto("/projects/supportops/");
     // The buttons only act once the page is hydrated; the palette button appears after hydration.
     await page.locator("button.palette-open[data-ready]").waitFor();
+    await page.getByRole("tab", { name: "Architecture" }).click();
     const next = page.getByRole("button", { name: "Next" }).first();
     await next.focus();
     await page.keyboard.press("Enter");

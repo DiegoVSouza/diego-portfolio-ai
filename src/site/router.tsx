@@ -2,6 +2,7 @@ import { createContext, useCallback, useContext, useEffect, useState, type Ancho
 import type { Lang } from "colagem-ui";
 import { caseCards } from "../content/caseIndex";
 import { preload } from "./pages";
+import { descend } from "./wipe";
 
 /** Real paths, prerendered: EN at the root, pt-BR under /pt/. */
 export type Page = "home" | "demo" | "case" | "evidence" | "method" | "experience" | "design-system" | "not-found";
@@ -14,7 +15,8 @@ export interface Route {
 const STATIC: Record<string, Page> = { "": "home", demo: "demo", evidence: "evidence", method: "method", experience: "experience", "design-system": "design-system" };
 
 export function parsePath(pathname: string): Route {
-  const parts = pathname.split("/").filter(Boolean);
+  // A hash or a query string is not part of the route: /projects/agents/#numbers is the agents case.
+  const parts = (pathname.split(/[?#]/)[0] ?? "").split("/").filter(Boolean);
   const lang: Lang = parts[0] === "pt" ? "pt" : "en";
   const rest = lang === "pt" ? parts.slice(1) : parts;
   if (rest.length === 0) return { lang, page: "home" };
@@ -58,9 +60,15 @@ export function RouterProvider({ initial, children }: { initial: string; childre
   }, []);
   const go = useCallback((to: string) => {
     // Load the page's chunk first, then switch, so the old page stays up instead of a blank one.
-    void preload(parsePath(to)).then(() => {
-      window.history.pushState({}, "", to);
-      setPath(to);
+    const target = parsePath(to);
+    void preload(target).then(() => {
+      const change = () => {
+        window.history.pushState({}, "", to);
+        setPath(to);
+      };
+      // Opening a project is the descent: the stripes cover the change. Everything else changes at once.
+      if (target.page === "case") descend(change);
+      else change();
     });
   }, []);
   const route = parsePath(path);

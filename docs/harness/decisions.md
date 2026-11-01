@@ -33,3 +33,9 @@ The owner reversed the earlier rule and asked for the phone number and a WhatsAp
 - **Measured:** worst-route first-load JavaScript 96.6 KB gzip with React, 37.9 KB with Preact. Local Lighthouse mobile on the Preact build: performance 85, LCP 2.0 s, TBT 500 ms (a local run, not the same network as the live run). The full e2e suite (22 tests: axe, CSP, hydration errors, no JavaScript, keyboard, scene, palette) passes against the Preact build.
 - **Cost and risk:** unit tests do not exercise Preact, so a behavior difference would show only in e2e. `REACT_BUILD=1 npm run build` builds with React for comparison. Preact 10.29.2 and preact-render-to-string 6.6.1 are pinned.
 - **Rejected:** deferring hydration to idle (it moves the long task, it does not remove it), and lazy Suspense boundaries around sections (they need the lazy chunk resolved at prerender and add boundaries without cutting the shared React cost).
+
+## 2026-11-01: the v5 scene replaces the generated one, and two Kenney models are allowed
+
+- **Why:** the owner asked to use the v5 file as the source of the scene, with better assets from the asset kit, and the earlier scene was my own approximation of it.
+- **Decision:** `src/scene/` is the v5 scene as TypeScript modules, driven by the tokens. The earlier spec said "all geometry is generated, no GLB". That is relaxed for two files: the Kenney truck and motorcycle (CC0) from the v5 file, textures stripped, self-hosted under `assets/game/models/`, registered in `assets/ledger.json`. The CSP does not change (`connect-src 'self'` covers the fetch).
+- **Asset search result:** Poly Haven (CC0) has realistic, high-polygon models only; the Quaternius packs the kit can download are medieval and fantasy. Neither fits a flat collage night city, so nothing else was imported. Kenney's Car Kit and City Kit, or Poly Pizza with a key, are the next candidates and need the owner.

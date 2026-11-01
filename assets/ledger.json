@@ -1,0 +1,40 @@
+{
+  "assets": [
+    {
+      "path": "assets/game/models/moto.glb",
+      "author": "Kenney (kenney.nl), textures removed by scripts/glb_strip_textures.py",
+      "license": "CC0",
+      "url": "https://kenney.nl/assets",
+      "source": "manual",
+      "sha256": "58379a2d1592354d1931dc483034ab2a05b869d2a5d56b2bcd2aaf2b495f5d69",
+      "fetchedAt": "2026-11-01T02:44:29.557Z"
+    },
+    {
+      "path": "assets/game/models/truck.glb",
+      "author": "Kenney (kenney.nl), textures removed by scripts/glb_strip_textures.py",
+      "license": "CC0",
+      "url": "https://kenney.nl/assets",
+      "source": "manual",
+      "sha256": "483d428c82f8316118b25f5531c8d481a11551b0c0e459021f6afd9e862bbe1e",
+      "fetchedAt": "2026-11-01T02:44:29.559Z"
+    },
+    {
+      "path": "assets/raw/v5-embedded/moto.glb",
+      "author": "Kenney (kenney.nl)",
+      "license": "CC0",
+      "url": "https://kenney.nl/assets",
+      "source": "manual",
+      "sha256": "c97911b8dbc2d5dd9d1961b46eb4d1f132b67a6c5a84f45593fea44e0595dd92",
+      "fetchedAt": "2026-11-01T02:43:25.275Z"
+    },
+    {
+      "path": "assets/raw/v5-embedded/truck.glb",
+      "author": "Kenney (kenney.nl)",
+      "license": "CC0",
+      "url": "https://kenney.nl/assets",
+      "source": "manual",
+      "sha256": "eca99bd9ab0a2b02125f915e65d1ec8f1c5a93be7c6d4840efdac6633f47772c",
+      "fetchedAt": "2026-11-01T02:43:25.276Z"
+    }
+  ]
+}

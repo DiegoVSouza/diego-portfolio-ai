@@ -1,3 +1,3 @@
-    e2e\site.spec.ts:20:3 › every route passes axe with contrast, does not overflow, and logs no errors at 1000px 
-    e2e\site.spec.ts:20:3 › every route passes axe with contrast, does not overflow, and logs no errors at 360px 
-  20 passed (58.3s)
+  ✓  23 e2e\site.spec.ts:119:1 › the demo page passes axe when a real run lights nodes in the diagram (accessible names include the measurement) (2.7s)
+
+  23 passed (1.5m)

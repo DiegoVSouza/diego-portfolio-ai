@@ -1,7 +1,10 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { BackgroundMode } from "colagem-ui";
 import { useLang } from "../site/Shell";
+import { useSimple } from "../site/simple";
 import { onPulse } from "./pulse";
+import motoUrl from "../../assets/game/models/moto.glb?url";
+import truckUrl from "../../assets/game/models/truck.glb?url";
 import type { Quality, SceneController } from "./scene";
 
 /** Loads after first paint, on idle. If anything fails the level 1 background stays and the page never notices. */
@@ -35,6 +38,7 @@ export function SceneHost({ mode, slugs, labels, focusSlug, pulseKey }: { mode: 
   const canvas = useRef<HTMLCanvasElement | null>(null);
   const controller = useRef<SceneController | null>(null);
   const { t } = useLang();
+  const simple = useSimple();
   const [running, setRunning] = useState(false);
   // The server renders no canvas, so the client adds it only after hydration. Nothing can mismatch.
   const [mounted, setMounted] = useState(false);
@@ -54,7 +58,7 @@ export function SceneHost({ mode, slugs, labels, focusSlug, pulseKey }: { mode: 
   const focus = focusSlug === undefined ? undefined : slugs.indexOf(focusSlug);
 
   useEffect(() => {
-    if (!mounted || mode === "2d" || saveData() || portrait() || !canvas.current) return undefined;
+    if (!mounted || simple || mode === "2d" || saveData() || portrait() || !canvas.current) return undefined;
     const element = canvas.current;
     let cancelled = false;
     const cancelIdle = onIdle(() => {
@@ -65,6 +69,7 @@ export function SceneHost({ mode, slugs, labels, focusSlug, pulseKey }: { mode: 
             controller.current = start(element, {
               slugs: slugKey.split(","),
               mode,
+              models: { truck: truckUrl, moto: motoUrl },
               halftone: readHalftone(),
               focus: focus === undefined || focus < 0 ? undefined : focus,
               onActive: (index) => {
@@ -97,7 +102,7 @@ export function SceneHost({ mode, slugs, labels, focusSlug, pulseKey }: { mode: 
       controller.current = null;
       setRunning(false);
     };
-  }, [mounted, mode, slugKey, focus]);
+  }, [mounted, simple, mode, slugKey, focus]);
 
   useEffect(() => {
     if (pulseKey) controller.current?.pulse();
@@ -138,7 +143,7 @@ export function SceneHost({ mode, slugs, labels, focusSlug, pulseKey }: { mode: 
     controller.current?.setMotion(!motion);
   };
 
-  if (!mounted || mode === "2d" || portrait()) return null;
+  if (!mounted || simple || mode === "2d" || portrait()) return null;
   return (
     <>
       <canvas ref={canvas} className={running ? "scene on" : "scene"} aria-hidden="true" />
