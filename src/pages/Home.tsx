@@ -1,4 +1,4 @@
-import { Band, Card, Command, GhostNumber, Headline, Lead, LinkTrio, Plate, StatusSeal } from "colagem-ui";
+import { Card, Command, GhostNumber, Headline, Lead, LinkTrio, Plate, StatusSeal } from "colagem-ui";
 import { caseCards } from "../content/caseIndex";
 import { ev, modeLabel, permalink } from "../content/evidence";
 import { pinnedLink } from "../content/flows";
@@ -20,19 +20,9 @@ export function Home() {
         <Link className="btn" to={hrefFor({ page: "case", slug: flagship.slug }, lang)}>{t.heroCta}</Link>
         <Link className="btn btn-secondary" to={`${hrefFor({ page: "case", slug: flagship.slug }, lang)}#demo`}>{t.navDemo}</Link>
       </p>
-      <Command verb="project open" object="" n="01" />
-      <Band words={t.band} />
-
-      <section aria-labelledby="about-h">
-        <h2 id="about-h" className="section-h">{t.aboutTitle}</h2>
-        <p className="surface-text">{profile.summary[lang]}</p>
-        <ul className="plain">
-          {profile.career.slice(0, 2).map((j) => (
-            <li key={j.id}><strong>{j.role}</strong>, {j.org}. <span className="sub">{j.from} to {j.to} · {t.careerNote}</span></li>
-          ))}
-        </ul>
-        <p><Link to={hrefFor({ page: "experience" }, lang)}>{t.navExperience}</Link></p>
-      </section>
+      <ol className="hero-steps" aria-label={t.heroStepsLabel}>
+        {t.heroSteps.map((step) => <li key={step}>{step}</li>)}
+      </ol>
 
       <section aria-labelledby="proof-h">
         <h2 id="proof-h" className="section-h">{t.proofTitle}</h2>
@@ -52,12 +42,6 @@ export function Home() {
           })}
         </ul>
         <p className="surface-text"><Link to={hrefFor({ page: "evidence" }, lang)}>{t.navEvidence}</Link></p>
-      </section>
-
-      <section aria-labelledby="tour-h">
-        <h2 id="tour-h" className="section-h">{t.tourTitle}</h2>
-        <p className="surface-text">{t.tourLead}</p>
-        <p><Link className="btn" to={hrefFor({ page: "case", slug: flagship.slug }, lang)}>{t.tourStart}</Link></p>
       </section>
 
       <section aria-labelledby="flag-h">
@@ -106,6 +90,17 @@ export function Home() {
             </li>
           ))}
         </ul>
+      </section>
+
+      <section aria-labelledby="about-h">
+        <h2 id="about-h" className="section-h">{t.aboutTitle}</h2>
+        <p className="surface-text">{profile.summary[lang]}</p>
+        <ul className="plain">
+          {profile.career.slice(0, 2).map((j) => (
+            <li key={j.id}><strong>{j.role}</strong>, {j.org}. <span className="sub">{j.from} to {j.to} · {t.careerNote}</span></li>
+          ))}
+        </ul>
+        <p><Link to={hrefFor({ page: "experience" }, lang)}>{t.navExperience}</Link></p>
       </section>
 
       <section aria-labelledby="contact-h">

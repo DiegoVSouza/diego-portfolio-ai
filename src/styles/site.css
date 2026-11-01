@@ -26,6 +26,9 @@
 /* ---- pages (layout only; color, font and shape come from the tokens) ---- */
 .cta { display: flex; flex-wrap: wrap; gap: var(--space-3); margin: var(--space-5) 0; }
 .cta .btn, .case-focus .btn, .btn { display: inline-flex; align-items: center; text-decoration: none; }
+.hero-steps { list-style: none; counter-reset: step; display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr)); gap: var(--space-3); padding: 0; margin: var(--space-4) 0 var(--space-6); }
+.hero-steps li { counter-increment: step; background: var(--card); color: var(--paper); border-left: 4px solid var(--red); padding: var(--space-3) var(--space-4); }
+.hero-steps li::before { content: counter(step) ". "; color: var(--red-text); font-weight: 700; }
 .proof { list-style: none; padding: 0; margin: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr)); gap: var(--space-4); }
 .proof-item { background: var(--card); color: var(--paper); border-left: 8px solid var(--red); padding: var(--space-4); }
 .proof-value { font-family: var(--f-display); font-size: clamp(30px, 5vw, 44px); margin: 0; line-height: 1.1; }

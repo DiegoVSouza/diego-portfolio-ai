@@ -84,9 +84,9 @@ describe("prerendered HTML (SEO-001, SEC-001)", () => {
     expect(last).toContain("Last stop: contact");
   });
 
-  it("the home page opens with About, then the proof, then the tour (FLOW-001)", async () => {
+  it("the home page opens with the proof, then the flagship and projects, then About and contact (FLOW-001)", async () => {
     const html = await renderToHtml("/");
-    const order = ["about-h", "proof-h", "tour-h", "flag-h", "projects-h", "contact-h"].map((id) => html.indexOf(`id="${id}"`));
+    const order = ["proof-h", "flag-h", "projects-h", "about-h", "contact-h"].map((id) => html.indexOf(`id="${id}"`));
     expect(order.every((i) => i > 0)).toBe(true);
     expect([...order].sort((a, b) => a - b)).toEqual(order);
     expect(html).not.toContain('id="map-h"');
