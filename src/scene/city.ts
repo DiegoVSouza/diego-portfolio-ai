@@ -70,7 +70,7 @@ export async function buildCity(c: CityContext): Promise<City> {
 
   await tick();
   /* ---------- FRENTE: speed streaks and torn paper ---------- */
-  const STREAKS = 60;
+  const STREAKS = 24;
   const streaks = new THREE.InstancedMesh(new THREE.BoxGeometry(1, 1, 1), new THREE.MeshStandardMaterial({ roughness: 0.6, metalness: 0.1, flatShading: true }), STREAKS);
   streaks.frustumCulled = false;
   const streakTones = [p.red, p.red, grey(0.15), grey(0.15), p.paper];
@@ -93,7 +93,7 @@ export async function buildCity(c: CityContext): Promise<City> {
   streaks.instanceMatrix.needsUpdate = true;
   scene.add(streaks);
 
-  const SCRAPS = 36;
+  const SCRAPS = 14;
   const scrapShape = new THREE.Shape([[-0.5, -0.6], [0.1, -0.72], [0.55, -0.3], [0.46, 0.5], [-0.1, 0.66], [-0.56, 0.2]].map(([x, y]) => new THREE.Vector2(x, y)));
   const scraps = new THREE.InstancedMesh(new THREE.ShapeGeometry(scrapShape), new THREE.MeshStandardMaterial({ flatShading: true, side: THREE.DoubleSide, roughness: 0.9 }), SCRAPS);
   scraps.frustumCulled = false;
@@ -132,7 +132,7 @@ export async function buildCity(c: CityContext): Promise<City> {
   const towerParts: THREE.BufferGeometry[] = [];
   const beacons: THREE.BufferGeometry[] = [];
   const signSpots: { x: number; y: number; z: number }[] = [];
-  for (let n = 0; n < 56; n += 1) {
+  for (let n = 0; n < 34; n += 1) {
     const t = -0.8 + rnd() * (NC + 1.6);
     const { p: at, R } = c.frameAt(t);
     const s = n % 2 ? 1 : -1;
@@ -248,7 +248,7 @@ export async function buildCity(c: CityContext): Promise<City> {
   await tick();
   /* ---------- MEIO: avenue with light trails and vehicles ---------- */
   const road = c.lane(-5, -11, 2);
-  const TRAILS = 46;
+  const TRAILS = 20;
   const trails = new THREE.InstancedMesh(new THREE.BoxGeometry(0.14, 0.14, 1), new THREE.MeshBasicMaterial(), TRAILS);
   trails.frustumCulled = false;
   const trailData = Array.from({ length: TRAILS }, (_, i) => {
@@ -322,7 +322,7 @@ export async function buildCity(c: CityContext): Promise<City> {
         pts.push(p0.x, p0.y, p0.z, p1.x, p1.y, p1.z);
       }
     };
-    for (let n = 0; n < 26; n += 1) {
+    for (let n = 0; n < 10; n += 1) {
       const t = -0.6 + rnd() * (NC + 1.2);
       const { p: at, R } = c.frameAt(t);
       const s = rnd() < 0.5 ? 1 : -1;
@@ -331,7 +331,7 @@ export async function buildCity(c: CityContext): Promise<City> {
       const a = V3(at.x + R.x * s * lat, at.y + 6 + rnd() * 14, at.z + R.z * s * lat);
       seg(a, V3(a.x + (rnd() - 0.3) * len * 0.5, a.y + (rnd() - 0.5) * 5, a.z - len), 1 + rnd() * 2);
     }
-    for (let n = 0; n < 10; n += 1) {
+    for (let n = 0; n < 4; n += 1) {
       const t = -0.4 + rnd() * (NC + 0.8);
       const { p: at, R } = c.frameAt(t);
       const y0 = at.y + 7 + rnd() * 9;

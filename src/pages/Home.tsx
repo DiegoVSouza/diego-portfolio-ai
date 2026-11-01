@@ -1,12 +1,9 @@
 import { Card, Command, GhostNumber, Headline, Lead, LinkTrio, Plate, StatusSeal } from "colagem-ui";
 import { caseCards } from "../content/caseIndex";
-import { ev, modeLabel, permalink } from "../content/evidence";
 import { pinnedLink } from "../content/flows";
 import { profile } from "../content/profile";
 import { Link, hrefFor } from "../site/router";
 import { useLang } from "../site/Shell";
-
-const PROOF = ["p00-trials", "p05-demo-live", "p05-dual-control"];
 
 export function Home() {
   const { lang, t } = useLang();
@@ -23,26 +20,6 @@ export function Home() {
       <ol className="hero-steps" aria-label={t.heroStepsLabel}>
         {t.heroSteps.map((step) => <li key={step}>{step}</li>)}
       </ol>
-
-      <section aria-labelledby="proof-h">
-        <h2 id="proof-h" className="section-h">{t.proofTitle}</h2>
-        <ul className="proof">
-          {PROOF.map((id) => {
-            const e = ev(id);
-            return (
-              <li key={id} className="proof-item">
-                <p className="proof-value">{e.value}</p>
-                <p className="proof-label">{e.label[lang]}</p>
-                <p className="proof-meta">
-                  <StatusSeal kind={e.mode === "live" ? "partial" : "full"} label={modeLabel(e.mode, lang)} /> <a href={permalink(e)} rel="noopener noreferrer">{t.commit} {e.commit.slice(0, 7)}</a>
-                </p>
-                {e.caveat && <p className="proof-caveat">{e.caveat[lang]}</p>}
-              </li>
-            );
-          })}
-        </ul>
-        <p className="surface-text"><Link to={hrefFor({ page: "evidence" }, lang)}>{t.navEvidence}</Link></p>
-      </section>
 
       <section aria-labelledby="flag-h">
         <h2 id="flag-h" className="section-h">{t.flagshipTitle}</h2>
