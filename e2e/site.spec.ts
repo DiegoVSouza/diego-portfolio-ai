@@ -84,12 +84,14 @@ test("the diagram walks through scenes and a failure scenario by keyboard, at bo
     await page.goto("/projects/supportops/");
     // The buttons only act once the page is hydrated; the palette button appears after hydration.
     await page.locator("button.palette-open[data-ready]").waitFor();
-    const next = page.getByRole("button", { name: "Next", exact: true }).first();
+    // The Flow stop only: the live demo above it has its own Next button (the guided tour of the demo).
+    const flow = page.locator("#flow");
+    const next = flow.getByRole("button", { name: "Next", exact: true });
     await next.focus();
     await page.keyboard.press("Enter");
-    await expect(page.getByRole("status").filter({ hasText: /1\/3/ })).toBeVisible();
-    await page.getByRole("button", { name: "Approve your own refund" }).first().click();
-    await expect(page.getByRole("status").filter({ hasText: /requester tries to approve/i })).toBeVisible();
+    await expect(flow.getByRole("status").filter({ hasText: /1\/3/ })).toBeVisible();
+    await flow.getByRole("button", { name: "Approve your own refund" }).click();
+    await expect(flow.getByRole("status").filter({ hasText: /requester tries to approve/i })).toBeVisible();
   }
 });
 

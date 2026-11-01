@@ -45,3 +45,14 @@ An audit of the running site (1280 and 390 px, EN and PT) found three serious pr
 `check_full`: exit 0, 60 unit and 38 e2e tests, budget 40.0 KB gzip.
 
 Still open: the live demo cannot start until the Turnstile site key and secret are deployed to Pages (owner configured them in `.env`; not yet wired). The desktop diagram's sideways scroll has no visible hint other than the clipped last node. Contrast of text over the 3D scene is not measured.
+
+## The live demo moves into the flow (2026-11-01)
+
+The owner pointed out that sending the visitor to `/demo/` broke the single flow. The SupportOps case now holds the live demo inside its first stop (`DemoPanel`, headings one level down). The home buttons, the case link row and the palette point to `/projects/supportops/#demo`. `/demo/` remains as a direct URL for old links and is no longer linked from the header or the footer.
+
+- CSP: `/projects/supportops/` and `/pt/projects/supportops/` may load Turnstile, like `/demo/` (`scripts/prerender.mjs`, `public/_headers.template`, both checked in `dist/_headers`). Every other route keeps the strict policy.
+- Defect found by the e2e suite: the case page did not preload the `system` flow the demo uses ("flow system is not loaded"). Fixed in `src/site/pages.ts`.
+- New unit test: the demo status section sits inside the first stop, before the flow stop, and no other case has it.
+- `site.spec.ts`: the diagram test is scoped to `#flow`, since the demo's guided tour has its own Next button.
+- `check_full`: exit 0, 61 unit and 38 e2e tests, worst route 42.1 KB gzip.
+- Read in a browser at 1280 and 390 px with the status API stubbed. Not deployed; production still has the previous version.

@@ -18,7 +18,7 @@ export function Home() {
       <Lead>{t.heroLead}</Lead>
       <p className="cta">
         <Link className="btn" to={hrefFor({ page: "case", slug: flagship.slug }, lang)}>{t.heroCta}</Link>
-        <Link className="btn btn-secondary" to={hrefFor({ page: "demo" }, lang)}>{t.navDemo}</Link>
+        <Link className="btn btn-secondary" to={`${hrefFor({ page: "case", slug: flagship.slug }, lang)}#demo`}>{t.navDemo}</Link>
       </p>
       <Command verb="project open" object="" n="01" />
       <Band words={t.band} />
@@ -80,7 +80,7 @@ export function Home() {
         <LinkTrio
           label={t.caseLinksLabel}
           links={[
-            { label: t.linkDemo, href: hrefFor({ page: "demo" }, lang) },
+            { label: t.linkDemo, href: `${hrefFor({ page: "case", slug: flagship.slug }, lang)}#demo` },
             { label: t.linkCode, href: `https://github.com/DiegoVSouza/${flagship.repo}` },
             { label: t.linkDocs, href: pinnedLink(flagship.repoKey, "docs/architecture.md") },
           ]}

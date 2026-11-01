@@ -29,7 +29,7 @@ export function Palette() {
   const items = useMemo<Item[]>(
     () => [
       { id: "home", label: t.navHome, href: hrefFor({ page: "home" }, lang) },
-      { id: "demo", label: t.navDemo, href: hrefFor({ page: "demo" }, lang) },
+      { id: "demo", label: t.navDemo, href: `${hrefFor({ page: "case", slug: "supportops" }, lang)}#demo` },
       { id: "evidence", label: t.navEvidence, href: hrefFor({ page: "evidence" }, lang) },
       { id: "method", label: t.navMethod, href: hrefFor({ page: "method" }, lang) },
       { id: "experience", label: t.navExperience, href: hrefFor({ page: "experience" }, lang) },

@@ -24,7 +24,7 @@ const loaded = new Map<Page, ComponentType<{ slug?: string }>>();
 
 /** Flows a page draws. */
 const flowsFor = (route: Pick<Route, "page" | "slug">): string[] =>
-  route.page === "home" || route.page === "demo" ? ["system"] : route.page === "method" ? ["harness"] : route.page === "case" && route.slug ? [route.slug] : [];
+  route.page === "home" || route.page === "demo" ? ["system"] : route.page === "method" ? ["harness"] : route.page === "case" && route.slug ? (route.slug === "supportops" ? [route.slug, "system"] : [route.slug]) : [];
 
 /** Load everything a route needs before it renders: its page chunk, its case text and its flows. */
 export async function preload(route: Pick<Route, "page" | "slug">): Promise<void> {

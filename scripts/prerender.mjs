@@ -34,7 +34,7 @@ function chunksFor(route) {
   return [...seen].map((k) => manifest[k].file);
 }
 
-// One strict policy. Only /demo/ may load Turnstile (SEC-001), and only from this one origin.
+// One strict policy. Only the pages that hold the live demo (/demo/ and the SupportOps case) may load Turnstile (SEC-001), and only from this one origin.
 const STRICT = "default-src 'none'; script-src 'self'; style-src 'self'; font-src 'self'; img-src 'self' data:; connect-src 'self'; form-action 'none'; base-uri 'none'";
 const TURNSTILE = "default-src 'none'; script-src 'self' https://challenges.cloudflare.com; style-src 'self'; font-src 'self'; img-src 'self' data:; connect-src 'self'; frame-src https://challenges.cloudflare.com; form-action 'none'; base-uri 'none'";
 const esc = (s) => s.replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;");
@@ -43,7 +43,7 @@ async function page(url) {
   const meta = server.head(url);
   const route = server.route(url);
   const preloads = chunksFor(route).map((f) => `<link rel="modulepreload" href="/${f}" />`);
-  const demo = /\/demo\/$/.test(url);
+  const demo = /\/(demo|projects\/supportops)\/$/.test(url);
   const abs = SITE + url;
   const tags = [
     `<meta http-equiv="Content-Security-Policy" content="${demo ? TURNSTILE : STRICT}" />`,

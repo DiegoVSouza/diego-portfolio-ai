@@ -5,6 +5,7 @@ import { ev, modeLabel, permalink, resolve } from "../content/evidence";
 import { OWNER, REPO_NAMES, flowLabels, getFlow, getLayout, pinDates, pinnedLink, pins } from "../content/flows";
 import { Link, hrefFor } from "../site/router";
 import { CaseSteps } from "../site/CaseSteps";
+import { DemoPanel } from "./Demo";
 import { FlowScroll } from "../site/FlowScroll";
 import { useLang } from "../site/Shell";
 import { NotFound } from "./NotFound";
@@ -48,7 +49,7 @@ export function CasePage({ slug }: { slug: string }) {
       <LinkTrio
         label={t.caseLinksLabel}
         links={[
-          { label: live ? t.linkDemo : t.demoReplay, href: live ? hrefFor({ page: "demo" }, lang) : "#demo" },
+          { label: live ? t.linkDemo : t.demoReplay, href: "#demo" },
           { label: t.linkCode, href: repoUrl },
           { label: t.linkDocs, href: pinnedLink(c.repoKey, c.repoKey === "p07" ? "docs/architecture.md" : "docs/architecture.md") },
         ]}
@@ -81,7 +82,7 @@ export function CasePage({ slug }: { slug: string }) {
               <section aria-labelledby="run-h">
                 <h3 id="run-h" className="sub-h">{t.seeItRun}</h3>
                 <p className="surface-text">{t.seeItRunBody}</p>
-                <p><Link className="btn" to={hrefFor({ page: "demo" }, lang)}>{t.linkDemo}</Link></p>
+                <DemoPanel embedded />
               </section>
             ) : (
               <section>

@@ -40,6 +40,20 @@ describe("prerendered HTML (SEO-001, SEC-001)", () => {
     expect(html).toContain("Not measured, so not claimed");
   });
 
+  it("the live demo is inside the first stop of the SupportOps case, not on another page (FLOW-001)", async () => {
+    const html = await renderToHtml("/projects/supportops/");
+    const demo = html.indexOf('<section id="demo"');
+    const flow = html.indexOf('<section id="flow"');
+    const status = html.indexOf('id="status-h"');
+    expect(demo).toBeGreaterThan(0);
+    expect(status).toBeGreaterThan(demo);
+    expect(status).toBeLessThan(flow);
+    expect(html).toContain("Stack status");
+    expect(html).not.toContain('href="/demo/"');
+    const other = await renderToHtml("/projects/agents/");
+    expect(other).not.toContain('id="status-h"');
+  });
+
   it("a case without a live backend offers the command to reproduce it, in the first stop", async () => {
     const html = await renderToHtml("/projects/agents/");
     const order = ["val-h", "how-h", "dec-h"].map((id) => html.indexOf(`id="${id}"`));

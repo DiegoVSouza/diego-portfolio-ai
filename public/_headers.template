@@ -10,6 +10,12 @@
 /pt/demo/
   ! Content-Security-Policy
   Content-Security-Policy: {{TURNSTILE}}
+/projects/supportops/
+  ! Content-Security-Policy
+  Content-Security-Policy: {{TURNSTILE}}
+/pt/projects/supportops/
+  ! Content-Security-Policy
+  Content-Security-Policy: {{TURNSTILE}}
 /assets/*
   Cache-Control: public, max-age=31536000, immutable
 /api/*

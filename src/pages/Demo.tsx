@@ -59,7 +59,8 @@ function useTurnstile(siteKey: string | null | undefined, onToken: (token: strin
   return box;
 }
 
-export function DemoPage() {
+/** The live demo itself. Embedded in the first stop of the SupportOps case, and shown alone on /demo/. */
+export function DemoPanel({ embedded = false }: { embedded?: boolean }) {
   const { lang, t } = useLang();
   const [status, setStatus] = useState<StatusReply | null>(null);
   const [loaded, setLoaded] = useState(false);
@@ -68,6 +69,9 @@ export function DemoPage() {
   const [waking, setWaking] = useState(false);
   const [failed, setFailed] = useState(false);
   const [step, setStep] = useState(0);
+  const H = embedded ? "h3" : "h2";
+  const Sub = embedded ? "h4" : "h3";
+  const hClass = embedded ? "sub-h" : "section-h";
   const elapsed = useElapsed(waking);
 
   const refresh = useCallback(async (signal?: AbortSignal) => {
@@ -149,13 +153,8 @@ export function DemoPage() {
 
   return (
     <>
-      <p className="crumb"><Link to={hrefFor({ page: "case", slug: "supportops" }, lang)}>← {t.projectOf.replace("{n}", "1").replace("{total}", String(caseCards.length))}</Link></p>
-      <Headline>{t.demoTitle}</Headline>
-      <Lead>{t.demoLead}</Lead>
-      <Command verb="demo status" object="" />
-
       <section aria-labelledby="status-h">
-        <h2 id="status-h" className="section-h">{t.demoStatus}</h2>
+        <H id="status-h" className={hClass}>{t.demoStatus}</H>
         <p role="status">
           <StatusSeal kind={state === "awake" ? "full" : state === "asleep" ? "none" : "partial"} label={!loaded ? "…" : state === "awake" ? t.demoAwake : state === "asleep" ? t.demoAsleep : t.demoUnknown} />
         </p>
@@ -182,7 +181,7 @@ export function DemoPage() {
         <p className="sub">{t.demoStartWhy}</p>
         {status?.budget && (
           <>
-            <h3 className="sub-h">{t.demoBudget}</h3>
+            <Sub className="sub-h">{t.demoBudget}</Sub>
             <Progress value={Math.round((status.budget.leftUsd / status.budget.ceilingUsd) * 100)} label={`${t.demoBudget}: USD ${status.budget.leftUsd.toFixed(2)} / ${status.budget.ceilingUsd.toFixed(2)}`} />
           </>
         )}
@@ -190,7 +189,7 @@ export function DemoPage() {
       </section>
 
       <section aria-labelledby="acc-h">
-        <h2 id="acc-h" className="section-h">{t.demoAccounts}</h2>
+        <H id="acc-h" className={hClass}>{t.demoAccounts}</H>
         {status?.accounts && status.accounts.length > 0 ? (
           <table className="dt">
             <caption className="sr">{t.demoAccounts}</caption>
@@ -207,8 +206,8 @@ export function DemoPage() {
         <p className="sub">{t.demoPublic}</p>
       </section>
 
-      <section aria-labelledby="tour-h">
-        <h2 id="tour-h" className="section-h">{t.demoTour}</h2>
+      <section aria-labelledby="demo-tour-h">
+        <H id="demo-tour-h" className={hClass}>{t.demoTour}</H>
         <Stepper
           label={t.demoTour}
           current={step}
@@ -218,7 +217,7 @@ export function DemoPage() {
       </section>
 
       <section aria-labelledby="runs-h">
-        <h2 id="runs-h" className="section-h">{t.demoRuns}</h2>
+        <H id="runs-h" className={hClass}>{t.demoRuns}</H>
         {latest ? (
           <>
             <p className="sub">{latest.at}</p>
@@ -242,6 +241,20 @@ export function DemoPage() {
           <p className="surface-text">{t.demoRunsEmpty}</p>
         )}
       </section>
+    </>
+  );
+}
+
+export function DemoPage() {
+  const { lang, t } = useLang();
+  return (
+    <>
+      <p className="crumb"><Link to={hrefFor({ page: "case", slug: "supportops" }, lang)}>← {t.projectOf.replace("{n}", "1").replace("{total}", String(caseCards.length))}</Link></p>
+      <Headline>{t.demoTitle}</Headline>
+      <Lead>{t.demoLead}</Lead>
+      <Command verb="demo status" object="" />
+      <DemoPanel />
+
       <p className="step-next">
         <Link className="btn" to={`${hrefFor({ page: "case", slug: "supportops" }, lang)}#flow`}>{t.nextToFlow}</Link>
       </p>
