@@ -71,18 +71,22 @@
       "id": "S4-line",
       "kind": "action",
       "status": "built",
-      "proof": "The side index lists all eight projects and marks the open one; Back to the surface returns to that project on the home",
+      "proof": "The metro line lists the eight projects, marks the open one, and moves one station with Next, Previous, or the j and k keys; Back to the surface returns to that project on the home",
       "trigger": {
         "type": "action",
         "events": [
           "click",
-          "tab"
+          "tab",
+          "next",
+          "previous",
+          "j",
+          "k"
         ]
       },
       "staticFrame": "artifacts/evidence/portfolio-w7b/case-agents-3d.png",
       "reducedMotion": "Identical",
-      "mobile": "The index is not shown on narrow screens; the home project list is the way between projects",
-      "focus": "Index links in order, current project marked with aria-current"
+      "mobile": "A bar at the bottom with Previous, the current station name and Next",
+      "focus": "Station links in order, the current one marked with aria-current; the bar buttons are real buttons"
     },
     {
       "id": "S5-contact",

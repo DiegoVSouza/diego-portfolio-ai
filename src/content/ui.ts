@@ -90,6 +90,9 @@ export interface Strings {
   demoNoWake: string;
   demoAccounts: string;
   sceneLabel: string;
+  metroLabel: string;
+  metroPrev: string;
+  metroNext: string;
   simpleVersion: string;
   backToSurface: string;
   tabsLabel: string;
@@ -235,6 +238,9 @@ const en: Strings = {
   demoNoWake: "Waking is available once the demo is deployed.",
   demoAccounts: "Demo accounts",
   sceneLabel: "Background scene",
+  metroLabel: "Project line",
+  metroPrev: "Previous project",
+  metroNext: "Next project",
   simpleVersion: "Simple version",
   backToSurface: "Back to the surface",
   tabsLabel: "Sections of this case",
@@ -387,6 +393,9 @@ const pt: Strings = {
   demoNoWake: "Acordar fica disponível quando o demo estiver publicado.",
   demoAccounts: "Contas de demo",
   sceneLabel: "Cena de fundo",
+  metroLabel: "Linha dos projetos",
+  metroPrev: "Projeto anterior",
+  metroNext: "Próximo projeto",
   simpleVersion: "Versão simples",
   backToSurface: "Voltar à superfície",
   tabsLabel: "Seções deste caso",

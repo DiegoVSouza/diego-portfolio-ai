@@ -131,3 +131,28 @@
 /* On the home the panels leave the right side open, where each project's object stands. Wide content keeps its width. */
 [data-page="home"].wrap > section { max-width: 760px; }
 [data-page="home"].wrap > section[aria-labelledby="proof-h"], [data-page="home"].wrap > section[aria-labelledby="map-h"] { max-width: none; }
+
+/* The metro line: a vertical line with named stations on a wide screen, a bar at the bottom on a narrow one. */
+.metro { position: fixed; z-index: var(--z-hud); }
+.metro-stations { list-style: none; margin: 0; padding: 12px 0; background: var(--ink); border-left: 4px solid var(--red); }
+.metro-stations li { margin: 0; }
+.metro-stations a { display: flex; gap: 8px; align-items: baseline; padding: 6px 12px; color: var(--paper); text-decoration: none; font: 700 13px/1.25 var(--f-body); }
+.metro-stations a:hover, .metro-stations a:focus-visible { background: var(--ink-2); }
+.metro-on a { background: var(--red); color: var(--on-red); }
+.metro-n { font-family: var(--f-display); }
+.metro-bar { display: none; }
+@media (min-width: 901px) {
+  .metro { left: 16px; top: 50%; transform: translateY(-50%); width: 196px; }
+  .metro-name { overflow-wrap: anywhere; }
+}
+@media (max-width: 900px) {
+  .metro { left: 0; right: 0; bottom: 0; background: var(--ink); border-top: 3px solid var(--red); }
+  .metro-stations { display: none; }
+  .metro-bar { display: flex; align-items: center; gap: 8px; padding: 8px 12px; }
+  .metro-now { flex: 1; min-width: 0; font: 700 13px/1.25 var(--f-body); color: var(--paper); text-align: center; }
+  .metro-bar .tg[disabled] { opacity: 1; color: var(--mut); border-style: dashed; }
+  .scene-controls { bottom: 64px; }
+  .wrap { padding-bottom: 72px; }
+}
+@media (max-width: 900px) { footer { padding-bottom: 72px; } }
+@media (max-width: 900px) { .metro-bar .tg { font-size: 20px; min-width: 48px; min-height: 44px; } }

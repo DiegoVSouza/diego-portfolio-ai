@@ -71,7 +71,7 @@ test("keyboard: skip link, then a project, then back", async ({ page }) => {
   await page.bringToFront();
   await page.keyboard.press("Tab");
   await expect(page.getByRole("link", { name: "Skip to content" })).toBeFocused();
-  await page.getByRole("link", { name: "Foundation and live evals" }).first().focus();
+  await page.getByRole("main").getByRole("link", { name: "Foundation and live evals" }).first().focus();
   await page.keyboard.press("Enter");
   await expect(page).toHaveURL(/\/projects\/foundation\/$/);
   await expect(page.getByRole("heading", { level: 1, name: "Foundation and live evals" })).toBeVisible();
@@ -86,7 +86,7 @@ test("the diagram walks through scenes and a failure scenario by keyboard, at bo
     // The buttons only act once the page is hydrated; the palette button appears after hydration.
     await page.locator("button.palette-open[data-ready]").waitFor();
     await page.getByRole("tab", { name: "Architecture" }).click();
-    const next = page.getByRole("button", { name: "Next" }).first();
+    const next = page.getByRole("button", { name: "Next", exact: true }).first();
     await next.focus();
     await page.keyboard.press("Enter");
     await expect(page.getByRole("status").filter({ hasText: /1\/3/ })).toBeVisible();

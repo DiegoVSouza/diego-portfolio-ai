@@ -52,9 +52,11 @@ test("the footer button opens the palette for a mouse user", async ({ page }) =>
 
 test("the home announces the active project when the scroll changes it", async ({ page }) => {
   await page.goto("/");
-  const status = page.locator(".scene-controls [role=status]");
+  const status = page.locator(".metro [role=status]");
   await expect(page.locator("canvas.scene")).toHaveAttribute("data-scene", "3d", { timeout: 20_000 });
+  await page.locator("#project-supportops").scrollIntoViewIfNeeded();
+  await page.evaluate(() => document.getElementById("project-supportops")!.scrollIntoView({ block: "center" }));
   await expect(status).toContainText(/Project 1 of 8/);
-  await page.evaluate(() => window.scrollTo(0, document.documentElement.scrollHeight));
+  await page.evaluate(() => document.getElementById("project-harness")!.scrollIntoView({ block: "center" }));
   await expect(status).toContainText(/Project 8 of 8/);
 });

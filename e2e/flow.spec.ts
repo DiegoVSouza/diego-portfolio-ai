@@ -86,7 +86,7 @@ test.describe("descent, simple version and back to the surface", () => {
         if (wipe.classList.contains("go")) (window as unknown as { __wiped: boolean }).__wiped = true;
       }).observe(wipe, { attributes: true, attributeFilter: ["class"] });
     });
-    await page.getByRole("link", { name: "Foundation and live evals" }).first().click();
+    await page.getByRole("main").getByRole("link", { name: "Foundation and live evals" }).first().click();
     await expect(page).toHaveURL(/\/projects\/foundation\/$/);
     expect(await page.evaluate(() => (window as unknown as { __wiped: boolean }).__wiped)).toBe(true);
 
@@ -101,7 +101,7 @@ test.describe("descent, simple version and back to the surface", () => {
         if (wipe.classList.contains("go")) (window as unknown as { __wiped: boolean }).__wiped = true;
       }).observe(wipe, { attributes: true, attributeFilter: ["class"] });
     });
-    await calm.getByRole("link", { name: "Foundation and live evals" }).first().click();
+    await calm.getByRole("main").getByRole("link", { name: "Foundation and live evals" }).first().click();
     await expect(calm).toHaveURL(/\/projects\/foundation\/$/);
     expect(await calm.evaluate(() => (window as unknown as { __wiped: boolean }).__wiped)).toBe(false);
     await context.close();
@@ -136,3 +136,66 @@ test.describe("descent, simple version and back to the surface", () => {
     await expect(canvas).toHaveAttribute("data-active", "3");
   });
 });
+
+test.describe("metro line", () => {
+  test("on a wide screen the line lists the eight stations and marks the open project", async ({ page }) => {
+    await page.setViewportSize({ width: 1280, height: 800 });
+    await page.goto("/projects/agents/");
+    const line = page.getByRole("navigation", { name: "Project line" });
+    await expect(line.getByRole("link")).toHaveCount(8);
+    await expect(line.getByRole("link", { name: /Multi-agent orchestration/ })).toHaveAttribute("aria-current", "page");
+    await expect(line.getByRole("button", { name: "Next project" })).toBeHidden();
+  });
+
+  test("on a narrow screen the line is a bar with previous and next, and next opens the next project", async ({ page }) => {
+    await page.setViewportSize({ width: 390, height: 800 });
+    await page.goto("/projects/agents/");
+    await ready(page);
+    const line = page.getByRole("navigation", { name: "Project line" });
+    await expect(line.getByRole("link")).toHaveCount(0).catch(() => undefined);
+    await expect(line.locator(".metro-now")).toHaveText(/03 · Multi-agent orchestration/);
+    await line.getByRole("button", { name: "Next project" }).click();
+    await expect(page).toHaveURL(/\/projects\/toolkit\/$/);
+    await expect(line.locator(".metro-now")).toHaveText(/04 · Production AI toolkit/);
+    await line.getByRole("button", { name: "Previous project" }).click();
+    await expect(page).toHaveURL(/\/projects\/agents\/$/);
+  });
+
+  test("the j and k keys move one station, and do nothing while typing", async ({ page }) => {
+    await page.setViewportSize({ width: 1280, height: 800 });
+    await page.goto("/projects/agents/");
+    await ready(page);
+    await page.keyboard.press("j");
+    await expect(page).toHaveURL(/\/projects\/toolkit\/$/);
+    await page.keyboard.press("k");
+    await expect(page).toHaveURL(/\/projects\/agents\/$/);
+    await page.keyboard.press("/");
+    await page.keyboard.type("jk");
+    await expect(page.getByRole("combobox")).toHaveValue("jk");
+    await expect(page).toHaveURL(/\/projects\/agents\/$/);
+  });
+
+  test("on the home the active station follows the card in the middle of the screen, and a station scrolls to its card", async ({ page }) => {
+    await page.setViewportSize({ width: 1280, height: 800 });
+    await page.goto("/");
+    await ready(page);
+    const line = page.getByRole("navigation", { name: "Project line" });
+    await line.getByRole("link", { name: /Production AI toolkit/ }).click();
+    await expect(page.locator("#project-toolkit")).toBeInViewport();
+    await expect(line.getByRole("link", { name: /Production AI toolkit/ })).toHaveAttribute("aria-current", "location");
+    await expect(line.locator("[role=status]")).toContainText(/Project 4 of 8/);
+  });
+
+  test("the line passes axe on the home and on a case, at both widths", async ({ page }) => {
+    for (const width of [1280, 390]) {
+      await page.setViewportSize({ width, height: 800 });
+      for (const path of ["/", "/projects/agents/", "/pt/projects/agents/"]) {
+        await page.goto(path);
+        await ready(page);
+        const result = await new AxeBuilder({ page }).analyze();
+        expect(result.violations.map((v) => `${path} ${width}px ${v.id}: ${v.nodes[0]?.target}`)).toEqual([]);
+      }
+    }
+  });
+});
+
