@@ -35,15 +35,12 @@ function Header() {
   const { route } = useRoute();
   const simple = useSimple();
   const { lang, t } = useLang();
-  const link = (page: Route["page"], label: string) => (
-    <Link to={hrefFor({ page }, lang)} aria-current={route.page === page ? "page" : undefined}>{label}</Link>
-  );
   return (
     <AppHeader
       brand={t.brand}
       brandHref={hrefFor({ page: "home" }, lang)}
       navLabel={t.nav}
-      nav={<>{link("demo", t.navDemo)}{link("evidence", t.navEvidence)}{link("method", t.navMethod)}{link("experience", t.navExperience)}</>}
+      nav={<Link to={`${hrefFor({ page: "case", slug: caseCards[0]!.slug }, lang)}#demo`} aria-current={route.page === "case" || route.page === "demo" ? "page" : undefined}>{t.navTour}</Link>}
     >
       <button type="button" className="tg simple-toggle" aria-pressed={simple} onClick={() => setSimple(!simple)}>
         {t.simpleVersion}
@@ -62,10 +59,11 @@ export function Shell({ children, hud, ghost }: { children: ReactNode; hud?: str
   const mode = useBackgroundMode();
   useEffect(() => {
     if (typeof window === "undefined") return;
-    // A link with a hash (Back to the surface) lands on its target; any other change starts at the top.
+    // A link with a hash (Back to the surface, the next stop of the trail, an old #numbers link) lands on its target;
+    // any other change starts at the top.
     const id = decodeURIComponent(window.location.hash.slice(1));
     const target = id ? document.getElementById(id) : null;
-    if (target && route.page === "home") target.scrollIntoView({ block: "center" });
+    if (target) target.scrollIntoView({ block: route.page === "home" ? "center" : "start" });
     else window.scrollTo(0, 0);
   }, [route.page, route.slug]);
   return (
@@ -81,7 +79,7 @@ export function Shell({ children, hud, ghost }: { children: ReactNode; hud?: str
       <main id="main" className="wrap" tabIndex={-1} data-page={route.page}>{children}</main>
       <AppFooter credits={t.credits}>
         <p>
-          <Link to={hrefFor({ page: "design-system" }, lang)}>{t.navDesign}</Link> · <a href="/llms.txt">llms.txt</a> · <a href="/resume.md">{t.resume}</a>
+          <Link to={hrefFor({ page: "demo" }, lang)}>{t.navDemo}</Link> · <Link to={hrefFor({ page: "evidence" }, lang)}>{t.navEvidence}</Link> · <Link to={hrefFor({ page: "method" }, lang)}>{t.navMethod}</Link> · <Link to={hrefFor({ page: "experience" }, lang)}>{t.navExperience}</Link> · <Link to={hrefFor({ page: "design-system" }, lang)}>{t.navDesign}</Link> · <a href="/llms.txt">llms.txt</a> · <a href="/resume.md">{t.resume}</a>
         </p>
         <p><LazyPalette /></p>
       </AppFooter>

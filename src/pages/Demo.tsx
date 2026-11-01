@@ -2,6 +2,8 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { emitPulse } from "../scene/pulse";
 import { Button, Command, FlowDiagram, Headline, Lead, Progress, RunLog, Stepper, StatusSeal, WakeNotice, useElapsed, type RunStep } from "colagem-ui";
 import { flowLabels, getFlow, getLayout, pinnedLink } from "../content/flows";
+import { caseCards } from "../content/caseIndex";
+import { Link, hrefFor } from "../site/router";
 import { useLang } from "../site/Shell";
 
 /** What /api/status returns. Reading it wakes nothing (LIVE-004). */
@@ -146,6 +148,7 @@ export function DemoPage() {
 
   return (
     <>
+      <p className="crumb"><Link to={`${hrefFor({ page: "case", slug: "supportops" }, lang)}#demo`}>← {t.projectOf.replace("{n}", "1").replace("{total}", String(caseCards.length))}</Link></p>
       <Headline>{t.demoTitle}</Headline>
       <Lead>{t.demoLead}</Lead>
       <Command verb="demo status" object="" />
@@ -236,6 +239,9 @@ export function DemoPage() {
           <p className="surface-text">{t.demoRunsEmpty}</p>
         )}
       </section>
+      <p className="step-next">
+        <Link className="btn" to={`${hrefFor({ page: "case", slug: "supportops" }, lang)}#flow`}>{t.nextToFlow}</Link>
+      </p>
     </>
   );
 }

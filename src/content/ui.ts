@@ -17,6 +17,10 @@ export interface Strings {
   heroTitle: string;
   heroLead: string;
   heroCta: string;
+  navTour: string;
+  aboutTitle: string;
+  tourTitle: string;
+  tourLead: string;
   heroCtaSecond: string;
   band: string[];
   proofTitle: string;
@@ -95,11 +99,20 @@ export interface Strings {
   metroNext: string;
   simpleVersion: string;
   backToSurface: string;
-  tabsLabel: string;
-  tabDemo: string;
-  tabArchitecture: string;
-  tabDecisions: string;
-  tabNumbers: string;
+  stepsLabel: string;
+  stepDemo: string;
+  stepFlow: string;
+  stepReadme: string;
+  projectOf: string;
+  nextToFlow: string;
+  nextToReadme: string;
+  nextProject: string;
+  nextContact: string;
+  demoReplay: string;
+  demoReplayBody: string;
+  readmeLead: string;
+  readmeOpen: string;
+  flowLead: string;
   sceneAnnounce: string;
   sceneHalftone: string;
   paletteOpen: string;
@@ -157,7 +170,11 @@ const en: Strings = {
   keys: "Keys",
   heroTitle: "AI Engineer building agents you can verify.",
   heroLead: "Four years of software engineering, two in generative AI, shipping production agents. This site runs a live multi-agent support platform. Trigger it, watch every step, then read the code and the evals behind it.",
-  heroCta: "Open the live demo",
+  heroCta: "Start the tour",
+  navTour: "Tour",
+  aboutTitle: "About me",
+  tourTitle: "The tour",
+  tourLead: "Eight projects. Each one has three stops, in order: the live demo, an interactive flow, and the README explained. Start with the first and press the button at the end of each stop.",
   heroCtaSecond: "Read the flagship case",
   band: ["verify", "evidence", "pending stays pending", "trace every step"],
   proofTitle: "What you can check here",
@@ -243,11 +260,20 @@ const en: Strings = {
   metroNext: "Next project",
   simpleVersion: "Simple version",
   backToSurface: "Back to the surface",
-  tabsLabel: "Sections of this case",
-  tabDemo: "Demo",
-  tabArchitecture: "Architecture",
-  tabDecisions: "Decisions",
-  tabNumbers: "Numbers",
+  stepsLabel: "Stops of this project",
+  stepDemo: "Live demo",
+  stepFlow: "Interactive flow",
+  stepReadme: "The README, explained",
+  projectOf: "Project {n} of {total}",
+  nextToFlow: "Next: the interactive flow",
+  nextToReadme: "Next: the README, explained",
+  nextProject: "Next project",
+  nextContact: "Last stop: contact",
+  demoReplay: "Reproduce it",
+  demoReplayBody: "This project has no live backend on the site. You can run it yourself with the command below, and the measured results are in the README stop.",
+  readmeLead: "The README of this project, in reading order: problem, decisions, failures, results and what I would do differently.",
+  readmeOpen: "Open the README on GitHub",
+  flowLead: "Click a node to see what it does and open its code. Play steps through the flow, or read the text version below the diagram.",
   sceneAnnounce: "Project {n} of {total}: {name}",
   sceneHalftone: "Halftone",
   paletteOpen: "Search pages",
@@ -312,7 +338,11 @@ const pt: Strings = {
   keys: "Teclas",
   heroTitle: "AI Engineer construindo agentes que você pode verificar.",
   heroLead: "Quatro anos de engenharia de software, dois em IA generativa, entregando agentes em produção. Este site roda uma plataforma de suporte multiagente ao vivo. Acione, veja cada passo, depois leia o código e os evals por trás.",
-  heroCta: "Abrir o demo ao vivo",
+  heroCta: "Começar o tour",
+  navTour: "Tour",
+  aboutTitle: "Sobre mim",
+  tourTitle: "O tour",
+  tourLead: "Oito projetos. Cada um tem três paradas, em ordem: o demo ao vivo, um fluxo interativo e o README explicado. Comece pelo primeiro e aperte o botão no fim de cada parada.",
   heroCtaSecond: "Ler o case principal",
   band: ["verificar", "evidência", "pendente continua pendente", "rastreie cada passo"],
   proofTitle: "O que você pode conferir aqui",
@@ -398,11 +428,20 @@ const pt: Strings = {
   metroNext: "Próximo projeto",
   simpleVersion: "Versão simples",
   backToSurface: "Voltar à superfície",
-  tabsLabel: "Seções deste caso",
-  tabDemo: "Demo",
-  tabArchitecture: "Arquitetura",
-  tabDecisions: "Decisões",
-  tabNumbers: "Números",
+  stepsLabel: "Paradas deste projeto",
+  stepDemo: "Demo ao vivo",
+  stepFlow: "Fluxo interativo",
+  stepReadme: "O README, explicado",
+  projectOf: "Projeto {n} de {total}",
+  nextToFlow: "Próximo: o fluxo interativo",
+  nextToReadme: "Próximo: o README, explicado",
+  nextProject: "Próximo projeto",
+  nextContact: "Última parada: contato",
+  demoReplay: "Reproduza",
+  demoReplayBody: "Este projeto não tem backend ao vivo no site. Você roda ele mesmo com o comando abaixo, e os resultados medidos estão na parada do README.",
+  readmeLead: "O README deste projeto, em ordem de leitura: problema, decisões, falhas, resultados e o que eu faria diferente.",
+  readmeOpen: "Abrir o README no GitHub",
+  flowLead: "Clique num nó para ver o que ele faz e abrir o código. Reproduza o fluxo passo a passo, ou leia a versão em texto abaixo do diagrama.",
   sceneAnnounce: "Projeto {n} de {total}: {name}",
   sceneHalftone: "Pontilhado",
   paletteOpen: "Buscar páginas",

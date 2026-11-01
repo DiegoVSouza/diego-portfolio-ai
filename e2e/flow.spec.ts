@@ -8,49 +8,39 @@ test.beforeEach(async ({ page }) => {
   await page.route("**/api/**", (route) => route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify({ state: "asleep", startAvailable: false, runs: [] }) }));
 });
 
-test.describe("case tabs", () => {
-  test("four tabs, one panel at a time, and the hash names the tab", async ({ page }) => {
-    await page.goto("/projects/supportops/");
+test.describe("case stops", () => {
+  test("three stops are stacked and visible at once, and the rail links to each", async ({ page }) => {
+    await page.goto("/projects/agents/");
     await ready(page);
-    const tabs = page.getByRole("tab");
-    await expect(tabs).toHaveText(["Demo", "Architecture", "Decisions", "Numbers"]);
-    await expect(page.getByRole("tab", { name: "Demo" })).toHaveAttribute("aria-selected", "true");
-    await expect(page.getByRole("tabpanel")).toHaveCount(1);
-    await expect(page.getByRole("heading", { name: "See it run" })).toBeVisible();
-    await expect(page.getByRole("heading", { name: "How it works" })).toBeHidden();
-    await page.getByRole("tab", { name: "Decisions" }).click();
-    await expect(page).toHaveURL(/#decisions$/);
-    await expect(page.getByRole("heading", { name: "Failure gallery" })).toBeVisible();
-    await expect(page.getByRole("heading", { name: "See it run" })).toBeHidden();
+    const rail = page.getByRole("navigation", { name: "Stops of this project" });
+    await expect(rail).toContainText("Project 3 of 8");
+    await expect(rail.getByRole("link")).toHaveText(["1 Reproduce it", "2 Interactive flow", "3 The README, explained"]);
+    for (const name of ["Reproduce it", "Interactive flow", "The README, explained"]) await expect(page.getByRole("heading", { level: 2, name: new RegExp(name) })).toBeVisible();
+    await expect(page.getByRole("tab")).toHaveCount(0);
+    await rail.getByRole("link", { name: /The README/ }).click();
+    await expect(page).toHaveURL(/#readme$/);
+    await expect(page.getByRole("heading", { name: "Decisions" })).toBeVisible();
   });
 
-  test("arrow keys, Home and End move between tabs", async ({ page }) => {
-    await page.goto("/projects/supportops/");
+  test("the next button ends each stop and walks to the following one", async ({ page }) => {
+    await page.goto("/projects/agents/");
     await ready(page);
-    await page.getByRole("tab", { name: "Demo" }).focus();
-    await page.keyboard.press("ArrowRight");
-    await expect(page.getByRole("tab", { name: "Architecture" })).toBeFocused();
-    await expect(page.getByRole("tab", { name: "Architecture" })).toHaveAttribute("aria-selected", "true");
-    await page.keyboard.press("End");
-    await expect(page.getByRole("tab", { name: "Numbers" })).toHaveAttribute("aria-selected", "true");
-    await page.keyboard.press("ArrowRight");
-    await expect(page.getByRole("tab", { name: "Demo" })).toHaveAttribute("aria-selected", "true");
+    await page.getByRole("link", { name: "Next: the interactive flow" }).click();
+    await expect(page).toHaveURL(/#flow$/);
+    await expect(page.getByRole("heading", { name: "How it works" })).toBeInViewport();
+    await page.getByRole("link", { name: "Next: the README, explained" }).click();
+    await expect(page).toHaveURL(/#readme$/);
   });
 
-  test("a link with a hash opens the tab that holds it, and so does a link inside the page", async ({ page }) => {
+  test("old anchors land on their section: a link to #numbers shows Results", async ({ page }) => {
     await page.goto("/projects/supportops/#numbers");
     await ready(page);
-    await expect(page.getByRole("tab", { name: "Numbers" })).toHaveAttribute("aria-selected", "true");
-    await expect(page.getByRole("heading", { name: "Results" })).toBeVisible();
-    await page.goto("/projects/supportops/#fail-h");
-    await ready(page);
-    await expect(page.getByRole("tab", { name: "Decisions" })).toHaveAttribute("aria-selected", "true");
-    await page.getByRole("tab", { name: "Demo" }).click();
-    await page.getByRole("link", { name: "Not measured, so not claimed" }).click();
-    await expect(page.getByRole("tab", { name: "Numbers" })).toHaveAttribute("aria-selected", "true");
+    await expect(page.getByRole("heading", { name: "Results" })).toBeInViewport();
+    await page.goto("/projects/supportops/#architecture");
+    await expect(page.getByRole("heading", { name: "How it works" })).toBeInViewport();
   });
 
-  test("without JavaScript every panel is stacked and visible, and there is no tab bar", async ({ browser }) => {
+  test("without JavaScript every stop is stacked and visible, and there is no tab bar", async ({ browser }) => {
     const context = await browser.newContext({ javaScriptEnabled: false });
     const page = await context.newPage();
     await page.goto("/projects/supportops/");
@@ -59,17 +49,14 @@ test.describe("case tabs", () => {
     await context.close();
   });
 
-  test("tabs pass axe in both languages and at both widths", async ({ page }) => {
+  test("a case passes axe in both languages and at both widths", async ({ page }) => {
     for (const width of [1000, 360]) {
       await page.setViewportSize({ width, height: 800 });
-      for (const path of ["/projects/agents/", "/pt/projects/agents/"]) {
+      for (const path of ["/projects/agents/", "/pt/projects/agents/", "/projects/supportops/"]) {
         await page.goto(path);
         await ready(page);
-        for (const index of [0, 1, 2, 3]) {
-          await page.getByRole("tab").nth(index).click();
-          const result = await new AxeBuilder({ page }).analyze();
-          expect(result.violations.map((v) => `${path} ${width}px tab ${index} ${v.id}: ${v.nodes[0]?.target}`)).toEqual([]);
-        }
+        const result = await new AxeBuilder({ page }).analyze();
+        expect(result.violations.map((v) => `${path} ${width}px ${v.id}: ${v.nodes[0]?.target}`)).toEqual([]);
       }
     }
   });

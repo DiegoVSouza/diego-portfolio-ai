@@ -1,7 +1,7 @@
-import { Band, Card, Command, FlowDiagram, GhostNumber, Headline, Lead, LinkTrio, Plate, StatusSeal } from "colagem-ui";
+import { Band, Card, Command, GhostNumber, Headline, Lead, LinkTrio, Plate, StatusSeal } from "colagem-ui";
 import { caseCards } from "../content/caseIndex";
 import { ev, modeLabel, permalink } from "../content/evidence";
-import { flowLabels, getFlow, getLayout, pinnedLink } from "../content/flows";
+import { pinnedLink } from "../content/flows";
 import { profile } from "../content/profile";
 import { Link, hrefFor } from "../site/router";
 import { useLang } from "../site/Shell";
@@ -17,11 +17,22 @@ export function Home() {
       <Headline>{t.heroTitle}</Headline>
       <Lead>{t.heroLead}</Lead>
       <p className="cta">
-        <Link className="btn" to={hrefFor({ page: "demo" }, lang)}>{t.heroCta}</Link>
-        <Link className="btn btn-secondary" to={hrefFor({ page: "case", slug: flagship.slug }, lang)}>{t.heroCtaSecond}</Link>
+        <Link className="btn" to={`${hrefFor({ page: "case", slug: flagship.slug }, lang)}#demo`}>{t.heroCta}</Link>
+        <Link className="btn btn-secondary" to={hrefFor({ page: "demo" }, lang)}>{t.navDemo}</Link>
       </p>
       <Command verb="project open" object="" n={flagship.n} />
       <Band words={t.band} />
+
+      <section aria-labelledby="about-h">
+        <h2 id="about-h" className="section-h">{t.aboutTitle}</h2>
+        <p className="surface-text">{profile.summary[lang]}</p>
+        <ul className="plain">
+          {profile.career.slice(0, 2).map((j) => (
+            <li key={j.id}><strong>{j.role}</strong>, {j.org}. <span className="sub">{j.from} to {j.to} · {t.careerNote}</span></li>
+          ))}
+        </ul>
+        <p><Link to={hrefFor({ page: "experience" }, lang)}>{t.navExperience}</Link></p>
+      </section>
 
       <section aria-labelledby="proof-h">
         <h2 id="proof-h" className="section-h">{t.proofTitle}</h2>
@@ -43,16 +54,9 @@ export function Home() {
         <p className="surface-text"><Link to={hrefFor({ page: "evidence" }, lang)}>{t.navEvidence}</Link></p>
       </section>
 
-      <section aria-labelledby="map-h">
-        <h2 id="map-h" className="section-h">{t.mapTitle}</h2>
-        <p className="surface-text">{t.mapLead}</p>
-        <FlowDiagram
-          flow={getFlow("system")}
-          layout={getLayout("system")}
-          lang={lang}
-          labels={flowLabels(lang)}
-          links={{ code: (path, node) => pinnedLink(node.repo ?? "p05", path), docs: (path, node) => pinnedLink(node.repo ?? "p05", path) }}
-        />
+      <section aria-labelledby="tour-h">
+        <h2 id="tour-h" className="section-h">{t.tourTitle}</h2>
+        <p className="surface-text">{t.tourLead}</p>
       </section>
 
       <section aria-labelledby="flag-h">
@@ -101,23 +105,6 @@ export function Home() {
             </li>
           ))}
         </ul>
-      </section>
-
-      <section aria-labelledby="method-h">
-        <h2 id="method-h" className="section-h">{t.methodTitle}</h2>
-        <p className="surface-text">{t.methodLead}</p>
-        <p><Link to={hrefFor({ page: "method" }, lang)}>{t.methodBody}</Link></p>
-      </section>
-
-      <section aria-labelledby="exp-h">
-        <h2 id="exp-h" className="section-h">{t.experienceTitle}</h2>
-        <p className="surface-text">{profile.summary[lang]}</p>
-        <ul className="plain">
-          {profile.career.slice(0, 2).map((j) => (
-            <li key={j.id}><strong>{j.role}</strong>, {j.org}. <span className="sub">{j.from} to {j.to} · {t.careerNote}</span></li>
-          ))}
-        </ul>
-        <p><Link to={hrefFor({ page: "experience" }, lang)}>{t.navExperience}</Link></p>
       </section>
 
       <section aria-labelledby="contact-h">

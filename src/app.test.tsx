@@ -30,24 +30,52 @@ describe("prerendered HTML (SEO-001, SEC-001)", () => {
     }
   });
 
-  it("a case page has the sections in the tab order, with a Rejected line per decision", async () => {
+  it("a case page reads in the trail order, with a Rejected line per decision", async () => {
     const html = await renderToHtml("/projects/supportops/");
-    // Four tab panels, each with its own headings: demo, architecture, decisions and failures, numbers.
-    const order = ["tldr-h", "run-h", "val-h", "how-h", "dec-h", "fail-h", "res-h", "diff-h", "next-h"].map((id) => html.indexOf(`id="${id}"`));
+    // Three stops, each with its own headings: demo, flow, and the README (decisions, failures, numbers, what I would change).
+    const order = ["tldr-h", "run-h", "how-h", "dec-h", "fail-h", "res-h", "diff-h"].map((id) => html.indexOf(`id="${id}"`));
     expect(order.every((i) => i > 0)).toBe(true);
     expect([...order].sort((a, b) => a - b)).toEqual(order);
     expect((html.match(/class="rejected"/g) ?? []).length).toBeGreaterThanOrEqual(3);
     expect(html).toContain("Not measured, so not claimed");
   });
 
-  it("the case tabs are an enhancement: in the HTML every panel is present and visible, and there is no tab bar", async () => {
+  it("a case without a live backend offers the command to reproduce it, in the first stop", async () => {
+    const html = await renderToHtml("/projects/agents/");
+    const order = ["val-h", "how-h", "dec-h"].map((id) => html.indexOf(`id="${id}"`));
+    expect(order.every((i) => i > 0)).toBe(true);
+    expect([...order].sort((a, b) => a - b)).toEqual(order);
+    expect(html).toContain("Reproduce it");
+    expect(html).not.toContain("Live demo</h2>");
+  });
+
+  it("the stops are stacked in the HTML with no tab bar, and the old anchors still exist (FLOW-002)", async () => {
     const html = await renderToHtml("/projects/supportops/");
-    const panels = ["demo", "architecture", "decisions", "numbers"].map((id) => html.indexOf(`id="${id}"`));
-    expect(panels.every((i) => i > 0)).toBe(true);
-    expect([...panels].sort((a, b) => a - b)).toEqual(panels);
+    const stops = ["demo", "flow", "readme"].map((id) => html.indexOf(`<section id="${id}"`));
+    expect(stops.every((i) => i > 0)).toBe(true);
+    expect([...stops].sort((a, b) => a - b)).toEqual(stops);
+    for (const legacy of ["architecture", "decisions", "numbers"]) expect(html).toContain(`id="${legacy}"`);
     expect(html).not.toContain('role="tablist"');
-    expect(html).not.toMatch(/class="case-panel"[^>]*hidden/);
+    expect(html).not.toMatch(/<section[^>]*shidden/);
     expect(html).toContain('href="#numbers"');
+    expect(html).toContain("Project 1 of 8");
+  });
+
+  it("each stop ends with one next action, and the last project ends at contact (FLOW-004)", async () => {
+    const first = await renderToHtml("/projects/supportops/");
+    expect(first).toContain("Next: the interactive flow");
+    expect(first).toContain("Next: the README, explained");
+    expect(first).toMatch(/Next project: [^<]+/);
+    const last = await renderToHtml("/projects/harness/");
+    expect(last).toContain("Last stop: contact");
+  });
+
+  it("the home page opens with About, then the proof, then the tour (FLOW-001)", async () => {
+    const html = await renderToHtml("/");
+    const order = ["about-h", "proof-h", "tour-h", "flag-h", "projects-h", "contact-h"].map((id) => html.indexOf(`id="${id}"`));
+    expect(order.every((i) => i > 0)).toBe(true);
+    expect([...order].sort((a, b) => a - b)).toEqual(order);
+    expect(html).not.toContain('id="map-h"');
   });
 
   it("the diagram and its text version are in the HTML without JavaScript (FLOW-005)", async () => {
