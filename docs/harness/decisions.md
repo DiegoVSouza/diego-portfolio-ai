@@ -39,3 +39,9 @@ The owner reversed the earlier rule and asked for the phone number and a WhatsAp
 - **Why:** the owner asked to use the v5 file as the source of the scene, with better assets from the asset kit, and the earlier scene was my own approximation of it.
 - **Decision:** `src/scene/` is the v5 scene as TypeScript modules, driven by the tokens. The earlier spec said "all geometry is generated, no GLB". That is relaxed for two files: the Kenney truck and motorcycle (CC0) from the v5 file, textures stripped, self-hosted under `assets/game/models/`, registered in `assets/ledger.json`. The CSP does not change (`connect-src 'self'` covers the fetch).
 - **Asset search result:** Poly Haven (CC0) has realistic, high-polygon models only; the Quaternius packs the kit can download are medieval and fantasy. Neither fits a flat collage night city, so nothing else was imported. Kenney's Car Kit and City Kit, or Poly Pizza with a key, are the next candidates and need the owner.
+
+## Phase 004 (2026-11-01): guided flow
+
+- The owner called the navigation and flow "terrible" and asked for one trail: About, then per project Demo, Flow, README. Spec, plan and research: `.planning/phases/004-guided-flow/`, `docs/knowledge/guided-flow-research.md`.
+- Tabs on the case page are replaced by three stacked stops (hidden content suffers the illusion of completeness, NN/g). The header keeps one primary link, Tour. React Flow, Scrollama and GSAP ScrollTrigger were evaluated and not adopted; the existing `FlowDiagram` and `IntersectionObserver` cover the need.
+- Deploy and push stay behind an explicit go.

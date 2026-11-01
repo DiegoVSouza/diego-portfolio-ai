@@ -1,0 +1,8 @@
+env.FLY_CEILING_USD ("5")                                             Environment Variable      
+env.COUNT_FROM ("2026-10-31T00:00:00Z")                               Environment Variable      
+
+Uploaded diego-portfolio-cost-guard (6.04 sec)
+Deployed diego-portfolio-cost-guard triggers (4.58 sec)
+  https://diego-portfolio-cost-guard.dvsdiegovieira.workers.dev
+  schedule: */5 * * * *
+Current Version ID: ab4521e0-31a0-4022-b738-c05993668b11

@@ -1,0 +1,6 @@
+
+✨ Uploading _headers
+✨ Uploading Functions bundle
+✨ Uploading _routes.json
+🌎 Deploying...
+✨ Deployment complete! Take a peek over at https://0822e0b9.diego-portfolio-ai.pages.dev
