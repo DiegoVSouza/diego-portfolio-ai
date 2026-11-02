@@ -8,6 +8,12 @@ const paths = [...pages.map((p) => `/${p}`), ...pages.map((p) => `/pt/${p}`)];
 const viewports = [{ width: 1000, height: 800 }, { width: 360, height: 740 }];
 const evidence = "artifacts/evidence/portfolio-w7";
 
+// On the deployed site the Turnstile widget is enabled. Its script probes the page with a fetch of "data:," that our strict CSP refuses on
+// purpose (connect-src has no data:), and it logs transparent console lines. That is third-party noise, not a defect of ours, so it is
+// ignored only against the deployed site and only for those exact messages. Every other console error still fails the test.
+const TURNSTILE_NOISE = /Connecting to 'data:,' violates|Fetch API cannot load data:,|font-size:0;color:transparent/;
+const isNoise = (text: string) => Boolean(process.env.PUBLIC_URL) && TURNSTILE_NOISE.test(text);
+
 // The Functions are tested on their own with mocks. Here the page gets the same shapes from a stub, so a missing backend is not a console error.
 test.beforeEach(async ({ page }) => {
   if (process.env.PUBLIC_URL) return; // against the deployed site the real Functions answer
@@ -21,7 +27,7 @@ for (const viewport of viewports) {
     test.setTimeout(240_000);
     await page.setViewportSize(viewport);
     const problems: string[] = [];
-    page.on("console", (m) => { if (m.type() === "error" || /Content.Security.Policy|Hydration|hydrat/i.test(m.text())) problems.push(`${page.url()} ${m.text()}`); });
+    page.on("console", (m) => { if ((m.type() === "error" || /Content.Security.Policy|Hydration|hydrat/i.test(m.text())) && !isNoise(m.text())) problems.push(`${page.url()} ${m.text()}`); });
     page.on("pageerror", (e) => problems.push(`${page.url()} pageerror ${e.message}`));
     for (const path of paths) {
       await page.goto(path);
@@ -102,7 +108,13 @@ test("the demo page requests nothing from a third party until a site key exists,
   await expect(page.getByRole("heading", { level: 1, name: "Live demo" })).toBeVisible();
   await page.waitForTimeout(500);
   const own = new URL(page.url()).origin;
-  expect(requests.filter((r) => !r.split(" ")[1]!.startsWith(own))).toEqual([]);
+  // Without a site key no third party is contacted. Against the deployed site a key exists, and then the Turnstile script is the one
+  // allowed third-party request: no other origin, and never a POST.
+  const status = process.env.PUBLIC_URL ? await page.request.get("/api/status").then((r) => r.json() as Promise<{ turnstileSiteKey?: string | null }>) : {};
+  const allowed = status.turnstileSiteKey ? "https://challenges.cloudflare.com/" : undefined;
+  // The script may also load a worker from a blob: URL that carries the same origin.
+  const target = (r: string) => r.split(" ")[1]!.replace(/^blob:/, "");
+  expect(requests.filter((r) => !target(r).startsWith(own) && !(allowed && target(r).startsWith(allowed)))).toEqual([]);
   expect(requests.filter((r) => r.startsWith("POST"))).toEqual([]);
 });
 

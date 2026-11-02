@@ -12,7 +12,7 @@ Evidence is under `artifacts/evidence/status-truth/` unless another path is give
 - [x] P02 adapter: red then green then check_fast exit 0 (P05 `artifacts/evidence/toolkit-limits-037/`), deployed with one live run under the limit
 - [x] P04 RAG ADR committed (P04 `docs/harness/decisions.md`)
 - [x] `python scripts/check_full.py` exit 0 in P07: unit 73, e2e 50 (`F6-p07-check-full-final.txt`)
-- [ ] Public e2e after deploy, 3 runs in a row: 2 of 3 (`F8-public-e2e-run1..3.txt`). Run 1 failed on console noise, see below
+- [ ] Public e2e after deploy, 3 runs in a row: pending the runs after the Turnstile-aware test change (`F8-*` were 2 of 3, `F10-*` 46 of 48; causes below, fixed in `e2e/site.spec.ts`)
 - [x] Remaining `PENDING` items each have a cause and an owner (see below)
 
 ## Left open, with cause and owner
