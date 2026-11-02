@@ -175,8 +175,11 @@ test.describe("metro line", () => {
     await ready(page);
     await page.keyboard.press("j");
     await expect(page).toHaveURL(/\/projects\/toolkit\/$/);
+    // The key handler reads the active station from the rendered line, so wait for the line to show the new station before the next key.
+    await expect(page.locator(".metro-stations [aria-current='page']")).toContainText(/toolkit/i);
     await page.keyboard.press("k");
     await expect(page).toHaveURL(/\/projects\/agents\/$/);
+    await expect(page.locator(".metro-stations [aria-current='page']")).toContainText(/orchestration/i);
     await page.keyboard.press("/");
     await page.keyboard.type("jk");
     await expect(page.getByRole("combobox")).toHaveValue("jk");
