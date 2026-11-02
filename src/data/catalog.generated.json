@@ -33,7 +33,7 @@
       "repo": "https://github.com/DiegoVSouza/diego-portfolio-ai"
     },
     "p08": {
-      "version": "0.4.4",
+      "version": "0.4.5",
       "repo": "https://github.com/DiegoVSouza/colagem-ui"
     },
     "lab": {
@@ -706,6 +706,13 @@
         "description": "At the end of the home and of a case page no footer text runs under the fixed menu, the metro line or the scene buttons",
         "status": "PASS_LOCAL",
         "evidence": "src/styles/site.css; e2e/footer-clear.spec.ts (red without the CSS, green with it); artifacts/evidence/status-truth/F15-p07-check-full.txt (gate exit 0, e2e 56 passed)",
+        "state": "verified"
+      },
+      {
+        "id": "flow-detail-modal",
+        "description": "A diagram node opens its explanation as a modal in document.body (colagem-ui 0.4.5), not as a card below the diagram",
+        "status": "PASS_LOCAL",
+        "evidence": "docs/harness/sources.lock.json (colagem-ui 0.4.5); artifacts/evidence/status-truth/F17-p07-check-full.txt (gate exit 0, e2e 58 passed, including the modal test at 1280 and 390 px with axe)",
         "state": "verified"
       }
     ],

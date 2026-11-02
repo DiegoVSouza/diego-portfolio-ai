@@ -280,7 +280,8 @@ a:not(.btn):hover { color: var(--paper); text-decoration-thickness: 3px; }
 .flow-text { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; margin: 0; }
 .flow-caption { font-size: 18px; border-left-width: 10px; }
 .flow-step { color: var(--red-text); }
-.flow-detail { border-left: 10px solid var(--red); animation: flow-detail-in 320ms var(--ease-out); }
+/* The node detail is the body of a modal in document.body (colagem-ui 0.4.5), so these rules cannot hang off .flow-stage-wrap. */
+.flow-detail { display: grid; gap: 8px; animation: flow-detail-in 320ms var(--ease-out); }
 @keyframes flow-detail-in { from { opacity: 0; transform: translateY(10px); } }
 
 /* Home: wide, with the cards in two columns over the city. */
@@ -422,10 +423,8 @@ a:not(.btn):hover { color: var(--paper); text-decoration-thickness: 3px; }
 .flow-stage-wrap .flow-stage { padding: var(--space-5); }
 .flow-stage-wrap .flow-caption { margin: var(--space-4) 0; padding: 16px 20px; font-size: 20px; line-height: 1.45; max-width: none; border-left-width: 12px; }
 .flow-stage-wrap .flow-step { display: inline-block; margin-right: 10px; padding: 2px 8px; background: var(--red); color: var(--on-red); }
-.flow-stage-wrap .flow-detail { max-width: none; padding: var(--space-5); display: grid; grid-template-columns: minmax(0, 1fr); gap: 8px; }
-.flow-stage-wrap .flow-detail h4 { font-size: 28px; margin: 0; }
-.flow-stage-wrap .flow-detail p { margin: 0; font-size: 17px; }
-.flow-stage-wrap .flow-detail .flow-links { display: flex; flex-wrap: wrap; gap: 8px 22px; }
+.flow-detail p { margin: 0; font-size: 17px; }
+.flow-detail .flow-links { display: flex; flex-wrap: wrap; gap: 8px 22px; }
 .flow-stage-wrap .flow-label { font-size: 20px; }
 /* The generic panel rule for direct children of the page column must not box a chapter: the chapter has its own banner and body. */
 .wrap > section.step { background: none; border: 0; padding: 0; margin: 104px 0 0; max-width: none; }
