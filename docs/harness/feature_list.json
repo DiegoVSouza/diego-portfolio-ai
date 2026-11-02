@@ -154,6 +154,13 @@
       "requirement_ids": [],
       "status": "PASS_LOCAL",
       "evidence": "docs/harness/sources.lock.json (colagem-ui 0.4.5); artifacts/evidence/status-truth/F17-p07-check-full.txt (gate exit 0, e2e 58 passed, including the modal test at 1280 and 390 px with axe)"
+    },
+    {
+      "id": "content-review",
+      "description": "Every route read in both languages against the evidence; stale claims, literal backticks and token-like seals fixed",
+      "requirement_ids": [],
+      "status": "PASS_LOCAL",
+      "evidence": "docs/harness/content-review-2026-11-02.md; src/status-truth.test.ts; artifacts/evidence/status-truth/F19-p07-check-full.txt (gate exit 0, e2e 58 passed)"
     }
   ]
 }

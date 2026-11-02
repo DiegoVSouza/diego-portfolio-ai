@@ -15,8 +15,8 @@ export const detail: CaseDetail = {
     role: t("I designed and built the API, the retrieval, the approval flow, the accounted live path and the console, with coding agents under a spec-first harness.", "Projetei e construí a API, a busca, o fluxo de aprovação, o caminho live contabilizado e o console, com agentes de código sob um harness que começa pela spec."),
     stack: "Python, FastAPI, PostgreSQL, pgvector, Redis, MCP, Keycloak, React, TypeScript, Fly.io, Cloudflare Pages",
     result: t(
-      "{ev:p05-tests} in its latest recorded suite run, and {ev:p05-demo-live} for the live ledger and key failover, run against PostgreSQL 16. The live demo itself has not been measured yet.",
-      "{ev:p05-tests} na última execução registrada da suíte, e {ev:p05-demo-live} para o ledger live e o failover de chaves, rodados contra PostgreSQL 16. O demo live em si ainda não foi medido.",
+      "The full gate with Docker services passed on the current version ({ev:p05-service-gate}), and the live ledger and key failover tests passed against PostgreSQL 16 ({ev:p05-demo-live}). One real triage on the live demo stack made {ev:p05-live-run}. That is a single run, not a benchmark.",
+      "O gate completo com serviços Docker passou na versão atual ({ev:p05-service-gate}), e os testes do ledger live e do failover de chaves passaram contra PostgreSQL 16 ({ev:p05-demo-live}). Uma triagem real na stack do demo live fez {ev:p05-live-run}. É uma única execução, não um benchmark.",
     ),
   },
   decisions: [
@@ -48,10 +48,10 @@ export const detail: CaseDetail = {
       rejected: t("Adding up spend after the fact.", "Somar o gasto depois do fato."),
     },
   ],
-  measured: ["p05-tests", "p05-demo-live", "p05-dual-control"],
+  measured: ["p05-service-gate", "p05-live-run", "p05-demo-live", "p05-tests", "p05-dual-control"],
   notMeasured: [
     t("Semantic quality of the answers. Retrieval fixtures prove control flow, not meaning.", "Qualidade semântica das respostas. Fixtures de busca provam fluxo de controle, não significado."),
-    t("Cost and latency of the live demo. No public live run exists yet.", "Custo e latência do demo live. Ainda não existe execução live pública."),
+    t("Cost and latency across many live runs. A few single runs are recorded, which is not a benchmark.", "Custo e latência em muitas execuções live. Há algumas execuções isoladas registradas, o que não é um benchmark."),
     t("Throughput under load.", "Vazão sob carga."),
   ],
   failures: [

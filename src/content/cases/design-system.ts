@@ -11,7 +11,7 @@ export const detail: CaseDetail = {
     problem: t("A portfolio makes claims. Without a rule that ties each number to a saved run, it drifts toward marketing.", "Um portfólio faz afirmações. Sem uma regra que ligue cada número a uma execução salva, ele deriva para marketing."),
     role: t("I designed the system, the components, the evidence pipeline and the pages.", "Projetei o sistema, os componentes, o pipeline de evidência e as páginas."),
     stack: "React, TypeScript, Vite, Three.js, ELK (build time), Playwright, axe, Cloudflare Pages",
-    result: t("Contrast is checked by axe in real Chrome in both themes, at a wide and a narrow viewport. The checks are in the repository, not in this sentence.", "O contraste é conferido pelo axe em Chrome real nos dois temas, em viewport largo e estreito. As checagens estão no repositório, não nesta frase."),
+    result: t("Contrast is checked by axe in real Chrome in both themes, at a wide and a narrow viewport. The checks are in the repository, not in this sentence. The browser suite passed against the deployed site ({ev:p07-e2e}), and the live home scores {ev:p07-lighthouse} (mobile / desktop) in Lighthouse, median of five runs.", "O contraste é conferido pelo axe em Chrome real nos dois temas, em viewport largo e estreito. As checagens estão no repositório, não nesta frase. A suíte de navegador passou contra o site publicado ({ev:p07-e2e}), e a home publicada tira {ev:p07-lighthouse} (móvel / desktop) no Lighthouse, mediana de cinco execuções."),
   },
   decisions: [
     {
@@ -27,7 +27,7 @@ export const detail: CaseDetail = {
       rejected: t("Mermaid, D2 and React Flow in the browser, which I measured under this site's CSP.", "Mermaid, D2 e React Flow no navegador, que medi sob a CSP deste site."),
     },
   ],
-  measured: [],
+  measured: ["p07-e2e", "p07-lighthouse"],
   notMeasured: [
     t("Real-user performance. No traffic yet.", "Desempenho com usuários reais. Ainda sem tráfego."),
     t("Frame rate of the 3D scene on an entry-level phone. It is pending a device test.", "Taxa de quadros da cena 3D em um celular de entrada. Pendente de teste em aparelho."),

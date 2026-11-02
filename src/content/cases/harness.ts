@@ -11,7 +11,7 @@ export const detail: CaseDetail = {
     problem: t("Coding agents write fast and claim more than they checked. Speed without a gate produces confident, unverified work.", "Agentes de código escrevem rápido e afirmam mais do que checaram. Velocidade sem gate produz trabalho confiante e não verificado."),
     role: t("I wrote the rules, the phase template and the gates, and I review what the agents produce.", "Escrevi as regras, o template de fase e os gates, e reviso o que os agentes produzem."),
     stack: "Markdown specs, Python gates, Git hooks, Conventional Commits",
-    result: t("The rules are in `AGENTS.md`: no result is called done without a command, an exit code and saved output, and a number comes only from a recorded run.", "As regras estão em `AGENTS.md`: nenhum resultado é chamado de pronto sem comando, exit code e saída salva, e um número só vem de uma execução registrada."),
+    result: t("The rules are in `AGENTS.md`: no result is called done without a command, an exit code and saved output, and a number comes only from a recorded run. Across the project repositories, {ev:lab-phases} phases have a spec, a plan and a verification file, and {ev:lab-open-boxes} of them still have open boxes.", "As regras estão em `AGENTS.md`: nenhum resultado é chamado de pronto sem comando, exit code e saída salva, e um número só vem de uma execução registrada. Nos repositórios dos projetos, {ev:lab-phases} fases têm spec, plano e arquivo de verificação, e {ev:lab-open-boxes} delas ainda têm caixas abertas."),
   },
   decisions: [
     {
@@ -27,7 +27,7 @@ export const detail: CaseDetail = {
       rejected: t("Letting an agent edit whatever it needs.", "Deixar um agente editar o que precisar."),
     },
   ],
-  measured: [],
+  measured: ["lab-phases", "lab-open-boxes"],
   notMeasured: [
     t("How much faster the harness makes delivery. I have no controlled comparison.", "O quanto o harness acelera a entrega. Não tenho comparação controlada."),
     t("Whether the process transfers to a team.", "Se o processo se transfere para um time."),

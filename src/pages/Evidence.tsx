@@ -22,7 +22,7 @@ export function EvidencePage() {
       <div className="filters">
         <SelectField label={t.evidenceFilterMode} value={mode} onChange={(e) => setMode(e.target.value)}>
           <option value="all">{t.all}</option>
-          {["fake", "replay", "live", "service"].map((m) => <option key={m} value={m}>{modeLabel(m as "fake", lang)}</option>)}
+          {["fake", "replay", "live", "service", "measured"].map((m) => <option key={m} value={m}>{modeLabel(m as "fake", lang)}</option>)}
         </SelectField>
         <SelectField label={t.evidenceFilterProject} value={project} onChange={(e) => setProject(e.target.value)}>
           <option value="all">{t.all}</option>

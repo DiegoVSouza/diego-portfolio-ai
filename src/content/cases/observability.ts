@@ -11,7 +11,7 @@ export const detail: CaseDetail = {
     problem: t("An agent can repeat, retry and spend across services, and teams should not need to collect prompts to see it.", "Um agente pode repetir, tentar de novo e gastar entre serviços, e as equipes não deveriam precisar coletar prompts para enxergar isso."),
     role: t("I built the instrumentation, the metrics and the loop detector.", "Construí a instrumentação, as métricas e o detector de loops."),
     stack: "Python, OpenTelemetry, Prometheus, Grafana, Jaeger",
-    result: t("The full fake service gate passed: {ev:p03-tests}.", "O gate fake de serviços completo passou: {ev:p03-tests}."),
+    result: t("The full fake service gate passed: {ev:p03-tests}. On the Fly stack, a real triage left {ev:p03-fly-trace} in Jaeger, and none of their attribute keys carries content.", "O gate fake de serviços completo passou: {ev:p03-tests}. Na stack da Fly, uma triagem real deixou {ev:p03-fly-trace} no Jaeger, e nenhuma chave de atributo carrega conteúdo."),
   },
   decisions: [
     {
@@ -27,7 +27,7 @@ export const detail: CaseDetail = {
       rejected: t("Asking a model whether the agent is stuck.", "Perguntar a um modelo se o agente travou."),
     },
   ],
-  measured: ["p03-tests"],
+  measured: ["p03-tests", "p03-fly-trace"],
   notMeasured: [
     t("Production telemetry volume and cost.", "Volume e custo de telemetria em produção."),
     t("Privacy for every integration, only for the paths the tests cover.", "Privacidade em toda integração, só nos caminhos que os testes cobrem."),

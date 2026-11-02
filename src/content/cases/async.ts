@@ -11,7 +11,7 @@ export const detail: CaseDetail = {
     problem: t("Work continues after the HTTP response, and brokers deliver a message more than once.", "O trabalho continua depois da resposta HTTP, e brokers entregam uma mensagem mais de uma vez."),
     role: t("I designed the task states, the lease model and the effect record.", "Projetei os estados da tarefa, o modelo de lease e o registro de efeito."),
     stack: "Python, FastAPI, Redis Streams, PostgreSQL, SQS-compatible service, Terraform",
-    result: t("The isolated full fake gate passed: {ev:p04-tests}.", "O gate fake completo e isolado passou: {ev:p04-tests}."),
+    result: t("The isolated full fake gate passed: {ev:p04-tests}. On Fly, one task went through the API, the queue and the worker: {ev:p04-fly-run}.", "O gate fake completo e isolado passou: {ev:p04-tests}. Na Fly, uma tarefa passou pela API, pela fila e pelo worker: {ev:p04-fly-run}."),
   },
   decisions: [
     {
@@ -21,9 +21,9 @@ export const detail: CaseDetail = {
       rejected: t("Relying on the broker for exactly-once delivery.", "Confiar no broker para entrega exatamente uma vez."),
     },
   ],
-  measured: ["p04-tests"],
+  measured: ["p04-tests", "p04-fly-run"],
   notMeasured: [
-    t("Behavior in a cloud deployment of this service alone. Terraform was planned, never applied.", "Comportamento em um deploy em nuvem só deste serviço. O Terraform foi planejado, nunca aplicado."),
+    t("Behavior of a cloud deployment under load. Terraform was planned, never applied; the service ran once on Fly, which is not a load test.", "Comportamento de um deploy em nuvem sob carga. O Terraform foi planejado, nunca aplicado; o serviço rodou uma vez na Fly, o que não é teste de carga."),
     t("Throughput.", "Vazão."),
   ],
   failures: [

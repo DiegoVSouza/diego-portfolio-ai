@@ -95,7 +95,7 @@ describe("numbers need evidence (EV-001, EV-003)", () => {
       expect(e.path.length).toBeGreaterThan(0);
       expect(e.command.length).toBeGreaterThan(0);
       expect(Number.isInteger(e.exitCode)).toBe(true);
-      expect(["fake", "replay", "live", "service"]).toContain(e.mode);
+      expect(["fake", "replay", "live", "service", "measured"]).toContain(e.mode);
       expect(e.recordedAt).toMatch(/^\d{4}-\d{2}-\d{2}$/);
       expect(e.value.length).toBeGreaterThan(0);
     }

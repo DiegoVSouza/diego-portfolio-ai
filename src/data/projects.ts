@@ -116,6 +116,42 @@ const curated: Record<string, { name: string; role: Text; summary: Text; proves:
       pt: "Cliente gerado do contrato, axe sem violações e orçamento de bundle, verificados em navegador real.",
     },
   },
+  p07: {
+    name: "Portfolio Site",
+    role: { en: "This site", pt: "Este site" },
+    summary: {
+      en: "Prerendered React site in two languages, with an evidence pipeline, Pages Functions for the live demo and a 3D scene with fallbacks.",
+      pt: "Site React prerenderizado em dois idiomas, com pipeline de evidência, Pages Functions para o demo live e uma cena 3D com fallbacks.",
+    },
+    proves: {
+      en: "A number only appears if a saved run backs it, and the build fails otherwise.",
+      pt: "Um número só aparece se uma execução salva o sustenta, e o build falha caso contrário.",
+    },
+  },
+  p08: {
+    name: "colagem-ui",
+    role: { en: "Design system", pt: "Design system" },
+    summary: {
+      en: "React design system with tokens, components, flow diagrams and a contrast table checked in code and in a real browser.",
+      pt: "Design system em React com tokens, componentes, diagramas de fluxo e uma tabela de contraste verificada em código e em navegador real.",
+    },
+    proves: {
+      en: "Contrast is a test, not a promise. The 3D level lives in the site, not in the package.",
+      pt: "Contraste é um teste, não uma promessa. O nível 3D vive no site, não no pacote.",
+    },
+  },
+  lab: {
+    name: "AI Engineer Lab",
+    role: { en: "Engineering harness", pt: "Harness de engenharia" },
+    summary: {
+      en: "The repository that holds the process, the gates and the Fly stack scripts the projects were built with.",
+      pt: "O repositório que guarda o processo, os gates e os scripts da stack na Fly com que os projetos foram construídos.",
+    },
+    proves: {
+      en: "Every phase has a spec, a plan and a verification. Some older verification files still have open boxes.",
+      pt: "Toda fase tem spec, plano e verificação. Alguns arquivos de verificação antigos ainda têm caixas abertas.",
+    },
+  },
 };
 
 const limits: Record<string, Limit[]> = {

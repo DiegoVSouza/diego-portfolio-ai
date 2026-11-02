@@ -242,5 +242,179 @@
     },
     "command": "uv run --locked pytest -v tests/test_api_security.py (two named tests)",
     "exitCode": 0
+  },
+  {
+    "id": "p05-service-gate",
+    "project": "supportops",
+    "repo": "p05",
+    "path": "artifacts/evidence/status-reconcile/check-full-with-services-0.4.5.txt",
+    "extract": {
+      "kind": "regex",
+      "pattern": "(\\d+) passed, (\\d+) skipped",
+      "template": "$1 passed, $2 skipped"
+    },
+    "mode": "service",
+    "label": {
+      "en": "P05 full gate with Docker services, current version",
+      "pt": "Gate completo do P05 com serviços Docker, versão atual"
+    },
+    "command": "uv run --locked python scripts/check_full.py (with the compose services)",
+    "exitCode": 0,
+    "caveat": {
+      "en": "Fake model. Integration, crash recovery, privacy and authorization-expiry layers all passed.",
+      "pt": "Modelo fake. As camadas de integração, recuperação de crash, privacidade e expiração de autorização passaram."
+    }
+  },
+  {
+    "id": "p05-live-run",
+    "project": "supportops",
+    "repo": "p05",
+    "path": "artifacts/evidence/status-reconcile/live-smoke-20261031.txt",
+    "extract": {
+      "kind": "regex",
+      "pattern": "\"calls\": (\\d+), \"input_tokens\": (\\d+), \"output_tokens\": (\\d+), \"estimated_cost_usd\": ([0-9.]+)",
+      "template": "$1 calls, $2 in / $3 out tokens, est. USD $4"
+    },
+    "mode": "live",
+    "label": {
+      "en": "One real triage on the public demo stack",
+      "pt": "Uma triagem real na stack do demo público"
+    },
+    "command": "POST /v1/tickets/{id}/triage on the Fly stack, LLM_MODE=live, as saved in the smoke output",
+    "exitCode": 0,
+    "caveat": {
+      "en": "One run, not a benchmark. Cost is the ledger's estimate, not an invoice.",
+      "pt": "Uma execução, não um benchmark. O custo é a estimativa do ledger, não uma fatura."
+    }
+  },
+  {
+    "id": "p03-fly-trace",
+    "project": "observability",
+    "repo": "p03",
+    "path": "artifacts/evidence/status-reconcile/jaeger-p05-runtime-summary.json",
+    "extract": {
+      "kind": "json",
+      "template": "{traces} traces, {spans} spans"
+    },
+    "mode": "live",
+    "label": {
+      "en": "Traces of the P05 runtime read from Jaeger on the Fly stack",
+      "pt": "Traces do runtime do P05 lidos no Jaeger da stack na Fly"
+    },
+    "command": "Jaeger query service=p05-runtime on the Fly stack, then a scan of every attribute key",
+    "exitCode": 0,
+    "caveat": {
+      "en": "No attribute key matched prompt, content, message, password or email; the matches were token counts. One day, one stack.",
+      "pt": "Nenhuma chave de atributo casou com prompt, content, message, password ou email; os casos foram contagens de tokens. Um dia, uma stack."
+    }
+  },
+  {
+    "id": "p04-fly-run",
+    "project": "async",
+    "repo": "p04",
+    "path": "artifacts/evidence/status-reconcile/fly-queue-acceptance.txt",
+    "extract": {
+      "kind": "regex",
+      "pattern": "create_http=(\\d+)[\\s\\S]*poll1=(done)",
+      "template": "HTTP $1, task $2"
+    },
+    "mode": "service",
+    "label": {
+      "en": "One task through the API, Redis Streams and the worker on Fly",
+      "pt": "Uma tarefa pela API, Redis Streams e o worker na Fly"
+    },
+    "command": "POST /tasks then GET /tasks/{id} against supportops-lab-p04 on Fly",
+    "exitCode": 0,
+    "caveat": {
+      "en": "One task. Not a load test.",
+      "pt": "Uma tarefa. Não é teste de carga."
+    }
+  },
+  {
+    "id": "p07-e2e",
+    "project": "design-system",
+    "repo": "p07",
+    "path": "artifacts/evidence/status-truth/F18-public-e2e-modal.txt",
+    "extract": {
+      "kind": "regex",
+      "pattern": "(\\d+) passed",
+      "template": "$1 passed"
+    },
+    "mode": "measured",
+    "label": {
+      "en": "Browser suite against the deployed site",
+      "pt": "Suíte de navegador contra o site publicado"
+    },
+    "command": "PUBLIC_URL=https://diego-portfolio-ai.pages.dev npx playwright test -c playwright.public.config.ts",
+    "exitCode": 0,
+    "caveat": {
+      "en": "Two tests are skipped by design.",
+      "pt": "Dois testes são pulados por desenho."
+    }
+  },
+  {
+    "id": "p07-lighthouse",
+    "project": "design-system",
+    "repo": "p07",
+    "path": "artifacts/evidence/status-truth/lighthouse/summary.json",
+    "extract": {
+      "kind": "json",
+      "template": "{mobile.performance_median} / {desktop.performance_median}"
+    },
+    "mode": "measured",
+    "label": {
+      "en": "Lighthouse performance score of the live home, mobile / desktop, median of five runs",
+      "pt": "Nota de performance do Lighthouse na home publicada, móvel / desktop, mediana de cinco execuções"
+    },
+    "command": "npx lighthouse https://diego-portfolio-ai.pages.dev/ (five mobile and five desktop runs)",
+    "exitCode": 0,
+    "caveat": {
+      "en": "Single runs vary a lot on this machine, so only the median is shown. Accessibility, best practices and SEO were 100 in every run. Not a measurement on real devices.",
+      "pt": "Execuções isoladas variam muito nesta máquina, então só a mediana aparece. Acessibilidade, boas práticas e SEO foram 100 em todas as execuções. Não é medição em aparelho real."
+    }
+  },
+  {
+    "id": "lab-phases",
+    "project": "harness",
+    "repo": "lab",
+    "path": "artifacts/evidence/status-truth-lab/sdd-phase-count.txt",
+    "extract": {
+      "kind": "regex",
+      "pattern": "total: phases=(\\d+) complete_triple=(\\d+) verify_with_unticked_boxes=(\\d+)",
+      "template": "$2 of $1"
+    },
+    "mode": "measured",
+    "label": {
+      "en": "Phases with SPEC, PLAN and VERIFY",
+      "pt": "Fases com SPEC, PLAN e VERIFY"
+    },
+    "command": "count of .planning/phases/* with the three files (the command is the first line of the saved output)",
+    "exitCode": 0,
+    "caveat": {
+      "en": "Counts files in the nine project repositories, not their quality.",
+      "pt": "Conta arquivos nos nove repositórios de projeto, não a qualidade deles."
+    }
+  },
+  {
+    "id": "lab-open-boxes",
+    "project": "harness",
+    "repo": "lab",
+    "path": "artifacts/evidence/status-truth-lab/sdd-phase-count.txt",
+    "extract": {
+      "kind": "regex",
+      "pattern": "total: phases=(\\d+) complete_triple=(\\d+) verify_with_unticked_boxes=(\\d+)",
+      "template": "$3 of $1"
+    },
+    "mode": "measured",
+    "label": {
+      "en": "Phases whose VERIFY file still has open boxes",
+      "pt": "Fases cujo VERIFY ainda tem caixas abertas"
+    },
+    "command": "count of .planning/phases/* with the three files (the command is the first line of the saved output)",
+    "exitCode": 0,
+    "caveat": {
+      "en": "Older phases that were not reopened.",
+      "pt": "Fases antigas que não foram reabertas."
+    }
   }
 ]

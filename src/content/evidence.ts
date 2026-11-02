@@ -1,7 +1,7 @@
 import type { Lang, Text } from "colagem-ui";
 import raw from "../data/evidence.generated.json";
 
-export type Mode = "fake" | "replay" | "live" | "service";
+export type Mode = "fake" | "replay" | "live" | "service" | "measured";
 
 /** One measured fact, copied from a saved file at an exact commit (EV-001). */
 export interface Evidence {
@@ -44,6 +44,7 @@ export function modeLabel(mode: Mode, lang: Lang): string {
     replay: { en: "replay", pt: "replay" },
     live: { en: "live model", pt: "modelo real" },
     service: { en: "services, fake model", pt: "serviços, modelo fake" },
+    measured: { en: "measured, no model involved", pt: "medido, sem modelo" },
   };
   return words[mode][lang];
 }

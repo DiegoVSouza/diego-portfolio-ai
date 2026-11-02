@@ -18,6 +18,9 @@ const REPOS = {
   p04: "supportops-async",
   p05: "supportops-platform",
   p06: "supportops-console",
+  p07: "diego-portfolio-ai",
+  p08: "colagem-ui",
+  lab: "ai-engineer-lab",
 };
 
 const git = (dir, ...args) => execFileSync("git", ["-C", dir, ...args], { encoding: "utf8" }).trim();
@@ -45,7 +48,7 @@ export function fromRegex(text, pattern, template) {
 function build() {
   const records = [];
   for (const source of sources) {
-    const dir = join(root, "..", source.repo);
+    const dir = source.repo === "lab" ? join(root, "..", "..") : join(root, "..", source.repo);
     if (!existsSync(join(dir, ".git"))) return null;
     const file = join(dir, source.path);
     if (!existsSync(file)) throw new Error(`${source.id}: ${source.repo}/${source.path} is missing`);
