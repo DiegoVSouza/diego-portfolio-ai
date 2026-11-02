@@ -1,0 +1,11 @@
+mobile 1 exit=1
+mobile 2 exit=1
+mobile 3 exit=1
+mobile 4 exit=1
+mobile 5 exit=1
+desktop 1 exit=1
+desktop 2 exit=1
+desktop 3 exit=1
+desktop 4 exit=1
+desktop 5 exit=1
+done
