@@ -109,13 +109,14 @@ test("the demo page requests nothing from a third party until a site key exists,
   await page.waitForTimeout(500);
   const own = new URL(page.url()).origin;
   // Without a site key no third party is contacted. Against the deployed site a key exists, and then the Turnstile script is the one
-  // allowed third-party request: no other origin, and never a POST.
+  // allowed third-party request: no other origin, and no POST to anything else.
   const status = process.env.PUBLIC_URL ? await page.request.get("/api/status").then((r) => r.json() as Promise<{ turnstileSiteKey?: string | null }>) : {};
   const allowed = status.turnstileSiteKey ? "https://challenges.cloudflare.com/" : undefined;
   // The script may also load a worker from a blob: URL that carries the same origin.
   const target = (r: string) => r.split(" ")[1]!.replace(/^blob:/, "");
   expect(requests.filter((r) => !target(r).startsWith(own) && !(allowed && target(r).startsWith(allowed)))).toEqual([]);
-  expect(requests.filter((r) => r.startsWith("POST"))).toEqual([]);
+  // Nothing of ours is posted (no wake request). The Turnstile widget posts to its own origin while it runs, and that is its business.
+  expect(requests.filter((r) => r.startsWith("POST") && !(allowed && target(r).startsWith(allowed)))).toEqual([]);
 });
 
 test("the home page has the role in the first screen, and a squint screenshot is saved for review", async ({ page }) => {

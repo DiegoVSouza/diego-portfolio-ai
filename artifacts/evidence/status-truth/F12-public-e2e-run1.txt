@@ -1,0 +1,83 @@
+
+Running 50 tests using 1 worker
+
+  ✓   1 e2e\flow.spec.ts:12:3 › case stops › three stops are stacked and visible at once, and the rail links to each (554ms)
+  ✓   2 e2e\flow.spec.ts:25:3 › case stops › the next button ends each stop and walks to the following one (467ms)
+  ✓   3 e2e\flow.spec.ts:35:3 › case stops › arriving at the live demo from another page loads the document that may use Turnstile (1.2s)
+  ✓   4 e2e\flow.spec.ts:48:3 › case stops › old anchors land on their section: a link to #numbers shows Results (415ms)
+  ✓   5 e2e\flow.spec.ts:56:3 › case stops › without JavaScript every stop is stacked and visible, and there is no tab bar (750ms)
+  ✓   6 e2e\flow.spec.ts:65:3 › case stops › a case passes axe in both languages and at both widths (5.8s)
+  ✓   7 e2e\flow.spec.ts:79:3 › descent, simple version and back to the surface › opening a project plays the stripes, and reduced motion changes the page at once (6.0s)
+  ✓   8 e2e\flow.spec.ts:116:3 › descent, simple version and back to the surface › the simple version turns the scene off, is remembered, and turns back on (1.3s)
+  ✓   9 e2e\flow.spec.ts:134:3 › descent, simple version and back to the surface › Back to the surface returns to the same project on the home (1.9s)
+  ✓  10 e2e\flow.spec.ts:149:3 › metro line › on a wide screen the line lists the eight stations and marks the open project (327ms)
+  ✓  11 e2e\flow.spec.ts:158:3 › metro line › on a narrow screen the line is a bar with previous and next, and next opens the next project (1.0s)
+  ✓  12 e2e\flow.spec.ts:172:3 › metro line › the j and k keys move one station, and do nothing while typing (1.3s)
+  ✓  13 e2e\flow.spec.ts:189:3 › metro line › the home is a game menu: a click, j and k and the number keys fly to each stop, and each is announced (8.5s)
+  ✓  14 e2e\flow.spec.ts:221:3 › metro line › the line passes axe on the home and on a case, at both widths (5.1s)
+  ✓  15 e2e\journey.spec.ts:15:3 › the trail walks from the home page through 8 projects to contact (en) (6.2s)
+  ✓  16 e2e\journey.spec.ts:15:3 › the trail walks from the home page through 8 projects to contact (pt) (6.1s)
+  ✓  17 e2e\palette.spec.ts:10:1 › the palette opens with / and with Ctrl+K, filters, and Enter goes to the page (487ms)
+  ✓  18 e2e\palette.spec.ts:28:1 › typing a slash in a form field does not open the palette (346ms)
+  ✓  19 e2e\palette.spec.ts:36:1 › arrow keys move the selection and the palette reaches a project in Portuguese (869ms)
+  ✓  20 e2e\palette.spec.ts:47:1 › the footer button opens the palette for a mouse user (327ms)
+  ✓  21 e2e\palette.spec.ts:53:1 › the home announces the active stop when the scroll changes it (1.0s)
+  ✓  22 e2e\scene.spec.ts:18:1 › SCENE-001/002/004: the 3d scene starts under the CSP, is hidden from assistive technology and takes no pointer events (1.0s)
+  ✓  23 e2e\scene.spec.ts:39:1 › SCENE-003: under reduced motion the scene is static and offers no motion toggle (837ms)
+  ✓  24 e2e\scene.spec.ts:52:1 › SCENE-001: without WebGL the level 1 background stays, with no error (361ms)
+  ✓  25 e2e\scene.spec.ts:71:1 › a case page holds the camera at its own project and does not scroll the scene (1.2s)
+  ✓  26 e2e\scene.spec.ts:86:1 › the scene stays off pages that do not use it (284ms)
+  ✓  27 e2e\scene.spec.ts:92:1 › a portrait screen keeps the level 1 background and mounts no canvas (1.9s)
+  ✓  28 e2e\scene.spec.ts:104:1 › static frame of the contact section (scene S5) (364ms)
+  ✓  29 e2e\scene.spec.ts:112:1 › the half-tone pass is on by default, the h key and the button turn it off, and the choice is remembered (2.0s)
+  ✓  30 e2e\scene.spec.ts:133:1 › SCENE-003: the RGB split fires only after a selection settles, and never under reduced motion (2.9s)
+  ✓  31 e2e\site.spec.ts:26:3 › every route passes axe with contrast, does not overflow, and logs no errors at 1000px (20.6s)
+  ✓  32 e2e\site.spec.ts:26:3 › every route passes axe with contrast, does not overflow, and logs no errors at 360px (18.1s)
+  ✓  33 e2e\site.spec.ts:51:1 › with JavaScript off, every route still shows its heading, and a case shows its diagram and its list (SEO-001, FLOW-005) (2.1s)
+  ✓  34 e2e\site.spec.ts:64:1 › English and Portuguese link to each other and set the document language (909ms)
+  ✓  35 e2e\site.spec.ts:74:1 › keyboard: skip link, then a project, then back (1.4s)
+  ✓  36 e2e\site.spec.ts:87:1 › the diagram walks through scenes and a failure scenario by keyboard, at both widths (763ms)
+  ✘  37 e2e\site.spec.ts:104:1 › the demo page requests nothing from a third party until a site key exists, and wakes nothing (LIVE-004, SEC-001) (1.1s)
+  ✓  38 e2e\site.spec.ts:121:1 › the home page has the role in the first screen, and a squint screenshot is saved for review (1.2s)
+  ✓  39 e2e\site.spec.ts:134:1 › the demo page passes axe when a real run lights nodes in the diagram (accessible names include the measurement) (2.0s)
+  -  40 e2e\v2.spec.ts:21:1 › the demo is ready on arrival: a clear call to action and the accounts with copy buttons
+  -  41 e2e\v2.spec.ts:35:1 › a guided-tour step opens on click and by keyboard, and never on hover
+  ✓  42 e2e\v2.spec.ts:57:1 › a project page is three separate chapters, each with a banner, a body and one action; the flow has its navigation and its scenarios on two rows (435ms)
+  ✓  43 e2e\v2.spec.ts:92:1 › a wide diagram is folded into rows so its boxes are drawn large, and nothing is cut (365ms)
+  ✓  44 e2e\v2.spec.ts:110:1 › a diagram fills its stop (no sideways scroll), says where to click, plays itself, and keeps its text version only for screen readers (360ms)
+  ✓  45 e2e\v2.spec.ts:135:1 › under reduced motion the diagram does not play itself and nothing pulses (1.8s)
+  ✓  46 e2e\v2.spec.ts:148:1 › the home is a wide stage: the menu on the left, the card as a sign filling most of the screen, no text spilling out (1.1s)
+  ✓  47 e2e\v2.spec.ts:169:1 › travelling: the camera parks on each card, swings between stops, and each card hangs in its own part of the city (1.6s)
+  ✓  48 e2e\v2.spec.ts:203:1 › travelling under reduced motion: no swing, no events, the scroll still reaches every stop (2.0s)
+  ✓  49 e2e\v2.spec.ts:223:1 › the scene is built from the real downloaded models, not the fallbacks (assets: buildings, cars, metro stations) (767ms)
+  ✓  50 e2e\v2.spec.ts:247:1 › the CC BY credit for the metro station is on every page, with links to the pack and to the licence (450ms)
+
+
+  1) e2e\site.spec.ts:104:1 › the demo page requests nothing from a third party until a site key exists, and wakes nothing (LIVE-004, SEC-001) 
+
+    Error: expect(received).toEqual(expected) // deep equality
+
+    - Expected  - 1
+    + Received  + 3
+
+    - Array []
+    + Array [
+    +   "POST https://challenges.cloudflare.com/cdn-cgi/challenge-platform/h/b/fo/2796247242:1793632226:yvx98Iom8COERTOOhkqkk5247GzNokBFTAicz0A06-k/a5445aad6e3c0b0d/CuPJ55l1dQhnHVfu27ho8P69NHwPZJFll49uXHC4ylLAd5IRicxiI2lNrR6m_wrddt_r3tJiXA-vq8SRkwlGoIZElPFXt6Qw9yMMAl8HpLY8p8gRQCFrMUoVFEfr8cLrHQ",
+    + ]
+
+      116 |   const target = (r: string) => r.split(" ")[1]!.replace(/^blob:/, "");
+      117 |   expect(requests.filter((r) => !target(r).startsWith(own) && !(allowed && target(r).startsWith(allowed)))).toEqual([]);
+    > 118 |   expect(requests.filter((r) => r.startsWith("POST"))).toEqual([]);
+          |                                                        ^
+      119 | });
+      120 |
+      121 | test("the home page has the role in the first screen, and a squint screenshot is saved for review", async ({ page }) => {
+        at C:\estudo\Golpe\lab\projects\p07\e2e\site.spec.ts:118:56
+
+    Error Context: test-results\site-the-demo-page-request-46982-s-nothing-LIVE-004-SEC-001-\error-context.md
+
+  1 failed
+    e2e\site.spec.ts:104:1 › the demo page requests nothing from a third party until a site key exists, and wakes nothing (LIVE-004, SEC-001) 
+  2 skipped
+  47 passed (2.0m)
+exit=1
