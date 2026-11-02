@@ -9,7 +9,9 @@
  *  4. at or above the ceiling sets `autostart_disabled` and stops every running machine with the write token.
  *
  * The number is an estimate from machine events at list prices, not the invoice. The Fly dashboard is the source
- * of truth. Prices below are rounded up from the rates reported for October 2026 (256 MB about USD 2.19 a month, 512 MB 3.69, 1 GB 6.70). The sources were secondary (articles); the official pricing page was not confirmed, so the figures stay PENDING.
+ * of truth. Prices below are rounded up from the official pricing page (docs.fly.io/about/pricing, read 2026-11-02, no page date, lowest-priced
+ * regions): shared-cpu-1x 256 MB USD 2.19 a month, 512 MB 3.69, 1 GB 6.70, billed by the second while running. That page shows no per-hour
+ * figure, so each hourly row is the monthly price over 730 hours, rounded up. The 2048 MB row is not on that page and stays PENDING.
  */
 
 export interface KV {
