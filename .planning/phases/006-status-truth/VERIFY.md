@@ -2,8 +2,8 @@
 
 Evidence is under `artifacts/evidence/status-truth/` unless another path is given.
 
-- [ ] Hosted CI green on every repository head (`F6-hosted-ci-after-push.txt`, filled when the runs finish)
-- [ ] Hosted CI of P07 green on the deployed commit (STAT-005), same file
+- [x] Hosted CI green on every repository head (`F6-hosted-ci-after-push.txt`: eight green; P07 was red on `f2efce2` and green on `bd1d3b1`, `F7-p07-hosted-ci.txt`)
+- [x] Hosted CI of P07 green on the fixed head, which is what was deployed (`F7-p07-hosted-ci.txt`)
 - [x] `status-truth.test.ts` red before (`F3-status-truth-red.txt`), green after (`F2-p07-check-full.txt`, `F6-p07-check-full-final.txt`)
 - [x] Catalog lists P00 to P08 and the lab with version and repository (`src/status-truth.test.ts`, STAT-002)
 - [x] Every card seal derived; none says "published" or "live" (STAT-003, STAT-006)
@@ -12,7 +12,7 @@ Evidence is under `artifacts/evidence/status-truth/` unless another path is give
 - [x] P02 adapter: red then green then check_fast exit 0 (P05 `artifacts/evidence/toolkit-limits-037/`), deployed with one live run under the limit
 - [x] P04 RAG ADR committed (P04 `docs/harness/decisions.md`)
 - [x] `python scripts/check_full.py` exit 0 in P07: unit 73, e2e 50 (`F6-p07-check-full-final.txt`)
-- [ ] Public e2e after deploy, 3 runs in a row
+- [ ] Public e2e after deploy, 3 runs in a row: 2 of 3 (`F8-public-e2e-run1..3.txt`). Run 1 failed on console noise, see below
 - [x] Remaining `PENDING` items each have a cause and an owner (see below)
 
 ## Left open, with cause and owner
@@ -25,6 +25,8 @@ Evidence is under `artifacts/evidence/status-truth/` unless another path is give
 | Third-party IdP acceptance | Keycloak on Fly is the lab's own | owner (a provider account) |
 | Production metrics (P03), production acceptance of trace export (P04) | one real trace was checked; no metrics run exists | a later phase |
 | Demo password rotation | the IdP image has the admin API switched off on purpose; the passwords are published by design on `/api/status` | owner decision |
+| Public e2e run 1 failed on `Connecting to 'data:,' violates ... Content Security Policy` on `/projects/supportops/`, likely the Cloudflare Turnstile script now that the widget is enabled; runs 2 and 3 passed. CSP or test not changed without a decision | owner (allow `data:` in connect-src, or filter that third-party message) |
+| Second real defect found by hosted CI: Back to the surface landed on the previous stop in 3D (fixed in `9ad435e`) | closed |
 | Menu over footer text at the page end | `home-3d.png` (scrolled to the bottom at 1280x720) shows the fixed menu covering part of the credits line; not fixed in this phase | next P07 phase (squint review) |
 | Metro index on mobile, symbol hero on case pages | feature work not started | next P07 phase |
 | P00 local service e2e | Docker containers were not started | P00 phase |
