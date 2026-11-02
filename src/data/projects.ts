@@ -122,8 +122,8 @@ const limits: Record<string, Limit[]> = {
   p06: [
     {
       text: {
-        en: "Not covered: a screen-reader pass by a person, silent token renewal past the five-minute lifetime in a browser, and the full P05 service gate on 0.4.4.",
-        pt: "Não coberto: passagem com leitor de tela feita por uma pessoa, renovação silenciosa do token além dos cinco minutos em navegador, e o gate de serviços completo do P05 na 0.4.4.",
+        en: "Not covered: a screen-reader pass by a person, and the full P05 service gate on the current P05 version (last run on 0.4.4). Silent token renewal past the five-minute lifetime passed in a real browser on 2026-11-02.",
+        pt: "Não coberto: passagem com leitor de tela feita por uma pessoa, e o gate de serviços completo do P05 na versão atual (última execução na 0.4.4). A renovação silenciosa do token além dos cinco minutos passou em navegador real em 2026-11-02.",
       },
       source: ".planning/phases/001-console/VERIFY.md",
     },

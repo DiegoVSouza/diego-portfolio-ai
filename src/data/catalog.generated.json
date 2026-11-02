@@ -27,6 +27,18 @@
     "p06": {
       "version": "0.1.0",
       "repo": "https://github.com/DiegoVSouza/supportops-console"
+    },
+    "p07": {
+      "version": "0.1.0",
+      "repo": "https://github.com/DiegoVSouza/diego-portfolio-ai"
+    },
+    "p08": {
+      "version": "0.4.4",
+      "repo": "https://github.com/DiegoVSouza/colagem-ui"
+    },
+    "lab": {
+      "version": "",
+      "repo": "https://github.com/DiegoVSouza/ai-engineer-lab"
     }
   },
   "projects": {
@@ -62,53 +74,53 @@
       {
         "id": "local-services-and-hosted-ci",
         "description": "",
-        "status": "incomplete",
-        "evidence": "artifacts/evidence/doctor.md and artifacts/evidence/phase-003-environment.md",
-        "state": "open"
+        "status": "PASS_HOSTED_CI_LINUX; LOCAL_SERVICE_E2E_PENDING",
+        "evidence": "artifacts/evidence/status-reconcile-hosted-ci.txt (hosted CI success on 047eef5); artifacts/evidence/doctor.md and artifacts/evidence/phase-003-environment.md (Postgres, Redis and LocalStack containers were not started)",
+        "state": "partial"
       }
     ],
     "p01": [
       {
         "id": "core-supervisor",
         "description": "Bounded supervisor-worker runner with shared state",
-        "status": "passes: true",
-        "evidence": "",
-        "state": "claimed"
+        "status": "PASS_LOCAL_FAKE",
+        "evidence": "artifacts/evidence/status-reconcile/unittest-fake.txt (119 tests, exit 0); test_core.CoreRunnerTests",
+        "state": "verified"
       },
       {
         "id": "core-stop-conditions",
         "description": "Approval, escalation, max steps, and malformed worker outputs",
-        "status": "passes: true",
-        "evidence": "",
-        "state": "claimed"
+        "status": "PASS_LOCAL_FAKE",
+        "evidence": "artifacts/evidence/status-reconcile/unittest-fake.txt (119 tests, exit 0); test_runner_contract.test_all_runners_stop_at_the_shared_step_boundary; test_all_runners_propagate_worker_escalations; test_langgraph budget and escalation tests",
+        "state": "verified"
       },
       {
         "id": "runner-registry",
         "description": "Stable names and explicit unavailable adapters",
-        "status": "passes: true",
-        "evidence": "",
-        "state": "claimed"
+        "status": "PASS_LOCAL_FAKE",
+        "evidence": "artifacts/evidence/status-reconcile/unittest-fake.txt (119 tests, exit 0); test_core.test_registry_does_not_impersonate_missing_framework",
+        "state": "verified"
       },
       {
         "id": "framework-adapters",
         "description": "Five real framework adapters conforming to TriageRunner",
-        "status": "passes: true",
-        "evidence": "",
-        "state": "claimed"
+        "status": "PASS_LOCAL_FAKE",
+        "evidence": "artifacts/evidence/status-reconcile/unittest-fake.txt (119 tests, exit 0); test_runner_contract.SharedRunnerContractTests across all runners",
+        "state": "verified"
       },
       {
         "id": "langgraph-recovery-hitl",
         "description": "SQLite checkpoint recovery and HITL pause/resume",
-        "status": "passes: true",
-        "evidence": "",
-        "state": "claimed"
+        "status": "PASS_LOCAL_FAKE",
+        "evidence": "artifacts/evidence/status-reconcile/unittest-fake.txt (119 tests, exit 0); test_langgraph checkpoint-survives-process-exit and interrupt-resume tests",
+        "state": "verified"
       },
       {
         "id": "run-checkpoint-identity",
         "description": "Fresh checkpoint identity per execution; explicit resume key supports cross-process recovery",
-        "status": "passes: true",
-        "evidence": "",
-        "state": "claimed"
+        "status": "PASS_LOCAL_FAKE",
+        "evidence": "artifacts/evidence/status-reconcile/unittest-fake.txt (119 tests, exit 0); test_langgraph.test_repeated_ticket_gets_fresh_checkpoint_without_resume_key",
+        "state": "verified"
       },
       {
         "id": "comparison-and-docs",
@@ -116,6 +128,13 @@
         "status": "PASS",
         "evidence": "artifacts/evidence/check-full.txt; all six adapters exercised 60 versioned P00 cases; unsupported P00 semantics are listed per case.",
         "state": "verified"
+      },
+      {
+        "id": "framework-quality-metrics",
+        "description": "Comparable quality, cost and latency metrics across the runners",
+        "status": "PENDING",
+        "evidence": "artifacts/evidence/check-full.txt: 6 runner identities found; metrics remain PENDING",
+        "state": "open"
       }
     ],
     "p02": [
@@ -136,9 +155,9 @@
       {
         "id": "token-limit-in-agent-path",
         "description": "",
-        "status": "INCOMPLETE",
-        "evidence": "P02 does not own an LLM/agent runtime; callers must report usage via ExecutionLimits.consume(tokens=...).",
-        "state": "open"
+        "status": "PASS_ADAPTER_IN_P05_TESTED; FLY_DEPLOY_PENDING",
+        "evidence": "P02 itself owns no runtime; the caller reports usage. P05 phase 037 does it on the live path: artifacts/evidence/status-reconcile/p05-adapter-red.txt; p05-adapter-green.txt; p05-adapter-check-fast.txt",
+        "state": "partial"
       },
       {
         "id": "schema-validation-subset",
@@ -274,6 +293,13 @@
         "status": "PASS_UNIT",
         "evidence": "artifacts/evidence/span-status-privacy-017/focused-tests.txt",
         "state": "verified"
+      },
+      {
+        "id": "fly-trace-content-free",
+        "description": "Traces of a real triage on the Fly stack reach Jaeger with no content attributes",
+        "status": "PASS_FLY_ONE_RUN; PRODUCTION_METRICS_PENDING",
+        "evidence": "artifacts/evidence/status-reconcile/jaeger-p05-runtime-summary.json (60 traces, 287 spans, one full triage trace with agent.triage, four llm.inference, three MCP tool calls; the only attribute keys matching prompt/content/message/token are token counts)",
+        "state": "partial"
       }
     ],
     "p04": [
@@ -376,26 +402,26 @@
         "state": "partial"
       },
       {
-        "id": "P04-RAG",
-        "description": "Retrieve attributable, authorized knowledge from a P04-owned source",
-        "status": "INCOMPLETE",
-        "evidence": "No P04-owned retrieval source, corpus or tenant protocol exists",
-        "state": "open"
+        "id": "P04-FLY-QUEUE-RUN",
+        "description": "The API, the Redis Streams queue and the worker run on Fly and finish a task",
+        "status": "PASS_FLY_ONE_RUN",
+        "evidence": "artifacts/evidence/status-reconcile/fly-queue-acceptance.txt (create 202, task done at step 2:draft_reply, 2026-11-02); earlier run in the lab at artifacts/evidence/fly/p04-redis-queue-acceptance.txt",
+        "state": "verified"
       }
     ],
     "p05": [
       {
         "id": "auth-tenant-scope",
         "description": "Locally verified JWT or introspected principal scopes API and repository access by tenant",
-        "status": "PASS_LOCAL_HS256_AND_KEYCLOAK_OIDC; INCOMPLETE_EXTERNAL_IDP_ACCEPTANCE",
-        "evidence": "artifacts/evidence/phase-009-full-gate-final.txt; artifacts/evidence/phase-015-keycloak-api.txt",
+        "status": "PASS_LOCAL_HS256_AND_KEYCLOAK_OIDC; PASS_KEYCLOAK_ON_FLY; THIRD_PARTY_IDP_PENDING",
+        "evidence": "artifacts/evidence/phase-009-full-gate-final.txt; artifacts/evidence/phase-015-keycloak-api.txt; artifacts/evidence/status-reconcile/keycloak-on-fly-oidc-acceptance.txt; artifacts/evidence/status-reconcile/keycloak-on-fly-mcp-acceptance.txt; artifacts/evidence/status-reconcile/console-e2e-on-fly-head-20261102.txt",
         "state": "partial"
       },
       {
         "id": "mcp-trusted-principal",
         "description": "In-memory MCP tools use injected principal and fail closed without it",
-        "status": "PASS_LOCAL_TCP; INCOMPLETE_EXTERNAL_IDENTITY",
-        "evidence": "artifacts/evidence/phase-009-full-gate-final.txt",
+        "status": "PASS_LOCAL_TCP; PASS_KEYCLOAK_ON_FLY; THIRD_PARTY_IDP_PENDING",
+        "evidence": "artifacts/evidence/phase-009-full-gate-final.txt; artifacts/evidence/status-reconcile/keycloak-on-fly-oidc-acceptance.txt; artifacts/evidence/status-reconcile/keycloak-on-fly-mcp-acceptance.txt; artifacts/evidence/status-reconcile/console-e2e-on-fly-head-20261102.txt",
         "state": "partial"
       },
       {
@@ -429,8 +455,8 @@
       {
         "id": "network-mcp-auth",
         "description": "Verified bearer creates a tenant principal through authenticated Streamable HTTP over loopback TCP",
-        "status": "PASS_LOCAL_HS256_AND_RFC7662_CONTRACT; INCOMPLETE_EXTERNAL_IDP_ACCEPTANCE",
-        "evidence": "artifacts/evidence/phase-010-full-gate.txt; artifacts/evidence/phase-011-introspection-green.txt; artifacts/evidence/phase-014-service-summary.json",
+        "status": "PASS_LOCAL_HS256_AND_RFC7662_CONTRACT; PASS_KEYCLOAK_ON_FLY; THIRD_PARTY_IDP_PENDING",
+        "evidence": "artifacts/evidence/phase-010-full-gate.txt; artifacts/evidence/phase-011-introspection-green.txt; artifacts/evidence/phase-014-service-summary.json; artifacts/evidence/status-reconcile/keycloak-on-fly-oidc-acceptance.txt; artifacts/evidence/status-reconcile/keycloak-on-fly-mcp-acceptance.txt; artifacts/evidence/status-reconcile/console-e2e-on-fly-head-20261102.txt",
         "state": "partial"
       },
       {
@@ -457,8 +483,8 @@
       {
         "id": "product-end-to-end-orchestration",
         "description": "Durable authenticated API to P04 worker to P01 agent to PostgreSQL RAG/MCP flow",
-        "status": "PASS_LOCAL_SERVICE; INCOMPLETE_EXTERNAL_IDENTITY",
-        "evidence": "artifacts/evidence/phase-010-full-gate.txt; artifacts/evidence/phase-010-service-summary.json; artifacts/evidence/phase-014-full-gate.txt; artifacts/evidence/phase-014-service-summary.json",
+        "status": "PASS_LOCAL_SERVICE; PASS_KEYCLOAK_ON_FLY; THIRD_PARTY_IDP_PENDING",
+        "evidence": "artifacts/evidence/phase-010-full-gate.txt; artifacts/evidence/phase-010-service-summary.json; artifacts/evidence/phase-014-full-gate.txt; artifacts/evidence/phase-014-service-summary.json; artifacts/evidence/status-reconcile/keycloak-on-fly-oidc-acceptance.txt; artifacts/evidence/status-reconcile/keycloak-on-fly-mcp-acceptance.txt; artifacts/evidence/status-reconcile/console-e2e-on-fly-head-20261102.txt",
         "state": "partial"
       },
       {
@@ -506,8 +532,15 @@
       {
         "id": "demo-live-v1",
         "description": "Accounted live triage for public traffic: Postgres ledger failing closed at USD 10, 429 failover across numbered credentials, per-step llm_steps",
-        "status": "PASS_LOCAL_OFFLINE_FAKE_TRANSPORT; LIVE_SMOKE_PENDING; FLY_DEPLOY_PENDING",
-        "evidence": ".planning/phases/036-demo-live/VERIFY.md; artifacts/evidence/demo-live-v1/pytest-demo-live-postgres.txt",
+        "status": "PASS_LOCAL_OFFLINE_FAKE_TRANSPORT; PASS_LIVE_RUNS_ON_FLY; PASS_FLY_DEPLOYED",
+        "evidence": ".planning/phases/036-demo-live/VERIFY.md; artifacts/evidence/demo-live-v1/pytest-demo-live-postgres.txt; artifacts/evidence/status-reconcile/live-smoke-20261031.txt (one ticket, four live calls on four keys); artifacts/evidence/status-reconcile/live-demo-runs-20261102.json (three live runs listed by /v1/demo/runs, latest 2026-11-02T14:07Z, model openai/gpt-oss-20b)",
+        "state": "verified"
+      },
+      {
+        "id": "toolkit-token-limit-live-path",
+        "description": "Each live triage run reports real token usage to the toolkit's ExecutionLimits and stops at its limits",
+        "status": "PASS_LOCAL_FAKE_TRANSPORT; FLY_DEPLOY_PENDING",
+        "evidence": ".planning/phases/037-toolkit-limits/VERIFY.md; artifacts/evidence/toolkit-limits-037/red.txt; artifacts/evidence/toolkit-limits-037/green.txt; artifacts/evidence/toolkit-limits-037/check-fast.txt",
         "state": "partial"
       }
     ],
@@ -543,8 +576,175 @@
       {
         "id": "console-design-system",
         "description": "UI on colagem-ui level 0, cross-origin API base, wake notice, Pages output",
-        "status": "PASS_LOCAL_OFFLINE_BROWSER; REAL_STACK_E2E_PENDING; PAGES_DEPLOY_PENDING",
-        "evidence": ".planning/phases/003-colagem-ui/VERIFY.md",
+        "status": "PASS_LOCAL_OFFLINE_BROWSER; PASS_REAL_STACK_E2E_ON_FLY; PAGES_DEPLOY_NOT_PLANNED_CONSOLE_SERVED_FROM_FLY",
+        "evidence": ".planning/phases/003-colagem-ui/VERIFY.md; artifacts/evidence/status-reconcile/e2e-fly-head.txt (P06 7898c8a against the Fly stack: 3 passed, renewal spec skipped by design); artifacts/evidence/status-reconcile/e2e-fly-renewal.txt (E2E_RENEWAL=1, silent renewal passed in 4.1 min). The console is served by supportops-lab-web on Fly by owner decision; there is no Pages project for it",
+        "state": "verified"
+      }
+    ],
+    "p07": [
+      {
+        "id": "portfolio-catalog",
+        "description": "Generated catalog from sibling feature lists, with drift check",
+        "status": "PASS_LOCAL",
+        "evidence": ".planning/phases/001-portfolio/VERIFY.md; artifacts/evidence/portfolio-001/check-fast.txt",
+        "state": "verified"
+      },
+      {
+        "id": "portfolio-pages",
+        "description": "Home, project pages, method section and language toggle, on colagem-ui level 1",
+        "status": "PASS_LOCAL",
+        "evidence": "artifacts/evidence/portfolio-001/check-full.txt",
+        "state": "verified"
+      },
+      {
+        "id": "portfolio-quality",
+        "description": "axe, bundle budget and CSP gates",
+        "status": "PASS_LOCAL; SCREEN_READER_AND_OWNER_SQUINT_REVIEW_PENDING",
+        "evidence": "artifacts/evidence/portfolio-001/check-full.txt",
+        "state": "partial"
+      },
+      {
+        "id": "portfolio-deploy",
+        "description": "Hosting and public URL on Cloudflare Pages",
+        "status": "PASS_PAGES_DEPLOYED; CLEAN_TREE_DEPLOY_PENDING",
+        "evidence": "artifacts/evidence/portfolio-w7b/deploy-pages.txt; latest deploy record artifacts/evidence/pages/portfolio-20261102T102556.json in the lab repository was made with dirty=true",
+        "state": "partial"
+      },
+      {
+        "id": "portfolio-design-system",
+        "description": "colagem-ui adoption: no local color, pinned tarball",
+        "status": "PASS_LOCAL",
+        "evidence": "src/rules.test.ts; docs/harness/sources.lock.json",
+        "state": "verified"
+      },
+      {
+        "id": "portfolio-public-readiness",
+        "description": "Secrets, license, clean clone and hosted CI across repositories",
+        "status": "PASS_ALL_REPOSITORIES_PUBLIC; HOSTED_CI_P07_PENDING",
+        "evidence": ".planning/phases/003-real-portfolio/SPEC.md; artifacts/evidence/status-truth/F1-hosted-ci.txt (P07 red on 143ef9c); artifacts/evidence/status-truth/F2-p07-failing-5-after-fix.txt",
+        "state": "partial"
+      },
+      {
+        "id": "portfolio-evidence-model",
+        "description": "Every number as a verified evidence record with mode and permalink",
+        "status": "PASS_LOCAL",
+        "evidence": "src/rules.test.ts; artifacts/evidence/portfolio-w7/check-full.txt",
+        "state": "verified"
+      },
+      {
+        "id": "portfolio-case-pages",
+        "description": "Prerendered home, cases, evidence board and method, EN and pt-BR",
+        "status": "PASS_LOCAL",
+        "evidence": "artifacts/evidence/portfolio-w7/check-full.txt",
+        "state": "verified"
+      },
+      {
+        "id": "portfolio-demo-tiers",
+        "description": "Tier 0 replay and Tier 1 real stack with wake state",
+        "status": "PASS_LIVE_RUN_LOG_ONE_RUN; TURNSTILE_START_FLOW_PENDING",
+        "evidence": "artifacts/evidence/portfolio-w7b/demo-live.png",
+        "state": "partial"
+      },
+      {
+        "id": "portfolio-routes-evidence",
+        "description": "Prerendered EN and pt-BR routes, evidence records from sibling commits, flow diagrams, Functions with mocks",
+        "status": "PASS_LOCAL_AND_DEPLOYED",
+        "evidence": "artifacts/evidence/portfolio-w7/check-full.txt; artifacts/evidence/portfolio-w7b/deploy-pages.txt",
+        "state": "verified"
+      },
+      {
+        "id": "portfolio-3d-scene",
+        "description": "Level 2 Three.js city journey with fallbacks",
+        "status": "PASS_LOCAL_AND_DEPLOYED; DEVICE_FPS_PENDING",
+        "evidence": "artifacts/evidence/portfolio-w11/e2e-edge.txt; artifacts/evidence/portfolio-w12/e2e-edge.txt; SCENE-005 device FPS has no measurement",
+        "state": "partial"
+      },
+      {
+        "id": "status-truth",
+        "description": "Card seals are derived from catalog records; the catalog covers P00 to P08 and the lab",
+        "status": "PASS_LOCAL",
+        "evidence": "src/status-truth.test.ts; artifacts/evidence/status-truth/F3-status-truth-red.txt (red before); artifacts/evidence/status-truth/F2-p07-check-full.txt (green after)",
+        "state": "verified"
+      },
+      {
+        "id": "portfolio-full-gate",
+        "description": "Full local gate (lint, types, unit, build, budget, 50 browser tests) on the current head",
+        "status": "PASS_LOCAL_FULL_GATE; HOSTED_CI_PENDING_PUSH",
+        "evidence": "artifacts/evidence/status-truth/F2-p07-check-full.txt; artifacts/evidence/status-truth/F2-p07-failing-5-after-fix.txt (five e2e tests that were red on 143ef9c, fixed); hosted run on 143ef9c was red (F1-hosted-ci.txt)",
+        "state": "partial"
+      }
+    ],
+    "p08": [
+      {
+        "id": "tokens-contrast",
+        "description": "tokens.css matches the design system contrast table",
+        "status": "PASS_LOCAL",
+        "evidence": "artifacts/evidence/colagem-ui-001/check-full.txt",
+        "state": "verified"
+      },
+      {
+        "id": "components-core",
+        "description": "Level 0 components with glyph seals, cut cards, forms, feedback",
+        "status": "PASS_LOCAL; SCREEN_READER_PENDING",
+        "evidence": "artifacts/evidence/colagem-ui-001/check-full.txt",
+        "state": "partial"
+      },
+      {
+        "id": "layers-2d",
+        "description": "Level 1 2D layers, reduced motion and background selector",
+        "status": "PASS_LOCAL; SQUINT_REVIEW_BY_OWNER_PENDING",
+        "evidence": "artifacts/evidence/colagem-ui-001/gallery-1000-squint.png",
+        "state": "partial"
+      },
+      {
+        "id": "package-tarball",
+        "description": "Pinned tarball with SHA-256 for consumers",
+        "status": "PASS_LOCAL",
+        "evidence": "artifacts/package.json",
+        "state": "verified"
+      },
+      {
+        "id": "level-2-3d",
+        "description": "Three.js scene",
+        "status": "PENDING",
+        "evidence": "Not exported by the package. The Three.js scene is built inside P07 (src/scene); no run of it as a package feature exists",
+        "state": "open"
+      },
+      {
+        "id": "flow-diagram",
+        "description": "FlowDiagram with build-time ELK layout, SVG in React, walkthrough, failure scenarios, text version and Mermaid export",
+        "status": "PASS_LOCAL_REAL_CHROME_AXE",
+        "evidence": "artifacts/evidence/colagem-ui-040/check-full.txt",
+        "state": "verified"
+      }
+    ],
+    "lab": [
+      {
+        "id": "harness-kit-acceptance",
+        "description": "Kit bootstrap accepted on a positive case; overwrite and a risky tool combination are rejected",
+        "status": "PASS_LOCAL",
+        "evidence": "artifacts/evidence/harness-kit/acceptance-exit-codes.json (positive 0, overwrite 1, trifecta 1); validation-exit-codes.json (0, 0)",
+        "state": "verified"
+      },
+      {
+        "id": "fly-stack-autostart-idle-stop",
+        "description": "Fly stack wakes on request and stops by itself when idle",
+        "status": "PASS_FLY_ONE_RUN",
+        "evidence": "artifacts/evidence/fly/autostart-acceptance.txt (wake http 200 for p04, p05, mcp); artifacts/evidence/fly/idle-acceptance/idle-probe.txt (all stopped after 671 s, wake 16 s)",
+        "state": "verified"
+      },
+      {
+        "id": "hosted-ci-nine-repositories",
+        "description": "Hosted CI on Linux for the lab's nine project repositories",
+        "status": "PASS_HOSTED_CI_8_OF_9; P07_HOSTED_CI_PENDING",
+        "evidence": "projects/p07/artifacts/evidence/status-truth/F1-hosted-ci.txt (P07 red on 143ef9c); F2-p07-failing-5-after-fix.txt (fix verified locally, not yet pushed)",
+        "state": "partial"
+      },
+      {
+        "id": "public-readiness-audit",
+        "description": "Secret, personal-data and licence audit across the lab and the nine repositories",
+        "status": "PASS_AUDIT_RUN; FINDING_TRIAGE_PENDING",
+        "evidence": "artifacts/evidence/public-readiness/audit-w3-final.json (6 secret-pattern findings and local user paths, not yet classified one by one)",
         "state": "partial"
       }
     ]

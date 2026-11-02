@@ -32,10 +32,10 @@
     },
     {
       "id": "portfolio-deploy",
-      "description": "Hosting and public URL",
+      "description": "Hosting and public URL on Cloudflare Pages",
       "requirement_ids": [],
-      "status": "PENDING",
-      "evidence": "Needs explicit authorization (lab rule 9)"
+      "status": "PASS_PAGES_DEPLOYED; CLEAN_TREE_DEPLOY_PENDING",
+      "evidence": "artifacts/evidence/portfolio-w7b/deploy-pages.txt; latest deploy record artifacts/evidence/pages/portfolio-20261102T102556.json in the lab repository was made with dirty=true"
     },
     {
       "id": "portfolio-design-system",
@@ -52,8 +52,8 @@
       "requirement_ids": [
         "LINK-001"
       ],
-      "status": "PENDING",
-      "evidence": ".planning/phases/003-real-portfolio/SPEC.md"
+      "status": "PASS_ALL_REPOSITORIES_PUBLIC; HOSTED_CI_P07_PENDING",
+      "evidence": ".planning/phases/003-real-portfolio/SPEC.md; artifacts/evidence/status-truth/F1-hosted-ci.txt (P07 red on 143ef9c); artifacts/evidence/status-truth/F2-p07-failing-5-after-fix.txt"
     },
     {
       "id": "portfolio-evidence-model",
@@ -64,8 +64,8 @@
         "EV-003",
         "EV-004"
       ],
-      "status": "PENDING",
-      "evidence": ".planning/phases/003-real-portfolio/SPEC.md"
+      "status": "PASS_LOCAL",
+      "evidence": "src/rules.test.ts; artifacts/evidence/portfolio-w7/check-full.txt"
     },
     {
       "id": "portfolio-case-pages",
@@ -75,8 +75,8 @@
         "I18N-001",
         "CUR-001"
       ],
-      "status": "PENDING",
-      "evidence": ".planning/phases/003-real-portfolio/SPEC.md"
+      "status": "PASS_LOCAL",
+      "evidence": "artifacts/evidence/portfolio-w7/check-full.txt"
     },
     {
       "id": "portfolio-demo-tiers",
@@ -85,20 +85,41 @@
         "DEMO-001",
         "DEMO-002"
       ],
-      "status": "PENDING",
-      "evidence": ".planning/phases/003-real-portfolio/SPEC.md"
+      "status": "PASS_LIVE_RUN_LOG_ONE_RUN; TURNSTILE_START_FLOW_PENDING",
+      "evidence": "artifacts/evidence/portfolio-w7b/demo-live.png"
     },
     {
-        "id": "portfolio-routes-evidence",
-        "description": "Prerendered EN and pt-BR routes, evidence records from sibling commits, flow diagrams, Functions with mocks",
-        "status": "PASS_LOCAL; NOT_DEPLOYED",
-        "evidence": "artifacts/evidence/portfolio-w7/check-full.txt"
+      "id": "portfolio-routes-evidence",
+      "description": "Prerendered EN and pt-BR routes, evidence records from sibling commits, flow diagrams, Functions with mocks",
+      "status": "PASS_LOCAL_AND_DEPLOYED",
+      "evidence": "artifacts/evidence/portfolio-w7/check-full.txt; artifacts/evidence/portfolio-w7b/deploy-pages.txt"
     },
     {
-        "id": "portfolio-3d-scene",
-        "description": "Level 2 Three.js scene with fallbacks",
-        "status": "PENDING",
-        "evidence": ".planning/phases/003-real-portfolio/VERIFY.md"
+      "id": "portfolio-3d-scene",
+      "description": "Level 2 Three.js city journey with fallbacks",
+      "status": "PASS_LOCAL_AND_DEPLOYED; DEVICE_FPS_PENDING",
+      "evidence": "artifacts/evidence/portfolio-w11/e2e-edge.txt; artifacts/evidence/portfolio-w12/e2e-edge.txt; SCENE-005 device FPS has no measurement"
+    },
+    {
+      "id": "status-truth",
+      "description": "Card seals are derived from catalog records; the catalog covers P00 to P08 and the lab",
+      "requirement_ids": [
+        "STAT-001",
+        "STAT-002",
+        "STAT-003",
+        "STAT-004",
+        "STAT-005",
+        "STAT-006"
+      ],
+      "status": "PASS_LOCAL",
+      "evidence": "src/status-truth.test.ts; artifacts/evidence/status-truth/F3-status-truth-red.txt (red before); artifacts/evidence/status-truth/F2-p07-check-full.txt (green after)"
+    },
+    {
+      "id": "portfolio-full-gate",
+      "description": "Full local gate (lint, types, unit, build, budget, 50 browser tests) on the current head",
+      "requirement_ids": [],
+      "status": "PASS_LOCAL_FULL_GATE; HOSTED_CI_PENDING_PUSH",
+      "evidence": "artifacts/evidence/status-truth/F2-p07-check-full.txt; artifacts/evidence/status-truth/F2-p07-failing-5-after-fix.txt (five e2e tests that were red on 143ef9c, fixed); hosted run on 143ef9c was red (F1-hosted-ci.txt)"
     }
   ]
 }

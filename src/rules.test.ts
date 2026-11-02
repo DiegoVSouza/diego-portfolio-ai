@@ -58,6 +58,9 @@ describe("numbers need evidence (EV-001, EV-003)", () => {
       for (const [path, text] of leaves({ ...texts, expected: c.validate.expected })) {
         if (/^\.(slug|n|ids|repo|repoKey|next|stack)$/.test(path) || /\.stack$/.test(path) || path.startsWith(".measured[")) continue; // identifiers, ids and technology names
         if (/\.(code\.repo|code\.path)$/.test(path)) continue;
+        // A seal's counts are generated from catalog.generated.json (a generated source, as AGENTS.md allows). status-truth.test.ts
+        // checks every count against that catalog, which is a stronger check than "no digit".
+        if (/^\.seal\.label\./.test(path)) continue;
         const stripped = text.replace(TOKEN, "").replace(ALLOWED, "");
         expect(/\d/.test(stripped), `${slug}${path} has a digit with no evidence behind it: "${text.slice(0, 80)}"`).toBe(false);
       }

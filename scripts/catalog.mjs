@@ -5,7 +5,9 @@ import { join } from "node:path";
 
 const root = new URL("..", import.meta.url).pathname.replace(/^\/([A-Za-z]:)/, "$1");
 const out = join(root, "src/data/catalog.generated.json");
-const ids = ["p00", "p01", "p02", "p03", "p04", "p05", "p06"];
+// "lab" is the repository that holds the projects; its record lives two levels up from this file.
+const ids = ["p00", "p01", "p02", "p03", "p04", "p05", "p06", "p07", "p08", "lab"];
+const dirOf = (id) => (id === "lab" ? join(root, "..", "..") : join(root, "..", id));
 // Public repository of each project. Pinned here because a clone's own origin is a local path, and the
 // catalog must not change with where it was built.
 const OWNER = "https://github.com/DiegoVSouza";
@@ -17,6 +19,9 @@ const REPOS = {
   p04: "supportops-async",
   p05: "supportops-platform",
   p06: "supportops-console",
+  p07: "diego-portfolio-ai",
+  p08: "colagem-ui",
+  lab: "ai-engineer-lab",
 };
 
 // verified: only PASS/complete words. partial: PASS plus a PENDING/INCOMPLETE/FAIL token. open: no PASS.
@@ -31,7 +36,7 @@ export function classify(status) {
 }
 
 function meta(id) {
-  const dir = join(root, "..", id);
+  const dir = dirOf(id);
   let version = "";
   for (const [name, re] of [["pyproject.toml", /^version\s*=\s*"([^"]+)"/m], ["package.json", /"version":\s*"([^"]+)"/]]) {
     const file = join(dir, name);
@@ -44,7 +49,7 @@ function build() {
   const projects = {};
   const info = {};
   for (const id of ids) {
-    const file = join(root, "..", id, "docs/harness/feature_list.json");
+    const file = join(dirOf(id), "docs/harness/feature_list.json");
     if (!existsSync(file)) return null;
     info[id] = meta(id);
     const list = JSON.parse(readFileSync(file, "utf8")).features;
