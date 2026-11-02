@@ -126,6 +126,27 @@
       "description": "The browser suite against the deployed site",
       "status": "PASS_3_OF_3_RUNS",
       "evidence": "artifacts/evidence/status-truth/F13-public-e2e-run1.txt; artifacts/evidence/status-truth/F13-public-e2e-run2.txt; artifacts/evidence/status-truth/F13-public-e2e-run3.txt (48 passed, 2 skipped each). Earlier runs F8 (2 of 3) and F10 and F12 (1 failure each) failed on Turnstile behaviour and were fixed in e2e/site.spec.ts"
+    },
+    {
+      "id": "mobile-metro-index",
+      "description": "On a narrow screen the project name in the bottom bar opens the list of all stations; it closes on a choice, on Escape and on navigation",
+      "requirement_ids": [],
+      "status": "PASS_LOCAL",
+      "evidence": "src/site/MetroLine.tsx; src/styles/site.css; e2e/flow.spec.ts (the narrow-screen list test, with axe); artifacts/evidence/status-truth/F15-p07-check-full.txt (gate exit 0, e2e 56 passed)"
+    },
+    {
+      "id": "case-symbol-hero",
+      "description": "Each case page shows its project's symbol as a flat drawing, painted with tokens only, clear of the title",
+      "requirement_ids": [],
+      "status": "PASS_LOCAL",
+      "evidence": "src/site/SymbolHero.tsx; src/styles/site.css; e2e/symbol.spec.ts (eight slugs at 1280 and 390 px, axe); artifacts/evidence/status-truth/F15-p07-check-full.txt (gate exit 0, e2e 56 passed)"
+    },
+    {
+      "id": "footer-clears-fixed-ui",
+      "description": "At the end of the home and of a case page no footer text runs under the fixed menu, the metro line or the scene buttons",
+      "requirement_ids": [],
+      "status": "PASS_LOCAL",
+      "evidence": "src/styles/site.css; e2e/footer-clear.spec.ts (red without the CSS, green with it); artifacts/evidence/status-truth/F15-p07-check-full.txt (gate exit 0, e2e 56 passed)"
     }
   ]
 }

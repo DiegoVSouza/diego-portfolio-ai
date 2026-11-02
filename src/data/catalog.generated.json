@@ -75,7 +75,7 @@
         "id": "local-services-and-hosted-ci",
         "description": "",
         "status": "PASS_HOSTED_CI_LINUX; LOCAL_SERVICE_E2E_PENDING",
-        "evidence": "artifacts/evidence/status-reconcile-hosted-ci.txt (hosted CI success on 047eef5); artifacts/evidence/doctor.md and artifacts/evidence/phase-003-environment.md (Postgres, Redis and LocalStack containers were not started)",
+        "evidence": "artifacts/evidence/status-reconcile-hosted-ci.txt (hosted CI success on 047eef5); artifacts/evidence/doctor.md and artifacts/evidence/phase-003-environment.md (Postgres, Redis and LocalStack containers were not started); 2026-11-02: not re-run. Docker Desktop was started, but the host ports 5432, 6379 and 4566 were held by containers of other projects (gossett, jarvis-fit, enferpro) that Docker restarted, so a doctor run would have observed their services, not P00's. Needs those ports free",
         "state": "partial"
       }
     ],
@@ -542,6 +542,13 @@
         "status": "PASS_LOCAL_FAKE_TRANSPORT; PASS_FLY_DEPLOYED_ONE_LIVE_RUN",
         "evidence": ".planning/phases/037-toolkit-limits/VERIFY.md; artifacts/evidence/toolkit-limits-037/red.txt; artifacts/evidence/toolkit-limits-037/green.txt; artifacts/evidence/toolkit-limits-037/check-fast.txt; artifacts/evidence/status-reconcile/fly-deploy-adapter.txt (deploy exit 0); artifacts/evidence/status-reconcile/live-demo-runs-after-adapter.json (a live run at 2026-11-02T14:30Z, four steps, 2730 tokens, under the 8192 limit); artifacts/evidence/status-reconcile/e2e-fly-after-adapter.txt (3 passed)",
         "state": "verified"
+      },
+      {
+        "id": "service-gate-0-4-5",
+        "description": "The full local gate with Docker services (integration, E2E, crash recovery, privacy, authorization expiry) on the current version",
+        "status": "PASS_LOCAL_SERVICE_GATE",
+        "evidence": "artifacts/evidence/status-reconcile/check-full-with-services-0.4.5.txt (P05 0.4.5, 214 passed 2 skipped, every service layer PASS, exit 0 on 2026-11-02)",
+        "state": "verified"
       }
     ],
     "p06": [
@@ -679,6 +686,27 @@
         "status": "PASS_3_OF_3_RUNS",
         "evidence": "artifacts/evidence/status-truth/F13-public-e2e-run1.txt; artifacts/evidence/status-truth/F13-public-e2e-run2.txt; artifacts/evidence/status-truth/F13-public-e2e-run3.txt (48 passed, 2 skipped each). Earlier runs F8 (2 of 3) and F10 and F12 (1 failure each) failed on Turnstile behaviour and were fixed in e2e/site.spec.ts",
         "state": "verified"
+      },
+      {
+        "id": "mobile-metro-index",
+        "description": "On a narrow screen the project name in the bottom bar opens the list of all stations; it closes on a choice, on Escape and on navigation",
+        "status": "PASS_LOCAL",
+        "evidence": "src/site/MetroLine.tsx; src/styles/site.css; e2e/flow.spec.ts (the narrow-screen list test, with axe); artifacts/evidence/status-truth/F15-p07-check-full.txt (gate exit 0, e2e 56 passed)",
+        "state": "verified"
+      },
+      {
+        "id": "case-symbol-hero",
+        "description": "Each case page shows its project's symbol as a flat drawing, painted with tokens only, clear of the title",
+        "status": "PASS_LOCAL",
+        "evidence": "src/site/SymbolHero.tsx; src/styles/site.css; e2e/symbol.spec.ts (eight slugs at 1280 and 390 px, axe); artifacts/evidence/status-truth/F15-p07-check-full.txt (gate exit 0, e2e 56 passed)",
+        "state": "verified"
+      },
+      {
+        "id": "footer-clears-fixed-ui",
+        "description": "At the end of the home and of a case page no footer text runs under the fixed menu, the metro line or the scene buttons",
+        "status": "PASS_LOCAL",
+        "evidence": "src/styles/site.css; e2e/footer-clear.spec.ts (red without the CSS, green with it); artifacts/evidence/status-truth/F15-p07-check-full.txt (gate exit 0, e2e 56 passed)",
+        "state": "verified"
       }
     ],
     "p08": [
@@ -753,6 +781,34 @@
         "status": "PASS_AUDIT_RUN_TRIAGED",
         "evidence": "artifacts/evidence/public-readiness/audit-w3-final.json (six findings read and classified as test or third-party content); artifacts/evidence/status-truth-lab/audit-with-allowlist.log (zero open findings in lab and P07 with docs/harness/public-readiness-allowlist.json)",
         "state": "verified"
+      },
+      {
+        "id": "sdd-phase-triple",
+        "description": "Every phase of every project has SPEC, PLAN and VERIFY",
+        "status": "PASS_188_OF_188",
+        "evidence": "artifacts/evidence/status-truth-lab/sdd-phase-count.txt",
+        "state": "verified"
+      },
+      {
+        "id": "commit-message-hooks",
+        "description": "Each project repository carries a commit-msg hook that checks the commit syntax",
+        "status": "PASS_9_OF_9",
+        "evidence": "artifacts/evidence/status-truth-lab/commit-hooks.txt",
+        "state": "verified"
+      },
+      {
+        "id": "verify-checklists-closed",
+        "description": "Every VERIFY.md has all its boxes ticked or states why one stays open",
+        "status": "PENDING",
+        "evidence": "artifacts/evidence/status-truth-lab/sdd-phase-count.txt: 34 of 188 VERIFY.md files still have unticked boxes (the older phases were not re-opened)",
+        "state": "open"
+      },
+      {
+        "id": "linux-clean-check-script",
+        "description": "scripts/harness/linux_clean_check.py runs a project's gates in a Linux container",
+        "status": "PENDING",
+        "evidence": "docs/harness/portfolio/W2-W3-status.md: the script exists and is untested; hosted CI is the Linux proof today",
+        "state": "open"
       }
     ]
   }

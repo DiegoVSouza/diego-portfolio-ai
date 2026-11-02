@@ -27,6 +27,7 @@ Evidence is under `artifacts/evidence/status-truth/` unless another path is give
 | Demo password rotation | the IdP image has the admin API switched off on purpose; the passwords are published by design on `/api/status` | owner decision |
 | Turnstile script behaviour in the public suite (data: fetch refused by the CSP, a worker blob, its own POST) | tolerated only against the deployed site in `e2e/site.spec.ts`; CSP unchanged; reversible, see `decisions.md` | closed unless the owner prefers allowing `data:` |
 | Second real defect found by hosted CI: Back to the surface landed on the previous stop in 3D (fixed in `9ad435e`) | closed |
-| Menu over footer text at the page end | `home-3d.png` (scrolled to the bottom at 1280x720) shows the fixed menu covering part of the credits line; not fixed in this phase | next P07 phase (squint review) |
-| Metro index on mobile, symbol hero on case pages | feature work not started | next P07 phase |
-| P00 local service e2e | Docker containers were not started | P00 phase |
+| Menu over footer text at the page end | fixed: the footer clears the menu, the metro line and the buttons (`e2e/footer-clear.spec.ts`, red without the CSS) | closed |
+| Metro index on mobile; symbol hero on case pages | built and tested (`e2e/flow.spec.ts`, `e2e/symbol.spec.ts`), gate `F15-p07-check-full.txt` | closed |
+| P00 local service e2e | Docker was started, but the host ports 5432, 6379 and 4566 were held by other projects' containers, so a doctor run would observe their services | owner (free those ports, then a P00 phase) |
+| P05 full service gate on 0.4.5 | passed (`p05 artifacts/evidence/status-reconcile/check-full-with-services-0.4.5.txt`, 214 passed) | closed |
