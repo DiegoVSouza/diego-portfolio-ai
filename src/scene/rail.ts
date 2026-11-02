@@ -41,8 +41,8 @@ const LOOK_SHIFT = -2;
 /** Ahead of the stop, along the avenue: with the board's width this puts the card at about 60% of the screen. */
 export const CARD_AHEAD = 0.27;
 export const CARD_LATERAL = 20;
-/** The middle of the board (its lower edge is 2.5, and it is 16.4 high: see world.ts). */
-export const CARD_HEIGHT = 10.7;
+/** The middle of the board (its lower edge is 2.5, and it is 18 high: see world.ts). */
+export const CARD_HEIGHT = 11.5;
 
 /**
  * Which side of the avenue stop k's card hangs on: +1 right, -1 left. They alternate, so two projects of one district face each other

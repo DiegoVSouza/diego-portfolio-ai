@@ -290,39 +290,44 @@ a:not(.btn):hover { color: var(--paper); text-decoration-thickness: 3px; }
 [data-page="home"].wrap { max-width: none; margin: 0; padding: 0 clamp(16px, 3vw, 56px) 80px; overflow-x: clip; }
 [data-page="home"].wrap > section.stop { background: none; border: 0; padding: 0; margin: 0 0 28px; max-width: none; position: relative; }
 .stop-card { box-sizing: border-box; background: var(--ink); color: var(--paper); border-left: 8px solid var(--red); padding: 22px 28px 24px 30px; max-width: 640px; box-shadow: 8px 8px 0 var(--red); }
-.sc { display: flex; flex-direction: column; gap: 10px; height: 100%; min-width: 0; }
-.sc-top { display: flex; align-items: center; gap: 14px; min-width: 0; }
-/* The number, outlined as on the sign: Anton, no fill. */
-.sc-num { flex: none; font-family: var(--f-display); font-size: 60px; line-height: 0.85; color: transparent; -webkit-text-stroke: 2px var(--paper); }
-.sc-kicker { flex: 1; min-width: 0; margin: 0; font: 700 12px/1.3 var(--f-body); text-transform: uppercase; letter-spacing: 0.14em; color: var(--red-text); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.sc-top > :last-child:not(.sc-num):not(.sc-kicker) { flex: none; max-width: 46%; }
-.sc-title { margin: 0; font-family: var(--f-display); font-weight: 400; font-size: clamp(32px, 3.1vw, 44px); line-height: 1.02; text-transform: uppercase; overflow-wrap: anywhere; }
+.sc { display: flex; flex-direction: column; gap: 14px; height: 100%; min-width: 0; }
+/* 1. Where: the stop's number (outlined, as on the sign) and its place. A dashed rule closes the row, so the title starts a new block. */
+.sc-top { display: flex; align-items: center; gap: 16px; min-width: 0; padding-bottom: 12px; border-bottom: 2px dashed var(--page-mut); }
+.sc-num { flex: none; font-family: var(--f-display); font-size: 56px; line-height: 0.85; color: transparent; -webkit-text-stroke: 2px var(--paper); }
+.sc-kicker { flex: 1; min-width: 0; margin: 0; font: 700 14px/1.3 var(--f-body); text-transform: uppercase; letter-spacing: 0.14em; color: var(--red-text); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+/* 2. What: the title is the loudest thing on the card. */
+.sc-title { margin: 0; font-family: var(--f-display); font-weight: 400; font-size: clamp(34px, 3.3vw, 48px); line-height: 1; text-transform: uppercase; overflow-wrap: anywhere; }
 .sc-title .card-link { color: inherit; text-decoration: none; }
-.sc-sum { margin: 0; font-size: 20px; line-height: 1.4; color: var(--paper); }
-/* The tag is the small tilted plate (-2.5 degrees), the one rotation inside the card. */
-.sc-tag { align-self: flex-start; margin: 2px 0 2px 4px; padding: 2px 10px; background: var(--red); color: var(--on-red); font-weight: 700; font-size: 15px; line-height: 1.35; transform: rotate(-2.5deg); transform-origin: 0 50%; }
-.sc-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 14px; margin: 4px 0 0; }
-.sc-actions .btn-big { min-height: 50px; padding: 0 var(--space-5); font-size: 17px; }
-.sc-links { display: flex; flex-wrap: wrap; gap: 6px 18px; margin: 0; padding: 0; list-style: none; font-size: 15px; }
+/* 3. Why: one short paragraph, 21 px, about 45 characters to the line. */
+.sc-sum { margin: 0; font-size: 21px; line-height: 1.45; color: var(--paper); }
+/* 4. The hook and the status. The hook is the small tilted plate (-2.5 degrees), the one rotation inside the card; the status is glyph and word. */
+.sc-notes { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 16px; margin: 0; }
+.sc-tag { display: inline-block; margin: 0 0 0 4px; padding: 3px 12px; background: var(--red); color: var(--on-red); font-weight: 700; font-size: 16px; line-height: 1.35; transform: rotate(-2.5deg); transform-origin: 0 50%; }
+.sc-notes .seal, .sc-notes [class*="seal"] { font-size: 14px; line-height: 1.35; }
+/* 5. Do: the actions, with the main one first. */
+.sc-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 16px; margin: 0; }
+.sc-actions .btn-big { min-height: 52px; padding: 0 var(--space-5); font-size: 17px; }
+.sc-links { display: flex; flex-wrap: wrap; gap: 6px 20px; margin: 0; padding: 0; list-style: none; font-size: 16px; line-height: 1.4; }
 .sc-links a { color: var(--paper); }
 .sc-links a:hover, .sc-links a:focus-visible { color: var(--red-text); }
 .flow-only { margin-top: 8px; }
 
 /* Wide screen with the scene running: the cards leave the flow and become the signs' faces. The scene writes --m (a perspective matrix
-   that fits the card to its board) and --o on each. The card has ONE size, 640 by 420 (CARD_W and CARD_H in src/scene/scene.ts, and the
+   that fits the card to its board) and --o on each. The card has ONE size, 640 by 460 (CARD_W and CARD_H in src/scene/scene.ts, and the
    board's proportions in src/scene/world.ts), and each text is cut at a set number of lines, so nothing spills over the edge. */
 @media (min-width: 1200px) {
   html[data-stage="3d"] [data-page="home"].wrap > section.stop { min-height: 100vh; margin: 0; }
-  html[data-stage="3d"] .stop-card { position: fixed; left: 0; top: 0; z-index: 5; width: 640px; height: 420px; max-width: none; margin: 0; overflow: hidden; transform: var(--m, scale(0)); transform-origin: 0 0; opacity: var(--o, 0); will-change: transform, opacity; pointer-events: none; }
+  html[data-stage="3d"] .stop-card { position: fixed; left: 0; top: 0; z-index: 5; width: 640px; height: 460px; max-width: none; margin: 0; overflow: hidden; transform: var(--m, scale(0)); transform-origin: 0 0; opacity: var(--o, 0); will-change: transform, opacity; pointer-events: none; }
   html[data-stage="3d"] .stop-card[data-near] { pointer-events: auto; }
   html[data-stage="3d"] .flow-only { display: none; }
-  html[data-stage="3d"] .sc-sum { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 4; overflow: hidden; }
+  html[data-stage="3d"] .sc-sum { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 3; overflow: hidden; }
   html[data-stage="3d"] .sc-title { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden; }
+  html[data-stage="3d"] #s-arrival .sc-sum, html[data-stage="3d"] #s-terminal .sc-sum { -webkit-line-clamp: 4; }
   html[data-stage="3d"] .sc-tag { max-width: calc(100% - 16px); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   /* The actions sit at the bottom edge whatever the text above takes. */
   html[data-stage="3d"] .sc-actions { margin-top: auto; flex-wrap: nowrap; }
   html[data-stage="3d"] .sc-actions .btn-big { white-space: nowrap; }
-  html[data-stage="3d"] .sc-links { max-height: 52px; overflow: hidden; }
+  html[data-stage="3d"] .sc-links { max-height: 60px; overflow: hidden; }
 }
 
 /* The game menu: slanted entries, the active one on a red shard with its projects under it, a description box, the keys. */

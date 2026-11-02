@@ -44,7 +44,7 @@ export interface SceneController {
 
 /** The card's size in CSS pixels while it hangs in the city. Keep in step with `.stop-card` in src/styles/site.css and BOARD_RATIO in world.ts. */
 const CARD_W = 640;
-const CARD_H = 420;
+const CARD_H = 460;
 const SETTLE_MS = 140;
 /** Fraction of a leg the camera rests at each end: the stop is a place, not a point. */
 const DWELL = 0.12;

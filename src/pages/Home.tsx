@@ -25,8 +25,8 @@ function StopSection({ stop, labelledBy, children }: { stop: Stop; labelledBy: s
   );
 }
 
-/** The top row: the stop's number (the same one painted on its sign), where it is, and, when there is one, its status. */
-function CardTop({ stop, seal }: { stop: Stop; seal?: ReactNode }) {
+/** The top row: the stop's number (the same one painted on its sign) and where it is. */
+function CardTop({ stop }: { stop: Stop }) {
   const { lang } = useLang();
   const mates = stops.filter((s) => s.district === stop.district);
   const place = districts[stop.district]!.name[lang] + (mates.length > 1 ? ` · ${mates.indexOf(stop) + 1}/${mates.length}` : "");
@@ -34,7 +34,6 @@ function CardTop({ stop, seal }: { stop: Stop; seal?: ReactNode }) {
     <header className="sc-top">
       <span className="sc-num" aria-hidden="true">{String(stops.indexOf(stop) + 1).padStart(2, "0")}</span>
       <p className="sc-kicker">{place}</p>
-      {seal}
     </header>
   );
 }
@@ -47,12 +46,15 @@ function ProjectStop({ stop }: { stop: Stop }) {
   return (
     <StopSection stop={stop} labelledBy={`${stop.id}-h`}>
       <div className="sc" data-scene-case={card.slug} id={`project-${card.slug}`}>
-        <CardTop stop={stop} seal={<StatusSeal kind={card.seal.kind} label={card.seal.label[lang]} />} />
+        <CardTop stop={stop} />
         <h2 className="sc-title" id={`${stop.id}-h`}>
           <Link className="card-link" to={to}>{card.name[lang]}</Link>
         </h2>
         <p className="sc-sum">{card.outcome[lang]}</p>
-        <p className="sc-tag">{card.hook[lang]}</p>
+        <p className="sc-notes">
+          <span className="sc-tag">{card.hook[lang]}</span>
+          <StatusSeal kind={card.seal.kind} label={card.seal.label[lang]} />
+        </p>
         <p className="sc-actions">
           <Link className="btn btn-big" to={first ? `${to}#demo` : to}>{first ? t.navDemo : t.openProject} →</Link>
           {first && <Link className="btn btn-secondary btn-big" to={to}>{t.openProject}</Link>}

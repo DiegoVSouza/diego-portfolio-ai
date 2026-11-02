@@ -47,8 +47,8 @@ export interface World {
 
 /** World width of a board, in units, before it is fitted to its card; the board is never taller than BOARD_MAX_HEIGHT. */
 export const BILLBOARD_WIDTH = 25;
-/** Height over width: the card is 640 by 420 px (src/styles/site.css), so the board has the same proportions. */
-const BILLBOARD_RATIO = 420 / 640;
+/** Height over width: the card is 640 by 460 px (src/styles/site.css), so the board has the same proportions. */
+const BILLBOARD_RATIO = 460 / 640;
 const BOARD_MAX_HEIGHT = 30;
 /** The board's lower edge above the street. */
 const BOARD_BOTTOM = 2.5;
