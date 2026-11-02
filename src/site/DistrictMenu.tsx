@@ -3,6 +3,10 @@ import { caseCards } from "../content/caseIndex";
 import { districts, stops } from "../content/districts";
 import { useLang } from "./Shell";
 
+/** One move from stop to stop takes this long: the camera flies the whole way, so the visitor can enjoy the ride. */
+const FLIGHT_MS = 2200;
+const ease = (x: number) => (x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2);
+
 const reduced = (): boolean => typeof matchMedia === "function" && matchMedia("(prefers-reduced-motion: reduce)").matches;
 
 /**
@@ -47,23 +51,41 @@ export function DistrictMenu() {
     setAnnouncement(t.districtAnnounce.replace("{n}", String(active + 1)).replace("{total}", String(total)).replace("{name}", stopTitle(active)));
   }, [active, lang, t, total]);
 
-  // Where the last move is heading: quick presses and wheel turns step from there, not from where the scroll has got to.
+  // Where the last move is heading, and whether a flight is under way. A wheel turn or a key moves exactly one stop and is ignored while
+  // a flight lasts (and until the wheel has been quiet for a moment, so a trackpad's long tail cannot start another).
   const heading = useRef(0);
-  const movedAt = useRef(0);
+  const flying = useRef(false);
+  const frame = useRef(0);
   useEffect(() => {
-    if (performance.now() - movedAt.current > 1200) heading.current = active;
+    if (!flying.current) heading.current = active;
   }, [active]);
+  useEffect(() => () => cancelAnimationFrame(frame.current), []);
   const goTo = useCallback(
     (index: number) => {
       const i = Math.min(total - 1, Math.max(0, index));
-      heading.current = i;
-      movedAt.current = performance.now();
       const el = document.getElementById(`s-${stops[i]!.id}`);
       if (!el) return;
       // The scene measures each section's middle and writes it here; without a scene the section's own middle is used.
       const station = Number(el.dataset.stationY);
-      const top = (Number.isFinite(station) && station > 0 ? station : el.getBoundingClientRect().top + window.scrollY + el.offsetHeight / 2) - window.innerHeight / 2;
-      window.scrollTo({ top: Math.max(0, top), behavior: reduced() ? "auto" : "smooth" });
+      const top = Math.max(0, (Number.isFinite(station) && station > 0 ? station : el.getBoundingClientRect().top + window.scrollY + el.offsetHeight / 2) - window.innerHeight / 2);
+      heading.current = i;
+      cancelAnimationFrame(frame.current);
+      const from = window.scrollY;
+      // Without the city (or with reduced motion) the page scrolls the ordinary way.
+      if (reduced() || document.documentElement.dataset.stage !== "3d") {
+        flying.current = false;
+        window.scrollTo({ top, behavior: reduced() ? "auto" : "smooth" });
+        return;
+      }
+      flying.current = true;
+      const started = performance.now();
+      const step = (now: number) => {
+        const x = Math.min(1, (now - started) / FLIGHT_MS);
+        window.scrollTo(0, from + (top - from) * ease(x));
+        if (x < 1) frame.current = requestAnimationFrame(step);
+        else flying.current = false;
+      };
+      frame.current = requestAnimationFrame(step);
     },
     [total],
   );
@@ -80,8 +102,12 @@ export function DistrictMenu() {
       // With the city running the home is a slide show: the arrows step one placa, as j and k do.
       const slides = document.documentElement.dataset.stage === "3d";
       const onControl = Boolean(target?.closest("button, a, summary, [role='button']"));
-      if (k === "j" || (slides && !onControl && (k === "arrowdown" || k === "arrowright" || k === "pagedown"))) goTo(heading.current + 1);
-      else if (k === "k" || (slides && !onControl && (k === "arrowup" || k === "arrowleft" || k === "pageup"))) goTo(heading.current - 1);
+      const next = k === "j" || (slides && !onControl && (k === "arrowdown" || k === "arrowright" || k === "pagedown"));
+      const prev = k === "k" || (slides && !onControl && (k === "arrowup" || k === "arrowleft" || k === "pageup"));
+      // One stop per press: a press (or a held key) during a flight is swallowed.
+      if (next || prev) {
+        if (!flying.current) goTo(heading.current + (next ? 1 : -1));
+      }
       else if (/^[1-9]$/.test(k) && Number(k) <= districts.length) goToDistrict(Number(k) - 1);
       else return;
       event.preventDefault();
@@ -90,9 +116,8 @@ export function DistrictMenu() {
     return () => window.removeEventListener("keydown", onKey);
   }, [active, goTo]);
 
-  // A wheel turn moves one placa, never a free scroll: the city is a slide show. A trackpad's long tail counts as one turn.
+  // A wheel turn moves one placa, never a free scroll: the city is a slide show.
   useEffect(() => {
-    let until = 0;
     let lastWheel = 0;
     const onWheel = (event: WheelEvent) => {
       if (document.documentElement.dataset.stage !== "3d" || event.ctrlKey || Math.abs(event.deltaY) < 4) return;
@@ -103,15 +128,14 @@ export function DistrictMenu() {
       }
       event.preventDefault();
       const now = performance.now();
-      const quiet = now - lastWheel > 140;
+      const quiet = now - lastWheel > 160;
       lastWheel = now;
-      if (now < until || !quiet) return;
-      until = now + 700;
+      if (flying.current || !quiet) return;
       goTo(heading.current + (event.deltaY > 0 ? 1 : -1));
     };
     window.addEventListener("wheel", onWheel, { passive: false });
     return () => window.removeEventListener("wheel", onWheel);
-  }, [active, goTo]);
+  }, [goTo]);
 
   const district = stops[active]!.district;
   const mates = stops.map((s, i) => ({ s, i })).filter((x) => x.s.district === district && x.s.slug);

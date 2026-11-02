@@ -32,19 +32,21 @@ export interface Rail {
 /** Spacing between stops, and the sway of the avenue (a long gentle S). */
 const SPACING = 85;
 const SWAY = 26;
-const CAMERA_HEIGHT = 16;
-const LOOK_HEIGHT = 9;
-/** The look-at point leans toward the side of the stop's card, so that card sits in its third of the screen and the avenue stays in the middle. */
-const LOOK_RIGHT = 6;
-const LOOK_LEFT = 16;
-const LOOK_AHEAD = 0.32;
-export const CARD_AHEAD = 0.32;
+/** The camera rides low and to the side of its board, close enough for the card to fill most of the screen. */
+const CAMERA_HEIGHT = 12;
+/** How far the camera moves toward its board's side at a stop (the stops alternate sides, so it weaves down the avenue). */
+const CAMERA_LATERAL = 9;
+/** The look-at point is the board's middle, a little toward the avenue, so the board sits a touch right of the screen's middle (clear of the menu). */
+const LOOK_SHIFT = -2;
+/** Ahead of the stop, along the avenue: with the board's width this puts the card at about 60% of the screen. */
+export const CARD_AHEAD = 0.27;
 export const CARD_LATERAL = 20;
-export const CARD_HEIGHT = 9.5;
+/** The middle of the board (its lower edge is 2.5, and it is 16.4 high: see world.ts). */
+export const CARD_HEIGHT = 10.7;
 
 /**
  * Which side of the avenue stop k's card hangs on: +1 right, -1 left. They alternate, so two projects of one district face each other
- * across the street instead of standing in a row. The arrival is on the right (the gate), the harbour at the end mirrors the left.
+ * across the street instead of standing in a row.
  */
 export const cardSide = (k: number): 1 | -1 => (k % 2 === 0 ? 1 : -1);
 
@@ -54,7 +56,6 @@ export function createRail(count: number): Rail {
   // One control point beyond the last stop (the overrun), so the last stop also has a street ahead of it: the harbour is there.
   const centres = Array.from({ length: n + 1 }, (_, k) => V3(SWAY * Math.sin(k * 0.85), 0, -SPACING * k + 26));
   const ground = new THREE.CatmullRomCurve3(centres, false, "catmullrom", 0.5);
-  const camera = new THREE.CatmullRomCurve3(centres.map((c) => V3(c.x, CAMERA_HEIGHT, c.z)), false, "catmullrom", 0.5);
   const up = V3(0, 1, 0);
   const tmp = V3(0, 0, 0);
   const tan = V3(0, 0, 0);
@@ -69,9 +70,20 @@ export function createRail(count: number): Rail {
     return out;
   };
   const stopFrame = { p: V3(0, 0, 0), T: V3(0, 0, 0), R: V3(0, 0, 0) };
+  // The camera and its look-at point are splines through one control point per stop, built from the street frame at that stop.
+  const sample = (k: number, build: (f: { p: THREE.Vector3; T: THREE.Vector3; R: THREE.Vector3 }, side: number) => THREE.Vector3) => {
+    const f = frameOf(Math.min(1, k / n), stopFrame);
+    return build(f, k < n ? cardSide(k) : 0);
+  };
+  const camera = new THREE.CatmullRomCurve3(
+    centres.map((_, k) => sample(k, (f, side) => V3(f.p.x + f.R.x * side * CAMERA_LATERAL, CAMERA_HEIGHT, f.p.z + f.R.z * side * CAMERA_LATERAL))),
+    false,
+    "catmullrom",
+    0.5,
+  );
   const look = new THREE.CatmullRomCurve3(
     centres.map((_, k) => {
-      const ahead = (k + LOOK_AHEAD) / n;
+      const ahead = (k + CARD_AHEAD) / n;
       const g = ground.getPoint(Math.min(1, ahead));
       // Past the end of the path (the last stop) the look-at point carries on along the final direction.
       if (ahead > 1) g.addScaledVector(ground.getTangent(1), (ahead - 1) * ground.getLength());
@@ -79,9 +91,9 @@ export function createRail(count: number): Rail {
       tan.y = 0;
       tan.normalize();
       right.crossVectors(tan, up).normalize();
-      // A left card leans further: the menu takes the left of the screen, so the card sits nearer the middle (about 0.43 of the width).
-      const lean = k < n ? (cardSide(k) > 0 ? LOOK_RIGHT : -LOOK_LEFT) : 0;
-      return V3(g.x + right.x * lean, LOOK_HEIGHT, g.z + right.z * lean);
+      // The board's middle (lateral CARD_LATERAL on its side), nudged toward the avenue by LOOK_SHIFT.
+      const lateral = k < n ? cardSide(k) * CARD_LATERAL + LOOK_SHIFT : 0;
+      return V3(g.x + right.x * lateral, CARD_HEIGHT, g.z + right.z * lateral);
     }),
     false,
     "catmullrom",

@@ -41,17 +41,15 @@ export interface World {
   trainKind(): "kenney" | "procedural";
   /** Sign text is painted again once the display font is ready. */
   repaintText(): void;
-  /** Fit stop k's board to its card: height over width of the card as laid out. The board keeps the card's proportions. */
-  setBoardRatio(k: number, ratio: number): void;
   /** The four corners of stop k's board in the world: top left, top right, bottom right, bottom left, as seen from the front. */
   boardCorners(k: number, out: THREE.Vector3[]): void;
 }
 
 /** World width of a board, in units, before it is fitted to its card; the board is never taller than BOARD_MAX_HEIGHT. */
-export const BILLBOARD_WIDTH = 22;
-export const BILLBOARD_WIDTH_WIDE = 27;
-const BILLBOARD_RATIO = 0.68;
-const BOARD_MAX_HEIGHT = 18;
+export const BILLBOARD_WIDTH = 25;
+/** Height over width: the card is 640 by 420 px (src/styles/site.css), so the board has the same proportions. */
+const BILLBOARD_RATIO = 420 / 640;
+const BOARD_MAX_HEIGHT = 30;
 /** The board's lower edge above the street. */
 const BOARD_BOTTOM = 2.5;
 
@@ -646,13 +644,13 @@ export async function buildWorld(c: WorldContext): Promise<World> {
   }
   const frameMat = new THREE.MeshBasicMaterial({ color: p.red });
   const unitBox = new THREE.BoxGeometry(1, 1, 1);
-  const boards: Board[] = stops.map((stop, k) => {
+  const boards: Board[] = stops.map((_, k) => {
     rail.cardAnchor(k, anchor, f);
     // It faces the camera's approach (back along the avenue), turned a little toward the avenue.
     const sd = cardSide(k);
     const group = new THREE.Group();
     group.position.set(anchor.x, 0, anchor.z);
-    group.rotation.y = face(-f.T.x - 0.35 * sd * f.R.x, -f.T.z - 0.35 * sd * f.R.z);
+    group.rotation.y = face(-f.T.x - 0.3 * sd * f.R.x, -f.T.z - 0.3 * sd * f.R.z);
     const painted = makeBillboardMap(k);
     const panel = new THREE.Mesh(new THREE.PlaneGeometry(1, 1), new THREE.MeshBasicMaterial({ map: painted.map }));
     const posts = [0, 1].map(() => new THREE.Mesh(unitBox, frameMat));
@@ -660,7 +658,7 @@ export async function buildWorld(c: WorldContext): Promise<World> {
     group.add(panel, ...posts, ...beams);
     scene.add(group);
     const board: Board = { group, panel, posts, beams, repaint: painted.paint, width: 1, height: 1 };
-    fitBoard(board, stop.wide ? BILLBOARD_WIDTH_WIDE : BILLBOARD_WIDTH, BILLBOARD_RATIO);
+    fitBoard(board, BILLBOARD_WIDTH, BILLBOARD_RATIO);
     return board;
   });
   function fitBoard(b: Board, baseWidth: number, ratio: number) {
@@ -858,14 +856,6 @@ export async function buildWorld(c: WorldContext): Promise<World> {
     stations: () => stationCount,
     trainKind: () => (realTrain ? "kenney" : "procedural"),
     repaintText: () => painters.forEach((paint) => paint()),
-    setBoardRatio(k, ratio) {
-      const b = board(k);
-      const r = Math.min(1.7, Math.max(0.45, ratio));
-      if (Math.abs(boardRatio[k]! - r) < 0.01) return;
-      boardRatio[k] = r;
-      fitBoard(b, stops[k]!.wide ? BILLBOARD_WIDTH_WIDE : BILLBOARD_WIDTH, r);
-      b.repaint();
-    },
     boardCorners(k, out) {
       const b = board(k);
       CORNERS.forEach(([cx, cy], i) => out[i]!.copy(corner.set(cx, cy, 0)).applyMatrix4(b.panel.matrixWorld));

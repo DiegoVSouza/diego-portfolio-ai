@@ -145,7 +145,7 @@ test("under reduced motion the diagram does not play itself and nothing pulses",
   await context.close();
 });
 
-test("the home is a wide stage: the menu on the left, the card on the right, the city between, the tests in an accordion", async ({ page }) => {
+test("the home is a wide stage: the menu on the left, the card as a sign filling most of the screen, no text spilling out", async ({ page }) => {
   await mockApi(page);
   await page.setViewportSize({ width: 1440, height: 900 });
   await page.goto("/");
@@ -155,17 +155,15 @@ test("the home is a wide stage: the menu on the left, the card on the right, the
   const menu = await page.locator(".districts-list").boundingBox();
   const panel = await page.locator("#s-arrival .stop-card").boundingBox();
   expect(menu!.x + menu!.width).toBeLessThan(400);
-  expect(panel!.x).toBeGreaterThan(1440 * 0.5);
-  // Between them the city is visible: nothing opaque stands in the middle third.
-  const covered = await page.evaluate(() => Boolean(document.elementFromPoint(window.innerWidth * 0.5, window.innerHeight * 0.5)?.closest(".stop-card, .districts")));
-  expect(covered).toBe(false);
-  // The tests of a project are tucked in an accordion that opens on click.
-  await page.evaluate(() => document.getElementById("s-supportops")!.scrollIntoView({ block: "center" }));
-  const tests = page.locator(".disclosure", { hasText: "Tests and evidence" }).first();
-  await expect(tests).not.toHaveAttribute("open", "");
-  await tests.locator("summary").click();
-  await expect(tests).toHaveAttribute("open", "");
-  await expect(tests.locator(".proof-mini li").first()).toBeVisible();
+  // The card is the face of its sign: it fills about 60% of the screen and stands clear of the menu.
+  expect(panel!.width).toBeGreaterThan(1440 * 0.5);
+  expect(panel!.x).toBeGreaterThan(menu!.x + menu!.width);
+  // It has one fixed size, so no text can spill over its edge: every part stays inside the card.
+  const spill = await page.evaluate(() => {
+    const card = document.querySelector("#s-arrival .stop-card .sc")!;
+    return card.scrollHeight - card.clientHeight;
+  });
+  expect(spill).toBeLessThanOrEqual(0);
 });
 
 test("travelling: the camera parks on each card, swings between stops, and each card hangs in its own part of the city", async ({ page }) => {

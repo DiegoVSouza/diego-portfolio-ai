@@ -42,6 +42,9 @@ export interface SceneController {
   pulse(): void;
 }
 
+/** The card's size in CSS pixels while it hangs in the city. Keep in step with `.stop-card` in src/styles/site.css and BOARD_RATIO in world.ts. */
+const CARD_W = 640;
+const CARD_H = 420;
 const SETTLE_MS = 140;
 /** Fraction of a leg the camera rests at each end: the stop is a place, not a point. */
 const DWELL = 0.12;
@@ -192,23 +195,6 @@ export async function start(canvas: HTMLCanvasElement, options: SceneOptions): P
     dirty = true;
   }, weak ? 1 : 0);
 
-  /** The boards take the proportions of their cards, once the cards hang in the city (in the page flow they are laid out differently). */
-  const watched = new Set<HTMLElement>();
-  const fitBoards = () => {
-    if (!fixed && document.documentElement.dataset.stage !== "3d") return;
-    cards.forEach((el, k) => {
-      if (el && cardWidth[k] && cardHeight[k]) world.setBoardRatio(k, cardHeight[k]! / cardWidth[k]!);
-    });
-    dirty = true;
-  };
-  const cardObserver = new ResizeObserver(() => {
-    cards.forEach((el, k) => {
-      if (el) cardHeight[k] = el.offsetHeight || cardHeight[k] || 420;
-    });
-    fitBoards();
-    schedule();
-  });
-
   /** Where each district's section sits on the page, measured once and when the layout changes, never per frame. */
   const measure = () => {
     width = window.innerWidth;
@@ -226,16 +212,9 @@ export async function start(canvas: HTMLCanvasElement, options: SceneOptions): P
     });
     options.stops.forEach((stop, k) => {
       cards[k] = document.querySelector<HTMLElement>(`[data-stop="${stop.id}"] .stop-card`);
-      cardWidth[k] = stop.wide ? 640 : 520;
-      cardHeight[k] = cards[k]?.offsetHeight || 420;
-    });
-    fitBoards();
-    options.stops.forEach((_, k) => {
-      const el = cards[k];
-      if (el && !watched.has(el)) {
-        watched.add(el);
-        cardObserver.observe(el);
-      }
+      // Every card has one fixed size while it hangs in the city (src/styles/site.css), so the board and the card always match.
+      cardWidth[k] = CARD_W;
+      cardHeight[k] = CARD_H;
     });
     const ys = options.stops.map((d) => found.get(d.id)).filter((y): y is number => y !== undefined);
     const maxScroll = Math.max(1, document.documentElement.scrollHeight - height);
@@ -518,8 +497,6 @@ export async function start(canvas: HTMLCanvasElement, options: SceneOptions): P
     if (raf) cancelAnimationFrame(raf);
     window.clearTimeout(settleTimer);
     observer.disconnect();
-    cardObserver.disconnect();
-    cardObserver.disconnect();
     window.removeEventListener("scroll", onScroll);
     window.removeEventListener("pointermove", onPointer);
     document.removeEventListener("visibilitychange", onVisibility);

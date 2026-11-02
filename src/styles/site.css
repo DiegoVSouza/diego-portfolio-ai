@@ -284,36 +284,45 @@ a:not(.btn):hover { color: var(--paper); text-decoration-thickness: 3px; }
 /* Panels slide in from the sides; what is still off-screen must not widen the page. */
 [data-page="home"].wrap { overflow-x: clip; }
 
-/* ================= the stops (phase 005, revised): one card per stop, hung in the city ================= */
-/* Page flow first: a stop is a section holding its card. */
+/* ================= the stops: one card per stop, the face of a sign in the city ================= */
+/* Page flow first: a stop is a section holding its card. Every card has the same five parts, in the same order:
+   the top row (number, place, status), the title, one paragraph, one tag, the actions. */
 [data-page="home"].wrap { max-width: none; margin: 0; padding: 0 clamp(16px, 3vw, 56px) 80px; overflow-x: clip; }
 [data-page="home"].wrap > section.stop { background: none; border: 0; padding: 0; margin: 0 0 28px; max-width: none; position: relative; }
-.stop-card { background: var(--ink); color: var(--paper); border-left: 8px solid var(--red); padding: 22px 26px 24px; max-width: 640px; box-shadow: 8px 8px 0 var(--red); }
-.stop-card.wide { max-width: 720px; }
-.stop-kicker { margin: 0 0 8px; font: 700 12px/1 var(--f-body); text-transform: uppercase; letter-spacing: 0.16em; color: var(--red-text); }
-.stop-kicker span { color: var(--mut); }
-.stop-card .plate { font-size: clamp(30px, 3.6vw, 52px); }
-.stop-card .hl { font-size: clamp(26px, 3vw, 44px); }
-.stop-card .lead { margin: 14px 0; }
-.stop-card .hero-steps { grid-template-columns: 1fr; margin: 14px 0 6px; }
-.stop-card .cw { max-width: none; margin: 10px 0; }
-.stop-card .surface-text { padding: 0; background: none; border: 0; margin: 0 0 12px; max-width: none; color: var(--paper); }
-.stop-card .cta { margin: 14px 0 10px; }
-.stop-card .proj-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin: 0 0 6px; }
-.stop-card .proj-title { margin: 0 0 6px; font-size: clamp(28px, 3vw, 40px); }
-.stop-card .proj-sum { margin: 0 0 8px; color: var(--mut); }
-.stop-card .proj-tag { display: inline-block; margin: 0 0 6px; padding: 0 8px; background: var(--red); color: var(--on-red); font-weight: 700; font-size: 13px; }
-.stop-card .proj-actions { display: grid; gap: 10px; margin: 8px 0 0; }
-.stop-card .proj-actions .btn { justify-self: start; }
-.stop-card .proj-actions .disclosure { margin: 0; }
-.stop-card .terminal-block { margin: 0 0 14px; }
+.stop-card { box-sizing: border-box; background: var(--ink); color: var(--paper); border-left: 8px solid var(--red); padding: 22px 28px 24px 30px; max-width: 640px; box-shadow: 8px 8px 0 var(--red); }
+.sc { display: flex; flex-direction: column; gap: 10px; height: 100%; min-width: 0; }
+.sc-top { display: flex; align-items: center; gap: 14px; min-width: 0; }
+/* The number, outlined as on the sign: Anton, no fill. */
+.sc-num { flex: none; font-family: var(--f-display); font-size: 60px; line-height: 0.85; color: transparent; -webkit-text-stroke: 2px var(--paper); }
+.sc-kicker { flex: 1; min-width: 0; margin: 0; font: 700 12px/1.3 var(--f-body); text-transform: uppercase; letter-spacing: 0.14em; color: var(--red-text); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.sc-top > :last-child:not(.sc-num):not(.sc-kicker) { flex: none; max-width: 46%; }
+.sc-title { margin: 0; font-family: var(--f-display); font-weight: 400; font-size: clamp(32px, 3.1vw, 44px); line-height: 1.02; text-transform: uppercase; overflow-wrap: anywhere; }
+.sc-title .card-link { color: inherit; text-decoration: none; }
+.sc-sum { margin: 0; font-size: 20px; line-height: 1.4; color: var(--paper); }
+/* The tag is the small tilted plate (-2.5 degrees), the one rotation inside the card. */
+.sc-tag { align-self: flex-start; margin: 2px 0 2px 4px; padding: 2px 10px; background: var(--red); color: var(--on-red); font-weight: 700; font-size: 15px; line-height: 1.35; transform: rotate(-2.5deg); transform-origin: 0 50%; }
+.sc-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 14px; margin: 4px 0 0; }
+.sc-actions .btn-big { min-height: 50px; padding: 0 var(--space-5); font-size: 17px; }
+.sc-links { display: flex; flex-wrap: wrap; gap: 6px 18px; margin: 0; padding: 0; list-style: none; font-size: 15px; }
+.sc-links a { color: var(--paper); }
+.sc-links a:hover, .sc-links a:focus-visible { color: var(--red-text); }
+.flow-only { margin-top: 8px; }
 
-/* Wide screen with the scene running: the cards leave the flow and hang in the city. The scene writes --x, --y, --s and --o on each. */
+/* Wide screen with the scene running: the cards leave the flow and become the signs' faces. The scene writes --m (a perspective matrix
+   that fits the card to its board) and --o on each. The card has ONE size, 640 by 420 (CARD_W and CARD_H in src/scene/scene.ts, and the
+   board's proportions in src/scene/world.ts), and each text is cut at a set number of lines, so nothing spills over the edge. */
 @media (min-width: 1200px) {
   html[data-stage="3d"] [data-page="home"].wrap > section.stop { min-height: 100vh; margin: 0; }
-  html[data-stage="3d"] .stop-card { position: fixed; left: 0; top: 0; z-index: 5; width: 520px; max-width: none; margin: 0; transform: var(--m, scale(0)); transform-origin: 0 0; opacity: var(--o, 0); will-change: transform, opacity; pointer-events: none; }
-  html[data-stage="3d"] .stop-card.wide { width: 640px; }
+  html[data-stage="3d"] .stop-card { position: fixed; left: 0; top: 0; z-index: 5; width: 640px; height: 420px; max-width: none; margin: 0; overflow: hidden; transform: var(--m, scale(0)); transform-origin: 0 0; opacity: var(--o, 0); will-change: transform, opacity; pointer-events: none; }
   html[data-stage="3d"] .stop-card[data-near] { pointer-events: auto; }
+  html[data-stage="3d"] .flow-only { display: none; }
+  html[data-stage="3d"] .sc-sum { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 4; overflow: hidden; }
+  html[data-stage="3d"] .sc-title { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden; }
+  html[data-stage="3d"] .sc-tag { max-width: calc(100% - 16px); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  /* The actions sit at the bottom edge whatever the text above takes. */
+  html[data-stage="3d"] .sc-actions { margin-top: auto; flex-wrap: nowrap; }
+  html[data-stage="3d"] .sc-actions .btn-big { white-space: nowrap; }
+  html[data-stage="3d"] .sc-links { max-height: 52px; overflow: hidden; }
 }
 
 /* The game menu: slanted entries, the active one on a red shard with its projects under it, a description box, the keys. */
@@ -401,7 +410,7 @@ a:not(.btn):hover { color: var(--paper); text-decoration-thickness: 3px; }
 @media (max-width: 700px) { .wrap > section.step { margin-top: 72px; } }
 /* The flow's labels: a little smaller, so a long name stays inside its box. */
 .flow-stage-wrap .flow-label { font-size: 18px; letter-spacing: 0; }
-/* On a wide screen the hero card waits on the right of the page, where the scene will hang it, so it does not jump when the scene starts. */
+/* On a wide screen the cards wait on the right of the page, where the scene will hang them, so they do not jump when the scene starts. */
 @media (min-width: 1200px) {
   [data-page="home"] .stop-card { margin-left: auto; margin-right: 7vw; }
   [data-page="home"].wrap > section.stop:first-of-type { padding-top: 9vh; }
