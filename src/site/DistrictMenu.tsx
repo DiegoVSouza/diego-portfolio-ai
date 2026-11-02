@@ -5,7 +5,12 @@ import { useLang } from "./Shell";
 
 /** One move from stop to stop takes this long: the camera flies the whole way, so the visitor can enjoy the ride. */
 const FLIGHT_MS = 2200;
-const ease = (x: number) => (x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2);
+/** Starts at once (a wheel turn must not wait) and glides to a stop: the long part of the trip is the arrival, not the take-off. */
+const ease = (x: number) => 1 - Math.pow(1 - x, 3);
+const setFlight = (on: boolean) => {
+  if (on) document.documentElement.dataset.flight = "1";
+  else delete document.documentElement.dataset.flight;
+};
 
 const reduced = (): boolean => typeof matchMedia === "function" && matchMedia("(prefers-reduced-motion: reduce)").matches;
 
@@ -59,7 +64,13 @@ export function DistrictMenu() {
   useEffect(() => {
     if (!flying.current) heading.current = active;
   }, [active]);
-  useEffect(() => () => cancelAnimationFrame(frame.current), []);
+  useEffect(
+    () => () => {
+      cancelAnimationFrame(frame.current);
+      setFlight(false);
+    },
+    [],
+  );
   const goTo = useCallback(
     (index: number) => {
       const i = Math.min(total - 1, Math.max(0, index));
@@ -74,16 +85,22 @@ export function DistrictMenu() {
       // Without the city (or with reduced motion) the page scrolls the ordinary way.
       if (reduced() || document.documentElement.dataset.stage !== "3d") {
         flying.current = false;
+        setFlight(false);
         window.scrollTo({ top, behavior: reduced() ? "auto" : "smooth" });
         return;
       }
       flying.current = true;
+      // The scene reads this: during a flight the scroll position already carries the easing, so the camera follows it one to one.
+      setFlight(true);
       const started = performance.now();
       const step = (now: number) => {
         const x = Math.min(1, (now - started) / FLIGHT_MS);
         window.scrollTo(0, from + (top - from) * ease(x));
         if (x < 1) frame.current = requestAnimationFrame(step);
-        else flying.current = false;
+        else {
+          flying.current = false;
+          setFlight(false);
+        }
       };
       frame.current = requestAnimationFrame(step);
     },

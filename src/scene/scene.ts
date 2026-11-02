@@ -232,9 +232,13 @@ export async function start(canvas: HTMLCanvasElement, options: SceneOptions): P
     const y = window.scrollY + height / 2;
     const cs = centers;
     if (!cs.length || y <= cs[0]!) return 0;
+    // During a flight started by a key, the wheel or the menu (src/site/DistrictMenu.tsx) the scroll is already eased, and the camera must
+    // leave the moment the visitor asks: no rest at the start of the leg and no second easing on top.
+    const flight = document.documentElement.dataset.flight === "1";
     for (let i = 0; i < count - 1; i += 1) {
       if (y <= cs[i + 1]!) {
         const f = (y - cs[i]!) / Math.max(1, cs[i + 1]! - cs[i]!);
+        if (flight) return i + f;
         return i + (f < DWELL ? 0 : f > 1 - DWELL ? 1 : smooth((f - DWELL) / (1 - 2 * DWELL)));
       }
     }
