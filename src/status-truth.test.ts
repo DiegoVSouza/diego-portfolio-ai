@@ -3,7 +3,7 @@ import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 import catalog from "./data/catalog.generated.json";
 import { caseCards } from "./content/caseIndex";
-import { CARD_PROJECTS, axesOf, sealFor, type Catalog } from "./content/seal";
+import { CARD_PROJECTS, axesOf, describeAxis, sealFor, type Catalog } from "./content/seal";
 
 const data = catalog as unknown as Catalog;
 
@@ -54,6 +54,18 @@ describe("status truth (STAT-001 to STAT-006)", () => {
       expect(axes.length > 0, slug).toBe(unverified);
       if (axes.length) expect(seal.label.en, slug).toContain("open:");
       else expect(seal.label.en, slug).not.toContain("open:");
+    }
+  });
+
+  it("STAT-006: every open axis in the catalog has words in both languages, so no seal shows a raw token", () => {
+    const unknown: string[] = [];
+    for (const ids of Object.values(CARD_PROJECTS)) {
+      for (const axis of axesOf(ids.flatMap((id) => data.projects[id]!))) if (!describeAxis(axis).known) unknown.push(axis);
+    }
+    expect([...new Set(unknown)]).toEqual([]);
+    for (const ids of Object.values(CARD_PROJECTS)) {
+      const label = sealFor(ids, data).label;
+      expect(label.pt).not.toMatch(/\b(quality|metrics|evaluation|review|checklists|identity|provider|frame|phone)\b/i);
     }
   });
 
