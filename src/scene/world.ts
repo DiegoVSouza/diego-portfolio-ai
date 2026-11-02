@@ -361,7 +361,7 @@ export async function buildWorld(c: WorldContext): Promise<World> {
   lane(3, { count: 8, latMin: 36, latMax: 60, hMin: 14, hMax: 30, wMin: 5, wMax: 9, side: 1 });
   /** The viaduct spans the avenue overhead, so its trains are in view all through the district and no card needs to dodge it. */
   const VIADUCT_LAT = 0;
-  const VIADUCT_Y = 22;
+  const VIADUCT_Y = 20;
   /** Each of the two tracks runs this far from the viaduct's middle. */
   const LANE = 2.8;
   const [vu0, vu1] = [rail.u(first[3]!, -0.45), rail.u(last[3]!, 0.45)];
