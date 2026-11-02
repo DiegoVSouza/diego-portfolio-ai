@@ -1,0 +1,22 @@
+{
+  "source": "Lighthouse 13.4.0 against https://diego-portfolio-ai.pages.dev/ on 2026-11-02, five runs per form factor, default simulated throttling; the runs are the home-*.json files beside this one",
+  "note": "Single Lighthouse runs vary by hundreds of ms of TBT on this machine, so only medians are reported",
+  "mobile": {
+    "runs": 5,
+    "performance_median": 83,
+    "accessibility_min": 100,
+    "best_practices_min": 100,
+    "seo_min": 100,
+    "lcp_ms_median": 1985,
+    "tbt_ms_median": 613
+  },
+  "desktop": {
+    "runs": 5,
+    "performance_median": 85,
+    "accessibility_min": 100,
+    "best_practices_min": 100,
+    "seo_min": 100,
+    "lcp_ms_median": 481,
+    "tbt_ms_median": 356
+  }
+}
