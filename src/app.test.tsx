@@ -21,6 +21,16 @@ describe("prerendered HTML (SEO-001, SEC-001)", () => {
     }
   });
 
+  it("code spans in case text are drawn as code, never as literal backticks (content review, 2026-11-02)", async () => {
+    for (const path of allPaths().filter((p) => /\/projects\//.test(p))) {
+      const html = await renderToHtml(path);
+      const main = /<main[\s\S]*<\/main>/.exec(html)![0];
+      const text = main.replace(/<[^>]+>/g, "");
+      expect(text.includes("`"), `${path} shows a literal backtick`).toBe(false);
+    }
+    expect(await renderToHtml("/projects/foundation/")).toContain("<code>FAIL_PROVISIONAL</code>");
+  });
+
   it("the contact section has a WhatsApp button and a phone link, in both languages", async () => {
     for (const [path, label] of [["/", "Message me on WhatsApp"], ["/pt/", "Fale comigo no WhatsApp"]] as [string, string][]) {
       const html = await renderToHtml(path);
@@ -142,7 +152,7 @@ describe("the demo page", () => {
     fetchMock.mockImplementation((url: string) => (url.includes("/api/status") ? reply({ state: "unknown" }) : reply({ runs: [] })));
     await wait("/demo/");
     mount(<App url="/demo/" />);
-    await waitFor(() => expect(screen.getByText(/No live run is recorded yet/)).toBeTruthy());
+    await waitFor(() => expect(screen.getByText(/No live run to show right now/)).toBeTruthy());
     expect(document.querySelector(".runlog")).toBeNull();
     expect(document.querySelectorAll(".flow-node.live")).toHaveLength(0);
   });

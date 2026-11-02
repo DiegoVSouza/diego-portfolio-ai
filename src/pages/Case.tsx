@@ -6,6 +6,7 @@ import { OWNER, REPO_NAMES, flowLabels, getFlow, getLayout, pinDates, pinnedLink
 import { Link, hrefFor } from "../site/router";
 import { CaseSteps } from "../site/CaseSteps";
 import { SymbolHero } from "../site/SymbolHero";
+import { Inline, plain } from "../site/Inline";
 import { DemoPanel } from "./Demo";
 import { FlowStage } from "../site/FlowStage";
 import { useLang } from "../site/Shell";
@@ -62,9 +63,9 @@ export function CasePage({ slug }: { slug: string }) {
           <div><dt>{t.problem}</dt><dd>{resolve(c.tldr.problem[lang])}</dd></div>
           <div><dt>{t.role}</dt><dd>{resolve(c.tldr.role[lang])}</dd></div>
           <div><dt>{t.stack}</dt><dd>{c.tldr.stack}</dd></div>
-          <div><dt>{t.result}</dt><dd>{resolve(c.tldr.result[lang])}</dd></div>
+          <div><dt>{t.result}</dt><dd><Inline text={resolve(c.tldr.result[lang])} /></dd></div>
         </dl>
-        <p className="surface-text">{c.summary[lang]}</p>
+        <p className="surface-text"><Inline text={c.summary[lang]} /></p>
         <p className="surface-text case-honest">
           <a href="#numbers">{t.notMeasured}</a> · <a href="#fail-h">{t.failures}</a>
         </p>
@@ -94,7 +95,7 @@ export function CasePage({ slug }: { slug: string }) {
                   <pre className="code" tabIndex={0}><code>{`git clone ${repoUrl}.git
 cd ${REPO_NAMES[c.repoKey]}
 ${c.validate.command}`}</code></pre>
-                  <p className="surface-text">{t.validateExpected}: {c.validate.expected[lang]}</p>
+                  <p className="surface-text">{t.validateExpected}: <Inline text={c.validate.expected[lang]} /></p>
                 </section>
               </section>
             ),
@@ -140,7 +141,7 @@ ${c.validate.command}`}</code></pre>
                     <DecisionCard
                       key={d.title.en}
                       title={d.title[lang]}
-                      body={<p>{resolve(d.body[lang])}</p>}
+                      body={<p><Inline text={resolve(d.body[lang])} /></p>}
                       rejected={d.rejected[lang]}
                       link={d.code ? { href: pinnedLink(d.code.repo, d.code.path), text: `${t.linkCode}: ${d.code.path}` } : undefined}
                       labels={{ rejected: t.rejected }}
@@ -150,7 +151,7 @@ ${c.validate.command}`}</code></pre>
                 <section aria-labelledby="fail-h">
                   <h3 id="fail-h" className="sub-h">{t.failures}</h3>
                   {c.failures.map((f) => (
-                    <FailureCard key={f.what.en} what={f.what[lang]} cause={f.cause[lang]} change={f.change[lang]} labels={{ what: t.failWhat, cause: t.failCause, change: t.failChange }} />
+                    <FailureCard key={f.what.en} what={plain(f.what[lang])} cause={plain(f.cause[lang])} change={plain(f.change[lang])} labels={{ what: t.failWhat, cause: t.failCause, change: t.failChange }} />
                   ))}
                 </section>
                 <section id="numbers" aria-labelledby="res-h">
