@@ -169,6 +169,33 @@ test.describe("metro line", () => {
     await expect(page).toHaveURL(/\/projects\/agents\/$/);
   });
 
+  test("on a narrow screen the project name opens the list of all stations, which closes on a choice and on Escape", async ({ page }) => {
+    await page.setViewportSize({ width: 390, height: 800 });
+    await page.goto("/projects/agents/");
+    await ready(page);
+    const line = page.getByRole("navigation", { name: "Project line" });
+    const toggle = line.locator("button.metro-now");
+    await expect(toggle).toHaveAttribute("aria-expanded", "false");
+    await expect(line.getByRole("link", { name: /Production AI toolkit/ })).toBeHidden();
+    await toggle.click();
+    await expect(toggle).toHaveAttribute("aria-expanded", "true");
+    await expect(line.getByRole("link")).toHaveCount(8);
+    await expect(line.getByRole("link", { name: /Production AI toolkit/ })).toBeVisible();
+    const box = await line.getByRole("link", { name: /SupportOps/ }).boundingBox();
+    expect(box!.height).toBeGreaterThanOrEqual(44);
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
+    await line.getByRole("link", { name: /Production AI toolkit/ }).click();
+    await expect(page).toHaveURL(/\/projects\/toolkit\/$/);
+    await expect(toggle).toHaveAttribute("aria-expanded", "false");
+    await expect(line.getByRole("link", { name: /Production AI toolkit/ })).toBeHidden();
+    await toggle.click();
+    await expect(toggle).toHaveAttribute("aria-expanded", "true");
+    await page.keyboard.press("Escape");
+    await expect(toggle).toHaveAttribute("aria-expanded", "false");
+    const axe = await new AxeBuilder({ page }).analyze();
+    expect(axe.violations.map((v) => `${v.id}: ${v.nodes[0]?.target}`)).toEqual([]);
+  });
+
   test("the j and k keys move one station, and do nothing while typing", async ({ page }) => {
     await page.setViewportSize({ width: 1280, height: 800 });
     await page.goto("/projects/agents/");

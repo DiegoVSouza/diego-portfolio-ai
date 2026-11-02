@@ -5,6 +5,7 @@ import { ev, modeLabel, permalink, resolve } from "../content/evidence";
 import { OWNER, REPO_NAMES, flowLabels, getFlow, getLayout, pinDates, pinnedLink, pins } from "../content/flows";
 import { Link, hrefFor } from "../site/router";
 import { CaseSteps } from "../site/CaseSteps";
+import { SymbolHero } from "../site/SymbolHero";
 import { DemoPanel } from "./Demo";
 import { FlowStage } from "../site/FlowStage";
 import { useLang } from "../site/Shell";
@@ -36,6 +37,7 @@ export function CasePage({ slug }: { slug: string }) {
       <p className="crumb">
         <Link to={`${hrefFor({ page: "home" }, lang)}#project-${c.slug}`}>← {t.backToSurface}</Link>
       </p>
+      <SymbolHero slug={c.slug} />
       <Headline>{c.name[lang]}</Headline>
       <Lead>{c.outcome[lang]}</Lead>
       <p className="case-seal">

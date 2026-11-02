@@ -14,6 +14,8 @@ export function MetroLine() {
   const { lang, t } = useLang();
   const [homeActive, setHomeActive] = useState(-1);
   const [announcement, setAnnouncement] = useState("");
+  // On a narrow screen the stations are a list that opens above the bar. It closes on a choice, on Escape and when the project changes.
+  const [open, setOpen] = useState(false);
   const last = useRef(-2);
   const onHome = false; // the home has its own menu (DistrictMenu)
   const onCase = route.page === "case";
@@ -50,6 +52,9 @@ export function MetroLine() {
     setAnnouncement(t.sceneAnnounce.replace("{n}", String(active + 1)).replace("{total}", String(total)).replace("{name}", card.name[lang]));
   }, [active, lang, t, total]);
 
+  useEffect(() => {
+    setOpen(false);
+  }, [route.slug, route.page, lang]);
   const reduced = () => typeof matchMedia === "function" && matchMedia("(prefers-reduced-motion: reduce)").matches;
 
   const goTo = useCallback(
@@ -89,9 +94,9 @@ export function MetroLine() {
   if (!onCase) return null;
   const current = active >= 0 ? caseCards[active]! : null;
   return (
-    <nav className="metro" aria-label={t.metroLabel} data-ready="true">
+    <nav className="metro" aria-label={t.metroLabel} data-ready="true" data-open={open ? "1" : undefined} onKeyDown={(event) => { if (event.key === "Escape" && open) setOpen(false); }}>
       <span className="sr" role="status" aria-live="polite">{announcement}</span>
-      <ol className="metro-stations">
+      <ol className="metro-stations" id="metro-stations">
         {caseCards.map((c, i) => {
           const href = onCase ? hrefFor({ page: "case", slug: c.slug }, lang) : `#project-${c.slug}`;
           const body = (
@@ -126,7 +131,10 @@ export function MetroLine() {
         <button type="button" className="tg" onClick={() => goTo((active < 0 ? 1 : active) - 1)} disabled={active <= 0} aria-label={t.metroPrev}>
           ◂
         </button>
-        <span className="metro-now">{current ? `${String(active + 1).padStart(2, "0")} · ${current.name[lang]}` : t.projectsTitle}</span>
+        <button type="button" className="metro-now" aria-expanded={open} aria-controls="metro-stations" aria-describedby="metro-index-hint" onClick={() => setOpen((value) => !value)}>
+          {current ? `${String(active + 1).padStart(2, "0")} · ${current.name[lang]}` : t.projectsTitle}
+        </button>
+        <span className="sr" id="metro-index-hint">{t.metroIndex}</span>
         <button type="button" className="tg" onClick={() => goTo((active < 0 ? -1 : active) + 1)} disabled={active >= total - 1} aria-label={t.metroNext}>
           ▸
         </button>

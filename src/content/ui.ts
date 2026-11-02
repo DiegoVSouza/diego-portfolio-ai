@@ -133,6 +133,7 @@ export interface Strings {
   metroLabel: string;
   metroPrev: string;
   metroNext: string;
+  metroIndex: string;
   simpleVersion: string;
   backToSurface: string;
   stepsLabel: string;
@@ -331,6 +332,7 @@ const en: Strings = {
   metroLabel: "Project line",
   metroPrev: "Previous project",
   metroNext: "Next project",
+  metroIndex: "All projects: open the list",
   simpleVersion: "Simple version",
   backToSurface: "Back to the surface",
   stepsLabel: "Stops of this project",
@@ -536,6 +538,7 @@ const pt: Strings = {
   metroLabel: "Linha dos projetos",
   metroPrev: "Projeto anterior",
   metroNext: "Próximo projeto",
+  metroIndex: "Todos os projetos: abrir a lista",
   simpleVersion: "Versão simples",
   backToSurface: "Voltar à superfície",
   stepsLabel: "Paradas deste projeto",

@@ -137,18 +137,33 @@
 .metro-bar { display: none; }
 @media (min-width: 1200px) {
   .metro { left: 16px; top: 50%; transform: translateY(-50%); width: 196px; }
+  html:has(.metro-stations) footer { padding-left: calc(16px + 196px + 40px); }
   .metro-name { overflow-wrap: anywhere; }
 }
 @media (max-width: 1199px) {
   .metro { left: 0; right: 0; bottom: 0; background: var(--ink); border-top: 3px solid var(--red); }
   .metro-stations { display: none; }
+  .metro[data-open] .metro-stations { display: block; position: absolute; left: 0; right: 0; bottom: 100%; max-height: 60vh; overflow-y: auto; border-left: 0; border-top: 3px solid var(--red); padding: 8px 0; }
+  .metro[data-open] .metro-stations a { min-height: 44px; align-items: center; font-size: 15px; }
   .metro-bar { display: flex; align-items: center; gap: 8px; padding: 8px 12px; }
-  .metro-now { flex: 1; min-width: 0; font: 700 13px/1.25 var(--f-body); color: var(--paper); text-align: center; }
+  .metro-now { flex: 1; min-width: 0; min-height: 44px; padding: 4px 8px; background: transparent; border: 2px dashed var(--mut); font: 700 13px/1.25 var(--f-body); color: var(--paper); text-align: center; cursor: pointer; }
+  .metro-now:focus-visible { outline: 3px solid var(--red); outline-offset: 2px; }
   .metro-bar .tg[disabled] { opacity: 1; color: var(--mut); border-style: dashed; }
   .scene-controls { bottom: 64px; }
   .wrap { padding-bottom: 72px; }
 }
-@media (max-width: 1199px) { footer { padding-bottom: 72px; } }
+/* The fixed bar (narrow) and the quality, half-tone and motion buttons (wide) sit over the bottom edge, so the last line clears them. */
+footer.foot { padding-bottom: 72px; }
+/* The project symbol: a flat drawing beside the case title on a wide screen, a small mark above it on a narrow one. Tokens only. */
+.case-symbol { width: 72px; margin: 0 0 12px; }
+.case-symbol svg { display: block; width: 100%; height: auto; }
+.case-symbol .sym-ink { fill: var(--ink); stroke: var(--paper); stroke-width: 2; }
+.case-symbol .sym-red { fill: var(--red); stroke: var(--ink); stroke-width: 2; }
+.case-symbol .sym-line { fill: none; stroke: var(--paper); stroke-width: 4; }
+@media (min-width: 700px) {
+  .case-symbol { float: right; width: 144px; margin: 4px 0 16px 28px; }
+  .case-focus { clear: both; }
+}
 @media (max-width: 1199px) { .metro-bar .tg { font-size: 20px; min-width: 48px; min-height: 44px; } }
 
 /* Guided flow: the stops of a project are stacked, with a rail of in-page links and one "next" action at the end of each. */
@@ -343,6 +358,8 @@ a:not(.btn):hover { color: var(--paper); text-decoration-thickness: 3px; }
 .d-sub a:hover, .d-sub a:focus-visible { transform: translateX(6px); background: var(--paper); color: var(--ink); border-left-color: var(--red); }
 .d-sub .on a { border-left-color: var(--red); background: var(--ink-2); }
 @media (min-width: 1200px) {
+  /* The fixed menu sits over the left edge; at the end of the page the footer clears it instead of running under it. */
+  html[data-stage="3d"] footer { padding-left: calc(clamp(14px, 2vw, 36px) + 272px + 48px); }
   .districts { left: clamp(14px, 2vw, 36px); top: 50%; transform: translateY(-50%); width: 272px; }
   .districts-prompt { display: inline-block; margin: 0 0 14px; padding: 0 12px; background: var(--red); color: var(--on-red); font-family: var(--f-display); font-size: 40px; line-height: 1.15; text-transform: uppercase; transform: rotate(-4deg); box-shadow: 5px 5px 0 var(--ink); }
   .districts-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
