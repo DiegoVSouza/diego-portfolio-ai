@@ -139,7 +139,9 @@ test.describe("descent, simple version and back to the surface", () => {
     await expect(page.locator("#project-toolkit")).toBeInViewport();
     const canvas = page.locator("canvas.scene");
     await expect(canvas).toHaveAttribute("data-scene", "3d", { timeout: 20_000 });
-    await expect(canvas).toHaveAttribute("data-active", "4"); // the toolkit stop (the fifth)
+    // The camera flies to the stop (software rendering on a hosted runner is slow), so wait for the flight to land, then check the stop.
+    await expect(page.locator("html[data-flight]")).toHaveCount(0, { timeout: 20_000 });
+    await expect(canvas).toHaveAttribute("data-active", "4", { timeout: 20_000 }); // the toolkit stop (the fifth)
   });
 });
 

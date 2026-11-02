@@ -47,6 +47,21 @@ const saveData = (): boolean => {
   return Boolean(connection?.saveData);
 };
 
+/**
+ * A link such as "Back to the surface" (#project-toolkit) scrolls before the scene exists. Starting the scene switches the home from the
+ * page flow to the slide-show layout, which changes the page height, so that scroll position then points at another stop. Once the stage
+ * is on and the stops are measured, scroll to the middle of the linked stop again.
+ */
+function landOnHashStop(): void {
+  const id = decodeURIComponent(window.location.hash.slice(1));
+  const stop = id ? document.getElementById(id)?.closest<HTMLElement>("[data-stop]") : null;
+  if (!stop) return;
+  window.setTimeout(() => {
+    const station = Number(stop.dataset.stationY);
+    if (Number.isFinite(station) && station > 0) window.scrollTo(0, Math.max(0, station - window.innerHeight / 2));
+  }, 500);
+}
+
 export function SceneHost({ mode, focusSlug, pulseKey }: { mode: BackgroundMode; focusSlug?: string; pulseKey?: number }) {
   const canvas = useRef<HTMLCanvasElement | null>(null);
   const controller = useRef<SceneController | null>(null);
@@ -110,6 +125,7 @@ export function SceneHost({ mode, focusSlug, pulseKey }: { mode: BackgroundMode;
             // The home hangs its cards in the city only while the scene runs (CSS reads this; the cards are in the page flow otherwise).
             if (focus === undefined) document.documentElement.dataset.stage = "3d";
             setRunning(true);
+            if (focus === undefined) landOnHashStop();
           } catch {
             document.documentElement.dataset.bg = "2d";
           }
