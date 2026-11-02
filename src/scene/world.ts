@@ -41,12 +41,19 @@ export interface World {
   trainKind(): "kenney" | "procedural";
   /** Sign text is painted again once the display font is ready. */
   repaintText(): void;
+  /** Fit stop k's board to its card: height over width of the card as laid out. The board keeps the card's proportions. */
+  setBoardRatio(k: number, ratio: number): void;
+  /** The four corners of stop k's board in the world: top left, top right, bottom right, bottom left, as seen from the front. */
+  boardCorners(k: number, out: THREE.Vector3[]): void;
 }
 
-/** World width of a card's billboard, in units: it matches the card (520 px, or 640 px for the wide ones) at the distance of its stop. */
+/** World width of a board, in units, before it is fitted to its card; the board is never taller than BOARD_MAX_HEIGHT. */
 export const BILLBOARD_WIDTH = 22;
 export const BILLBOARD_WIDTH_WIDE = 27;
 const BILLBOARD_RATIO = 0.68;
+const BOARD_MAX_HEIGHT = 18;
+/** The board's lower edge above the street. */
+const BOARD_BOTTOM = 2.5;
 
 type Part = THREE.BufferGeometry;
 
@@ -567,29 +574,34 @@ export async function buildWorld(c: WorldContext): Promise<World> {
     painters.push(paint);
     return new THREE.Mesh(new THREE.PlaneGeometry(w, h), new THREE.MeshBasicMaterial({ map }));
   };
-  /** The billboard of one stop: the number outlined, the name in up to three lines, a line under it, on the card's own colours. */
-  const makeBillboard = (index: number, w: number, h: number): THREE.Mesh => {
+  /** The painted face of a board: the number outlined, the name in up to three lines, a line under it. The card hides it when it is near. */
+  const boardRatio: number[] = stops.map(() => BILLBOARD_RATIO);
+  const makeBillboardMap = (index: number): { map: THREE.CanvasTexture; paint: () => void } => {
     const stop = stops[index]!;
     const cv = document.createElement("canvas");
     cv.width = 1024;
-    cv.height = Math.round(1024 * BILLBOARD_RATIO);
+    cv.height = 1024;
     const map = new THREE.CanvasTexture(cv);
     map.colorSpace = THREE.SRGBColorSpace;
     const paint = () => {
       const x = cv.getContext("2d")!;
+      const r = boardRatio[index]!;
+      const H = Math.round(1024 * r);
+      // Design space is 1024 by H; the texture is square, and the plane is as tall as it is wide times r, so the stretch cancels.
+      x.setTransform(1, 0, 0, 1 / r, 0, 0);
       x.fillStyle = p.css(p.ink);
-      x.fillRect(0, 0, cv.width, cv.height);
+      x.fillRect(0, 0, 1024, H);
       x.fillStyle = p.css(p.red);
-      x.fillRect(0, 0, 26, cv.height);
+      x.fillRect(0, 0, 26, H);
       x.strokeStyle = p.css(p.paper);
       x.lineWidth = 10;
-      x.strokeRect(5, 5, cv.width - 10, cv.height - 10);
+      x.strokeRect(5, 5, 1024 - 10, H - 10);
       x.textBaseline = "alphabetic";
       x.textAlign = "right";
       x.font = "400 250px Anton, Impact, sans-serif";
       x.lineWidth = 6;
       x.strokeStyle = p.css(p.red);
-      x.strokeText(String(index + 1).padStart(2, "0"), cv.width - 50, 250);
+      x.strokeText(String(index + 1).padStart(2, "0"), 1024 - 50, 250);
       x.textAlign = "left";
       x.fillStyle = p.css(p.paper);
       const lines: string[] = [];
@@ -604,41 +616,73 @@ export async function buildWorld(c: WorldContext): Promise<World> {
       const rows = lines.slice(0, 3);
       const fs = rows.length > 2 ? 120 : rows.length > 1 ? 150 : 190;
       x.font = `400 ${fs}px Anton, Impact, sans-serif`;
-      rows.forEach((r, i) => x.fillText(r, 70, 330 + i * fs * 0.98));
+      rows.forEach((row, i) => x.fillText(row, 70, 330 + i * fs * 0.98));
       x.fillStyle = p.css(p.red);
-      x.fillRect(70, cv.height - 176, 300, 24);
+      x.fillRect(70, H - 176, 300, 24);
       x.fillStyle = p.css(p.paper);
       x.font = '700 42px "Courier Prime", "Courier New", monospace';
-      x.fillText(stop.tag.toUpperCase().slice(0, 34), 70, cv.height - 70);
+      x.fillText(stop.tag.toUpperCase().slice(0, 34), 70, H - 70);
       map.needsUpdate = true;
     };
     paint();
     painters.push(paint);
-    return new THREE.Mesh(new THREE.PlaneGeometry(w, h), new THREE.MeshBasicMaterial({ map }));
+    return { map, paint };
   };
-  stops.forEach((stop, k) => {
-    const w = stop.wide ? BILLBOARD_WIDTH_WIDE : BILLBOARD_WIDTH;
-    const h = w * BILLBOARD_RATIO;
+  /**
+   * One board per stop, standing on two red posts. The card IS the board's face: the scene fits the card to the board's four corners
+   * in perspective, so it leans, shrinks and foreshortens with the street. Until the card is near, the painted face shows.
+   */
+  interface Board {
+    group: THREE.Group;
+    panel: THREE.Mesh;
+    posts: THREE.Mesh[];
+    beams: THREE.Mesh[];
+    repaint: () => void;
+    width: number;
+    height: number;
+  }
+  const frameMat = new THREE.MeshBasicMaterial({ color: p.red });
+  const unitBox = new THREE.BoxGeometry(1, 1, 1);
+  const boards: Board[] = stops.map((stop, k) => {
     rail.cardAnchor(k, anchor, f);
     // It faces the camera's approach (back along the avenue), turned a little toward the avenue.
     const sd = cardSide(k);
-    const ry = face(-f.T.x - 0.35 * sd * f.R.x, -f.T.z - 0.35 * sd * f.R.z);
-    const m = makeBillboard(k, w, h);
-    m.position.copy(anchor);
-    m.rotation.y = ry;
-    scene.add(m);
-    // A plinth and a frame, so it stands on the ground and reads as a screen, not a floating plane.
-    const bottom = anchor.y - h / 2;
-    solid(stop.district, w * 0.5, bottom, 1.8, anchor.x, 0, anchor.z, ry, grey(0.2), false);
-    const side = (s: number) => V3(anchor.x + Math.cos(ry) * s * (w / 2 + 0.3), 0, anchor.z - Math.sin(ry) * s * (w / 2 + 0.3));
-    for (const s of [-1, 1]) {
-      const b = side(s);
-      strut(stop.district, V3(b.x, bottom, b.z), V3(b.x, bottom + h, b.z), 0.6, p.red);
-      beacon(b.x, bottom + h + 0.6, b.z, 0.7);
-    }
-    strut(stop.district, V3(side(-1).x, bottom + h, side(-1).z), V3(side(1).x, bottom + h, side(1).z), 0.5, p.red);
-    strut(stop.district, V3(side(-1).x, bottom, side(-1).z), V3(side(1).x, bottom, side(1).z), 0.5, p.red);
+    const group = new THREE.Group();
+    group.position.set(anchor.x, 0, anchor.z);
+    group.rotation.y = face(-f.T.x - 0.35 * sd * f.R.x, -f.T.z - 0.35 * sd * f.R.z);
+    const painted = makeBillboardMap(k);
+    const panel = new THREE.Mesh(new THREE.PlaneGeometry(1, 1), new THREE.MeshBasicMaterial({ map: painted.map }));
+    const posts = [0, 1].map(() => new THREE.Mesh(unitBox, frameMat));
+    const beams = [0, 1].map(() => new THREE.Mesh(unitBox, frameMat));
+    group.add(panel, ...posts, ...beams);
+    scene.add(group);
+    const board: Board = { group, panel, posts, beams, repaint: painted.paint, width: 1, height: 1 };
+    fitBoard(board, stop.wide ? BILLBOARD_WIDTH_WIDE : BILLBOARD_WIDTH, BILLBOARD_RATIO);
+    return board;
   });
+  function fitBoard(b: Board, baseWidth: number, ratio: number) {
+    // Keep the card's proportions; a tall card makes a narrower board so it never grows past the screen.
+    const h = Math.min(BOARD_MAX_HEIGHT, baseWidth * ratio);
+    const w = h / ratio;
+    b.width = w;
+    b.height = h;
+    const mid = BOARD_BOTTOM + h / 2;
+    b.panel.scale.set(w, h, 1);
+    b.panel.position.set(0, mid, 0);
+    b.posts.forEach((post, i) => {
+      const side = i ? 1 : -1;
+      post.scale.set(0.7, BOARD_BOTTOM + h, 0.7);
+      post.position.set(side * (w / 2 + 0.35), (BOARD_BOTTOM + h) / 2, -0.4);
+    });
+    b.beams.forEach((beam, i) => {
+      beam.scale.set(w + 1.4, 0.6, 0.6);
+      beam.position.set(0, i ? BOARD_BOTTOM + h + 0.3 : BOARD_BOTTOM - 0.3, -0.2);
+    });
+    b.group.updateMatrixWorld(true);
+  }
+  const corner = V3(0, 0, 0);
+  const CORNERS: [number, number][] = [[-0.5, 0.5], [0.5, 0.5], [0.5, -0.5], [-0.5, -0.5]];
+  const board = (k: number) => boards[k]!;
 
   /* ---------- merge every district ---------- */
   await tick();
@@ -811,5 +855,17 @@ export async function buildWorld(c: WorldContext): Promise<World> {
     stations: () => stationCount,
     trainKind: () => (realTrain ? "kenney" : "procedural"),
     repaintText: () => painters.forEach((paint) => paint()),
+    setBoardRatio(k, ratio) {
+      const b = board(k);
+      const r = Math.min(1.7, Math.max(0.45, ratio));
+      if (Math.abs(boardRatio[k]! - r) < 0.01) return;
+      boardRatio[k] = r;
+      fitBoard(b, stops[k]!.wide ? BILLBOARD_WIDTH_WIDE : BILLBOARD_WIDTH, r);
+      b.repaint();
+    },
+    boardCorners(k, out) {
+      const b = board(k);
+      CORNERS.forEach(([cx, cy], i) => out[i]!.copy(corner.set(cx, cy, 0)).applyMatrix4(b.panel.matrixWorld));
+    },
   };
 }

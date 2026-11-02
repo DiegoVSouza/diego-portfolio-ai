@@ -9,7 +9,7 @@ import { createPost } from "./post";
 import { createQuality, type Quality } from "./quality";
 import { createRail } from "./rail";
 import { readPalette } from "./tokens";
-import { BILLBOARD_WIDTH, BILLBOARD_WIDTH_WIDE, buildWorld } from "./world";
+import { buildWorld } from "./world";
 
 export type { Quality } from "./quality";
 export type SceneMode = "3d" | "3d-static";
@@ -49,8 +49,6 @@ const DWELL = 0.12;
 const SWING_SHIFT = 5;
 const SWING_PAN = 0.4;
 const BANK = 0.28;
-/** Screen pixels the left menu takes, with its gap: a card never slides under it. */
-const MENU_CLEAR = 330;
 const smooth = (x: number) => x * x * (3 - 2 * x);
 
 export async function start(canvas: HTMLCanvasElement, options: SceneOptions): Promise<SceneController> {
@@ -78,7 +76,6 @@ export async function start(canvas: HTMLCanvasElement, options: SceneOptions): P
 
   const rnd = rng(11);
 
-  const anchor = V3(0, 0, 0);
   const projected = V3(0, 0, 0);
   const cards: (HTMLElement | null)[] = [];
   /** The last value written to each custom property of each card: a write that changes nothing still costs a style recalculation. */
@@ -92,8 +89,6 @@ export async function start(canvas: HTMLCanvasElement, options: SceneOptions): P
   };
   const cardWidth: number[] = [];
   const cardHeight: number[] = [];
-  /** The header's bottom edge in page pixels: it scrolls away, so on screen it is this minus the scroll. A card never rides up under it. */
-  let headerBottom = 0;
 
   // State.
   let motion = options.mode === "3d" && !fixed;
@@ -197,6 +192,23 @@ export async function start(canvas: HTMLCanvasElement, options: SceneOptions): P
     dirty = true;
   }, weak ? 1 : 0);
 
+  /** The boards take the proportions of their cards, once the cards hang in the city (in the page flow they are laid out differently). */
+  const watched = new Set<HTMLElement>();
+  const fitBoards = () => {
+    if (!fixed && document.documentElement.dataset.stage !== "3d") return;
+    cards.forEach((el, k) => {
+      if (el && cardWidth[k] && cardHeight[k]) world.setBoardRatio(k, cardHeight[k]! / cardWidth[k]!);
+    });
+    dirty = true;
+  };
+  const cardObserver = new ResizeObserver(() => {
+    cards.forEach((el, k) => {
+      if (el) cardHeight[k] = el.offsetHeight || cardHeight[k] || 420;
+    });
+    fitBoards();
+    schedule();
+  });
+
   /** Where each district's section sits on the page, measured once and when the layout changes, never per frame. */
   const measure = () => {
     width = window.innerWidth;
@@ -217,8 +229,14 @@ export async function start(canvas: HTMLCanvasElement, options: SceneOptions): P
       cardWidth[k] = stop.wide ? 640 : 520;
       cardHeight[k] = cards[k]?.offsetHeight || 420;
     });
-    const head = document.querySelector<HTMLElement>("header");
-    headerBottom = head ? Math.max(0, head.getBoundingClientRect().bottom + window.scrollY) : 0;
+    fitBoards();
+    options.stops.forEach((_, k) => {
+      const el = cards[k];
+      if (el && !watched.has(el)) {
+        watched.add(el);
+        cardObserver.observe(el);
+      }
+    });
     const ys = options.stops.map((d) => found.get(d.id)).filter((y): y is number => y !== undefined);
     const maxScroll = Math.max(1, document.documentElement.scrollHeight - height);
     if (ys.length === count) {
@@ -327,13 +345,33 @@ export async function start(canvas: HTMLCanvasElement, options: SceneOptions): P
   };
 
   /**
-   * Each card hangs in its part of the city: its screen position and size are the projection of its billboard, so it grows out of the
-   * city as the camera comes and drifts away behind it. Only the card at the camera's stop is interactive; the others are previews.
-   * Transform and opacity only, written as custom properties on at most three elements per frame.
+   * Each card IS its board. The board's four corners are projected to the screen and the card is fitted to them with a perspective
+   * transform (a homography written as matrix3d), so the card leans, shrinks and foreshortens exactly as the sign does, and grows out of
+   * the city as the camera comes. Only the card at the camera's stop is interactive; the others are previews. Transform and opacity only,
+   * written as one custom property on at most three elements per frame.
    */
+  const corners = [V3(0, 0, 0), V3(0, 0, 0), V3(0, 0, 0), V3(0, 0, 0)];
+  const quad = [0, 0, 0, 0, 0, 0, 0, 0];
+  const homography = (cw: number, ch: number): string => {
+    const [x0, y0, x1, y1, x2, y2, x3, y3] = quad as [number, number, number, number, number, number, number, number];
+    const dx1 = x1 - x2;
+    const dx2 = x3 - x2;
+    const dx3 = x0 - x1 + x2 - x3;
+    const dy1 = y1 - y2;
+    const dy2 = y3 - y2;
+    const dy3 = y0 - y1 + y2 - y3;
+    const det = dx1 * dy2 - dy1 * dx2;
+    const g = Math.abs(det) < 1e-9 ? 0 : (dx3 * dy2 - dy3 * dx2) / det;
+    const h = Math.abs(det) < 1e-9 ? 0 : (dx1 * dy3 - dy1 * dx3) / det;
+    const a = x1 - x0 + g * x1;
+    const b = x3 - x0 + h * x3;
+    const d = y1 - y0 + g * y1;
+    const e = y3 - y0 + h * y3;
+    const n = (v: number) => v.toFixed(6);
+    return `matrix3d(${n(a / cw)},${n(d / cw)},0,${n(g / cw)},${n(b / ch)},${n(e / ch)},0,${n(h / ch)},0,0,1,0,${n(x0)},${n(y0)},0,1)`;
+  };
   const updateCards = () => {
     camera.updateMatrixWorld();
-    const tan = Math.tan((camera.fov * Math.PI) / 360);
     let shown = 0;
     for (let k = 0; k < cards.length; k += 1) {
       const el = cards[k];
@@ -341,43 +379,34 @@ export async function start(canvas: HTMLCanvasElement, options: SceneOptions): P
       const d = cCur - k;
       const ad = Math.abs(d);
       const visible = d > -1.15 && d < 0.55;
-      if (!visible) {
+      const hide = () => {
         if (el.dataset.shown !== "0") {
           el.dataset.shown = "0";
           put(el, "--o", "0");
           el.inert = true;
         }
+      };
+      if (!visible) {
+        hide();
         continue;
       }
-      rail.cardAnchor(k, anchor);
-      projected.copy(anchor).applyMatrix4(camera.matrixWorldInverse);
-      const depth = -projected.z;
-      if (depth < 3) {
-        el.dataset.shown = "0";
-        put(el, "--o", "0");
-        el.inert = true;
+      world.boardCorners(k, corners);
+      let near3 = true;
+      for (let i = 0; i < 4; i += 1) {
+        projected.copy(corners[i]!).applyMatrix4(camera.matrixWorldInverse);
+        if (-projected.z < 2) near3 = false;
+        projected.copy(corners[i]!).project(camera);
+        quad[i * 2] = ((projected.x + 1) / 2) * width;
+        quad[i * 2 + 1] = ((1 - projected.y) / 2) * height;
+      }
+      if (!near3) {
+        hide();
         continue;
       }
-      projected.copy(anchor).project(camera);
-      const px = ((projected.x + 1) / 2) * width;
-      let py = ((1 - projected.y) / 2) * height;
-      const world = options.stops[k]!.wide ? BILLBOARD_WIDTH_WIDE : BILLBOARD_WIDTH;
-      const pxPerUnit = height / (2 * depth * tan);
-      // The card fits between the header and the bottom of the screen: it shrinks if it is too tall, and slides down if it would touch the header.
-      const top = Math.max(0, headerBottom - window.scrollY);
-      const room = height - top - 28;
-      const scale = Math.min(1.12, room / cardHeight[k]!, Math.max(0.08, (world * pxPerUnit) / cardWidth[k]!));
-      const half = (cardHeight[k]! * scale) / 2;
-      py = Math.min(height - 14 - half, Math.max(top + 14 + half, py));
       const near = ad < 0.22;
       // Previews fade in from the distance; the card at its stop is fully there.
       const o = near ? 1 : Math.max(0, 0.9 * (1 - (ad - 0.22) / 0.9));
-      // A card on the left keeps clear of the district menu (272 px wide at the screen's left edge, from 1200 px up).
-      const halfW = (cardWidth[k]! * scale) / 2;
-      const cx = Math.max(px, MENU_CLEAR + halfW);
-      put(el, "--x", cx.toFixed(1));
-      put(el, "--y", py.toFixed(1));
-      put(el, "--s", scale.toFixed(3));
+      put(el, "--m", homography(cardWidth[k]!, cardHeight[k]!));
       put(el, "--o", o.toFixed(2));
       if (el.dataset.shown !== "1" || el.inert === near) {
         el.dataset.shown = "1";
@@ -489,6 +518,8 @@ export async function start(canvas: HTMLCanvasElement, options: SceneOptions): P
     if (raf) cancelAnimationFrame(raf);
     window.clearTimeout(settleTimer);
     observer.disconnect();
+    cardObserver.disconnect();
+    cardObserver.disconnect();
     window.removeEventListener("scroll", onScroll);
     window.removeEventListener("pointermove", onPointer);
     document.removeEventListener("visibilitychange", onVisibility);

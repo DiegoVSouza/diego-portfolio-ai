@@ -47,9 +47,17 @@ export function DistrictMenu() {
     setAnnouncement(t.districtAnnounce.replace("{n}", String(active + 1)).replace("{total}", String(total)).replace("{name}", stopTitle(active)));
   }, [active, lang, t, total]);
 
+  // Where the last move is heading: quick presses and wheel turns step from there, not from where the scroll has got to.
+  const heading = useRef(0);
+  const movedAt = useRef(0);
+  useEffect(() => {
+    if (performance.now() - movedAt.current > 1200) heading.current = active;
+  }, [active]);
   const goTo = useCallback(
     (index: number) => {
       const i = Math.min(total - 1, Math.max(0, index));
+      heading.current = i;
+      movedAt.current = performance.now();
       const el = document.getElementById(`s-${stops[i]!.id}`);
       if (!el) return;
       // The scene measures each section's middle and writes it here; without a scene the section's own middle is used.
@@ -69,14 +77,40 @@ export function DistrictMenu() {
       if (target && (/^(INPUT|TEXTAREA|SELECT)$/.test(target.tagName) || target.isContentEditable)) return;
       if (document.querySelector("dialog[open]")) return;
       const k = event.key.toLowerCase();
-      if (k === "j") goTo(active + 1);
-      else if (k === "k") goTo(active - 1);
+      // With the city running the home is a slide show: the arrows step one placa, as j and k do.
+      const slides = document.documentElement.dataset.stage === "3d";
+      const onControl = Boolean(target?.closest("button, a, summary, [role='button']"));
+      if (k === "j" || (slides && !onControl && (k === "arrowdown" || k === "arrowright" || k === "pagedown"))) goTo(heading.current + 1);
+      else if (k === "k" || (slides && !onControl && (k === "arrowup" || k === "arrowleft" || k === "pageup"))) goTo(heading.current - 1);
       else if (/^[1-9]$/.test(k) && Number(k) <= districts.length) goToDistrict(Number(k) - 1);
       else return;
       event.preventDefault();
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
+  }, [active, goTo]);
+
+  // A wheel turn moves one placa, never a free scroll: the city is a slide show. A trackpad's long tail counts as one turn.
+  useEffect(() => {
+    let until = 0;
+    let lastWheel = 0;
+    const onWheel = (event: WheelEvent) => {
+      if (document.documentElement.dataset.stage !== "3d" || event.ctrlKey || Math.abs(event.deltaY) < 4) return;
+      if (document.querySelector("dialog[open]")) return;
+      // A card whose content scrolls on its own keeps its wheel.
+      for (let el = event.target as HTMLElement | null; el && el !== document.body; el = el.parentElement) {
+        if (el.scrollHeight > el.clientHeight + 2 && /(auto|scroll)/.test(getComputedStyle(el).overflowY)) return;
+      }
+      event.preventDefault();
+      const now = performance.now();
+      const quiet = now - lastWheel > 140;
+      lastWheel = now;
+      if (now < until || !quiet) return;
+      until = now + 700;
+      goTo(heading.current + (event.deltaY > 0 ? 1 : -1));
+    };
+    window.addEventListener("wheel", onWheel, { passive: false });
+    return () => window.removeEventListener("wheel", onWheel);
   }, [active, goTo]);
 
   const district = stops[active]!.district;

@@ -36,7 +36,7 @@ const CAMERA_HEIGHT = 16;
 const LOOK_HEIGHT = 9;
 /** The look-at point leans toward the side of the stop's card, so that card sits in its third of the screen and the avenue stays in the middle. */
 const LOOK_RIGHT = 6;
-const LOOK_LEFT = 11;
+const LOOK_LEFT = 16;
 const LOOK_AHEAD = 0.32;
 export const CARD_AHEAD = 0.32;
 export const CARD_LATERAL = 20;
