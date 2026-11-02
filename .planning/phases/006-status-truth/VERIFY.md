@@ -12,7 +12,7 @@ Evidence is under `artifacts/evidence/status-truth/` unless another path is give
 - [x] P02 adapter: red then green then check_fast exit 0 (P05 `artifacts/evidence/toolkit-limits-037/`), deployed with one live run under the limit
 - [x] P04 RAG ADR committed (P04 `docs/harness/decisions.md`)
 - [x] `python scripts/check_full.py` exit 0 in P07: unit 73, e2e 50 (`F6-p07-check-full-final.txt`)
-- [ ] Public e2e after deploy, 3 runs in a row: pending the runs after the Turnstile-aware test change (`F8-*` were 2 of 3, `F10-*` 46 of 48; causes below, fixed in `e2e/site.spec.ts`)
+- [x] Public e2e after deploy, 3 runs in a row: 48 passed, 2 skipped each (`F13-public-e2e-run1..3.txt`), after the Turnstile-aware test changes (`F8`, `F10`, `F12` failures are kept)
 - [x] Remaining `PENDING` items each have a cause and an owner (see below)
 
 ## Left open, with cause and owner
@@ -25,7 +25,7 @@ Evidence is under `artifacts/evidence/status-truth/` unless another path is give
 | Third-party IdP acceptance | Keycloak on Fly is the lab's own | owner (a provider account) |
 | Production metrics (P03), production acceptance of trace export (P04) | one real trace was checked; no metrics run exists | a later phase |
 | Demo password rotation | the IdP image has the admin API switched off on purpose; the passwords are published by design on `/api/status` | owner decision |
-| Public e2e run 1 failed on `Connecting to 'data:,' violates ... Content Security Policy` on `/projects/supportops/`, likely the Cloudflare Turnstile script now that the widget is enabled; runs 2 and 3 passed. CSP or test not changed without a decision | owner (allow `data:` in connect-src, or filter that third-party message) |
+| Turnstile script behaviour in the public suite (data: fetch refused by the CSP, a worker blob, its own POST) | tolerated only against the deployed site in `e2e/site.spec.ts`; CSP unchanged; reversible, see `decisions.md` | closed unless the owner prefers allowing `data:` |
 | Second real defect found by hosted CI: Back to the surface landed on the previous stop in 3D (fixed in `9ad435e`) | closed |
 | Menu over footer text at the page end | `home-3d.png` (scrolled to the bottom at 1280x720) shows the fixed menu covering part of the credits line; not fixed in this phase | next P07 phase (squint review) |
 | Metro index on mobile, symbol hero on case pages | feature work not started | next P07 phase |

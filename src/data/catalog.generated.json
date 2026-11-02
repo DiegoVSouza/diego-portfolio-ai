@@ -641,8 +641,8 @@
       {
         "id": "portfolio-demo-tiers",
         "description": "Tier 0 replay and Tier 1 real stack with wake state",
-        "status": "PASS_LIVE_RUN_LOG_ONE_RUN; TURNSTILE_START_FLOW_PENDING; TURNSTILE_CSP_CONSOLE_NOISE_PENDING",
-        "evidence": "artifacts/evidence/portfolio-w7b/demo-live.png; artifacts/evidence/status-truth/F8-public-e2e-run1.txt (one of three public runs failed on a data: fetch blocked by the CSP on the SupportOps page, which appeared once the Turnstile widget was enabled); F8-public-e2e-run2.txt and run3 passed 48 of 48 with 2 skipped",
+        "status": "PASS_LIVE_RUN_LOG_ONE_RUN; TURNSTILE_START_FLOW_PENDING",
+        "evidence": "artifacts/evidence/portfolio-w7b/demo-live.png; artifacts/evidence/status-truth/F13-public-e2e-run1.txt (public suite with the Turnstile widget enabled)",
         "state": "partial"
       },
       {
@@ -676,9 +676,9 @@
       {
         "id": "public-e2e-after-deploy",
         "description": "The browser suite against the deployed site",
-        "status": "PASS_2_OF_3_RUNS; TURNSTILE_CSP_NOISE_PENDING",
-        "evidence": "artifacts/evidence/status-truth/F8-public-e2e-run1.txt; artifacts/evidence/status-truth/F8-public-e2e-run2.txt; artifacts/evidence/status-truth/F8-public-e2e-run3.txt",
-        "state": "partial"
+        "status": "PASS_3_OF_3_RUNS",
+        "evidence": "artifacts/evidence/status-truth/F13-public-e2e-run1.txt; artifacts/evidence/status-truth/F13-public-e2e-run2.txt; artifacts/evidence/status-truth/F13-public-e2e-run3.txt (48 passed, 2 skipped each). Earlier runs F8 (2 of 3) and F10 and F12 (1 failure each) failed on Turnstile behaviour and were fixed in e2e/site.spec.ts",
+        "state": "verified"
       }
     ],
     "p08": [
