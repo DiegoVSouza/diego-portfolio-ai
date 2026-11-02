@@ -1,0 +1,8 @@
+
+Running 2 tests using 1 worker
+
+  ✓  1 e2e\console.spec.ts:24:1 › agent and approver complete a refund, and tenants stay apart (31.6s)
+  ✓  2 e2e\console.spec.ts:72:1 › narrow screen keeps the console usable (5.3s)
+
+  2 passed (38.6s)
+exit=0

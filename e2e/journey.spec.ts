@@ -33,6 +33,7 @@ for (const lang of ["en", "pt"] as const) {
       else await page.getByRole("link", { name: labels.contact }).click();
     }
     expect(new Set(visited).size).toBe(8);
-    await expect(page.getByRole("heading", { level: 2, name: lang === "en" ? "Contact" : "Contato" })).toBeVisible();
+    // The terminal stop keeps Contact as a heading of its own (level 3, read by screen readers) under the About title.
+    await expect(page.getByRole("heading", { name: lang === "en" ? "Contact" : "Contato" })).toBeVisible();
   });
 }

@@ -205,6 +205,8 @@ test.describe("metro line", () => {
     await page.keyboard.press("6");
     await expect(menu.getByRole("link", { name: /Terminal/ })).toHaveAttribute("aria-current", "location", { timeout: 10_000 });
     await expect(menu.locator("[role=status]")).toContainText("Stop 10 of 10");
+    // A key press during a flight is ignored on purpose (one stop per press), so wait for the flight to land before stepping back.
+    await expect(page.locator("html[data-flight]")).toHaveCount(0, { timeout: 10_000 });
     await page.keyboard.press("k");
     await expect(menu.getByRole("link", { name: /Craft/ }).first()).toHaveAttribute("aria-current", "location", { timeout: 10_000 });
     // The description box follows the active district.

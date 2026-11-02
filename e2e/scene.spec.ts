@@ -103,7 +103,7 @@ test("a portrait screen keeps the level 1 background and mounts no canvas", asyn
 
 test("static frame of the contact section (scene S5)", async ({ page }) => {
   await page.goto("/");
-  const section = page.locator('section[aria-labelledby="contact-h"]');
+  const section = page.locator("section:has(#contact-h)");
   await expect(section).toBeVisible();
   mkdirSync(evidence, { recursive: true });
   await section.screenshot({ path: `${evidence}/contact.png` });

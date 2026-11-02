@@ -180,8 +180,11 @@ test("travelling: the camera parks on each card, swings between stops, and each 
   await page.evaluate((y) => window.scrollTo(0, y), await stop("supportops"));
   await expect.poll(travel, { timeout: 8000 }).toBeLessThan(0.1);
   await expect(first).toHaveAttribute("data-near", "1");
-  // At its stop the card is on the right of the screen, full size, and the next one is only a preview (not interactive).
-  await expect.poll(async () => { const b = await first.boundingBox(); return b!.x + b!.width / 2; }, { timeout: 8000 }).toBeGreaterThan(1280 * 0.62);
+  // At its stop the card is the sign filling most of the screen (see the wide-stage test), clear of the menu and centred right of the
+  // middle of the screen, and the next one is only a preview (not interactive).
+  const menuRight = await page.locator(".districts-list").evaluate((el) => el.getBoundingClientRect().right);
+  await expect.poll(async () => { const b = await first.boundingBox(); return b!.x + b!.width / 2; }, { timeout: 8000 }).toBeGreaterThan(1280 * 0.5);
+  expect((await first.boundingBox())!.x).toBeGreaterThan(menuRight);
   expect(await second.evaluate((el) => (el as HTMLElement & { inert: boolean }).inert)).toBe(true);
   // Half way to the next stop the camera has swung out and no card is the near one.
   const from = await stop("supportops");

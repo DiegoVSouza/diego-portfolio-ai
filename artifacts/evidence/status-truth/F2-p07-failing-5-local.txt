@@ -1,0 +1,145 @@
+[WebServer] [plugin builtin:vite-reporter] 
+[WebServer] (!) Some chunks are larger than 500 kB after minification. Consider:
+[WebServer] - Using dynamic import() to code-split the application
+[WebServer] - Use build.rolldownOptions.output.codeSplitting to improve chunking: https://rolldown.rs/reference/OutputOptions.codeSplitting
+[WebServer] - Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+
+Running 5 tests using 1 worker
+
+  ✘  1 e2e\flow.spec.ts:184:3 › metro line › the home is a game menu: a click, j and k and the number keys fly to each stop, and each is announced (17.4s)
+  ✘  2 e2e\journey.spec.ts:15:3 › the trail walks from the home page through 8 projects to contact (en) (12.6s)
+  ✘  3 e2e\journey.spec.ts:15:3 › the trail walks from the home page through 8 projects to contact (pt) (12.7s)
+  ✘  4 e2e\scene.spec.ts:104:1 › static frame of the contact section (scene S5) (5.4s)
+  ✘  5 e2e\v2.spec.ts:169:1 › travelling: the camera parks on each card, swings between stops, and each card hangs in its own part of the city (8.7s)
+
+
+  1) e2e\flow.spec.ts:184:3 › metro line › the home is a game menu: a click, j and k and the number keys fly to each stop, and each is announced 
+
+    Error: expect(locator).toHaveAttribute(expected) failed
+
+    Locator:  getByRole('navigation', { name: 'Districts' }).getByRole('link', { name: /Craft/ }).first()
+    Expected: "location"
+    Received: ""
+    Timeout:  10000ms
+
+    Call log:
+      - Expect "toHaveAttribute" getByRole('navigation', { name: 'Districts' }).getByRole('link', { name: /Craft/ }).first() with timeout 10000ms
+      - waiting for getByRole('navigation', { name: 'Districts' }).getByRole('link', { name: /Craft/ }).first()
+        23 × locator resolved to <a href="#s-design-system">…</a>
+           - unexpected value "null"
+
+
+      207 |     await expect(menu.locator("[role=status]")).toContainText("Stop 10 of 10");
+      208 |     await page.keyboard.press("k");
+    > 209 |     await expect(menu.getByRole("link", { name: /Craft/ }).first()).toHaveAttribute("aria-current", "location", { timeout: 10_000 });
+          |                                                                     ^
+      210 |     // The description box follows the active district.
+      211 |     await expect(menu.locator(".districts-desc")).toContainText("This site, its design system");
+      212 |   });
+        at C:\estudo\Golpe\lab\projects\p07\e2e\flow.spec.ts:209:69
+
+    Error Context: test-results\flow-metro-line-the-home-i-1ed95--stop-and-each-is-announced\error-context.md
+
+  2) e2e\journey.spec.ts:15:3 › the trail walks from the home page through 8 projects to contact (en) 
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: getByRole('heading', { name: 'Contact', level: 2 })
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" getByRole('heading', { name: 'Contact', level: 2 }) with timeout 5000ms
+      - waiting for getByRole('heading', { name: 'Contact', level: 2 })
+
+
+      34 |     }
+      35 |     expect(new Set(visited).size).toBe(8);
+    > 36 |     await expect(page.getByRole("heading", { level: 2, name: lang === "en" ? "Contact" : "Contato" })).toBeVisible();
+         |                                                                                                        ^
+      37 |   });
+      38 | }
+      39 |
+        at C:\estudo\Golpe\lab\projects\p07\e2e\journey.spec.ts:36:104
+
+    Error Context: test-results\journey-the-trail-walks-fr-fa67c-h-8-projects-to-contact-en-\error-context.md
+
+  3) e2e\journey.spec.ts:15:3 › the trail walks from the home page through 8 projects to contact (pt) 
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: getByRole('heading', { name: 'Contato', level: 2 })
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" getByRole('heading', { name: 'Contato', level: 2 }) with timeout 5000ms
+      - waiting for getByRole('heading', { name: 'Contato', level: 2 })
+
+
+      34 |     }
+      35 |     expect(new Set(visited).size).toBe(8);
+    > 36 |     await expect(page.getByRole("heading", { level: 2, name: lang === "en" ? "Contact" : "Contato" })).toBeVisible();
+         |                                                                                                        ^
+      37 |   });
+      38 | }
+      39 |
+        at C:\estudo\Golpe\lab\projects\p07\e2e\journey.spec.ts:36:104
+
+    Error Context: test-results\journey-the-trail-walks-fr-a50be-h-8-projects-to-contact-pt-\error-context.md
+
+  4) e2e\scene.spec.ts:104:1 › static frame of the contact section (scene S5) ──────────────────────
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: locator('section[aria-labelledby="contact-h"]')
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" locator('section[aria-labelledby="contact-h"]') with timeout 5000ms
+      - waiting for locator('section[aria-labelledby="contact-h"]')
+
+
+      105 |   await page.goto("/");
+      106 |   const section = page.locator('section[aria-labelledby="contact-h"]');
+    > 107 |   await expect(section).toBeVisible();
+          |                         ^
+      108 |   mkdirSync(evidence, { recursive: true });
+      109 |   await section.screenshot({ path: `${evidence}/contact.png` });
+      110 | });
+        at C:\estudo\Golpe\lab\projects\p07\e2e\scene.spec.ts:107:25
+
+    Error Context: test-results\scene-static-frame-of-the-contact-section-scene-S5-\error-context.md
+
+  5) e2e\v2.spec.ts:169:1 › travelling: the camera parks on each card, swings between stops, and each card hangs in its own part of the city 
+
+    Error: expect(received).toBeGreaterThan(expected)
+
+    Expected: > 793.6
+    Received:   728.7486419677734
+
+    Call Log:
+    - Timeout 8000ms exceeded while waiting on the predicate
+
+      182 |   await expect(first).toHaveAttribute("data-near", "1");
+      183 |   // At its stop the card is on the right of the screen, full size, and the next one is only a preview (not interactive).
+    > 184 |   await expect.poll(async () => { const b = await first.boundingBox(); return b!.x + b!.width / 2; }, { timeout: 8000 }).toBeGreaterThan(1280 * 0.62);
+          |                                                                                                                          ^
+      185 |   expect(await second.evaluate((el) => (el as HTMLElement & { inert: boolean }).inert)).toBe(true);
+      186 |   // Half way to the next stop the camera has swung out and no card is the near one.
+      187 |   const from = await stop("supportops");
+        at C:\estudo\Golpe\lab\projects\p07\e2e\v2.spec.ts:184:122
+
+    Error Context: test-results\v2-travelling-the-camera-p-bd7d1-in-its-own-part-of-the-city\error-context.md
+
+  5 failed
+    e2e\flow.spec.ts:184:3 › metro line › the home is a game menu: a click, j and k and the number keys fly to each stop, and each is announced 
+    e2e\journey.spec.ts:15:3 › the trail walks from the home page through 8 projects to contact (en) 
+    e2e\journey.spec.ts:15:3 › the trail walks from the home page through 8 projects to contact (pt) 
+    e2e\scene.spec.ts:104:1 › static frame of the contact section (scene S5) ───────────────────────
+    e2e\v2.spec.ts:169:1 › travelling: the camera parks on each card, swings between stops, and each card hangs in its own part of the city 
+exit=1
