@@ -1,7 +1,7 @@
 import * as THREE from "three";
 import { V3, bar, fit, mergeGeometries, tick, tint } from "./geometry";
 import { loadModel } from "./loaders";
-import type { Frame, Rail } from "./rail";
+import { cardSide, type Frame, type Rail } from "./rail";
 import { truckFallback } from "./symbols";
 import type { Palette } from "./tokens";
 
@@ -188,8 +188,8 @@ export async function buildWorld(c: WorldContext): Promise<World> {
     side?: 1 | -1;
     signs?: number;
   }
-  /** The right-hand side keeps clear for the billboards: nothing stands closer than this to the avenue there. */
-  const RIGHT_CLEAR = 34;
+  /** Both sides keep clear for the billboards (they alternate): nothing stands closer than this to the avenue. */
+  const SIDE_CLEAR = 34;
   /** Towers on both sides of the avenue for district d. Returns where they stood, for features that sit on roofs. */
   const lane = (d: number, o: Lane) => {
     const [u0, u1] = span(d);
@@ -201,8 +201,8 @@ export async function buildWorld(c: WorldContext): Promise<World> {
       const w = o.wMin + rnd() * (o.wMax - o.wMin);
       const dd = o.wMin + rnd() * (o.wMax - o.wMin);
       const h = o.hMin + rnd() * (o.hMax - o.hMin);
-      // The nearest face stands at least `latMin` from the avenue's middle (more on the right, where the billboards are).
-      const near = s > 0 ? Math.max(o.latMin, RIGHT_CLEAR) : o.latMin;
+      // The nearest face stands at least `latMin` from the avenue's middle (billboards hang on both sides).
+      const near = Math.max(o.latMin, SIDE_CLEAR);
       const lat = near + w / 2 + rnd() * (o.latMax - o.latMin);
       const x = f.p.x + f.R.x * s * lat;
       const z = f.p.z + f.R.z * s * lat + (rnd() - 0.5) * 5;
@@ -348,12 +348,13 @@ export async function buildWorld(c: WorldContext): Promise<World> {
     for (const s of [-1, 1]) strut(2, V3(f.p.x + f.R.x * s * 27, y, f.p.z + f.R.z * s * 27), V3(f.p.x + f.R.x * s * 27, y - 12, f.p.z + f.R.z * s * 27), 0.5, grey(0.4));
   }
 
-  /* ---------- district 3, PLATFORM: an elevated viaduct on the left, a metro station and trains ---------- */
+  /* ---------- district 3, PLATFORM: an elevated viaduct over the avenue, a metro station and trains ---------- */
   await tick();
   lane(3, { count: 22, latMin: 36, latMax: 62, hMin: 20, hMax: 54, wMin: 5, wMax: 10, realEvery: 4, side: -1, signs: 2 });
   lane(3, { count: 8, latMin: 36, latMax: 60, hMin: 14, hMax: 30, wMin: 5, wMax: 9, side: 1 });
-  const VIADUCT_LAT = -19;
-  const VIADUCT_Y = 15;
+  /** The viaduct spans the avenue overhead, so its trains are in view all through the district and no card needs to dodge it. */
+  const VIADUCT_LAT = 0;
+  const VIADUCT_Y = 22;
   /** Each of the two tracks runs this far from the viaduct's middle. */
   const LANE = 2.8;
   const [vu0, vu1] = [rail.u(first[3]!, -0.45), rail.u(last[3]!, 0.45)];
@@ -368,7 +369,11 @@ export async function buildWorld(c: WorldContext): Promise<World> {
       solid(3, 10.4, 1.4, 7.6, x, VIADUCT_Y - 1.4, z, ry, grey(0.24), false);
       // Two tracks, two rails each.
       for (const lane of [-LANE, LANE]) for (const s of [-1, 1]) solid(3, 0.3, 0.3, 7.6, x + f.R.x * (lane + s * 1.3), VIADUCT_Y, z + f.R.z * (lane + s * 1.3), ry, grey(0.5), false);
-      if (i % 2 === 0) solid(3, 3, VIADUCT_Y - 1.4, 2.4, x, 0, z, ry, grey(0.18), false);
+      if (i % 5 === 0) {
+        // A portal: a cross beam under the deck and a column on each side of the avenue.
+        solid(3, 36, 1.2, 2.4, x, VIADUCT_Y - 2.6, z, ry, grey(0.2), false);
+        for (const side of [-1, 1]) solid(3, 2.4, VIADUCT_Y - 2.6, 2.4, x + f.R.x * side * 16, 0, z + f.R.z * side * 16, ry, grey(0.18), false);
+      }
     }
   }
   let stationCount = 0;
@@ -403,6 +408,8 @@ export async function buildWorld(c: WorldContext): Promise<World> {
     return mergeGeometries(g)!;
   };
   const TRAINS = 2;
+  /** Seconds for one trip there and back. */
+  const TRAIN_CYCLE = 80;
   const MIDS = 3;
   // The procedural train is the fallback; the Kenney metro cars replace it when they load.
   let heads = new THREE.InstancedMesh(trainCar(true), flatMat(), TRAINS * 2);
@@ -465,7 +472,7 @@ export async function buildWorld(c: WorldContext): Promise<World> {
       streaks.setMatrixAt(i, dummy.matrix);
     }
     scene.add(streaks);
-    // Container stacks beside the avenue, in a few colours; the right-hand side stays clear for the billboard.
+    // Container stacks beside the avenue, in a few colours; the left-hand side stays clear for the last billboard.
     const stackCount = 48;
     const stacks = new THREE.InstancedMesh(new THREE.BoxGeometry(2.8, 2.8, 6.4), new THREE.MeshStandardMaterial({ flatShading: true, roughness: 0.8, metalness: 0.1 }), stackCount);
     stacks.frustumCulled = false;
@@ -476,7 +483,7 @@ export async function buildWorld(c: WorldContext): Promise<World> {
       const row = Math.floor(i / 2) % 8;
       const level = Math.floor(i / 16);
       rail.frameAt(rail.u(lastStop, -0.45 + row * 0.12), f);
-      const lat = s > 0 ? 38 + (i % 3) * 3.2 : 15 + (i % 3) * 3.2;
+      const lat = s < 0 ? 38 + (i % 3) * 3.2 : 15 + (i % 3) * 3.2;
       dummy.position.set(f.p.x + f.R.x * s * lat, 1.4 + level * 2.8, f.p.z + f.R.z * s * lat);
       dummy.rotation.set(0, yaw(f.T), 0);
       dummy.scale.setScalar(1);
@@ -485,11 +492,11 @@ export async function buildWorld(c: WorldContext): Promise<World> {
       stacks.setColorAt(i, col.copy(tones[Math.floor(rnd() * tones.length)]!));
     }
     scene.add(stacks);
-    // Portal cranes straddling the left stacks.
+    // Portal cranes straddling the right stacks.
     for (let j = 0; j < 3; j += 1) {
       rail.frameAt(rail.u(lastStop, -0.35 + j * 0.3), f);
-      const a = f.p.clone().addScaledVector(f.R, -28);
-      const b = f.p.clone().addScaledVector(f.R, -10);
+      const a = f.p.clone().addScaledVector(f.R, 28);
+      const b = f.p.clone().addScaledVector(f.R, 10);
       for (const q of [a, b]) strut(5, V3(q.x, 0, q.z), V3(q.x, 26, q.z), 0.8, grey(0.4));
       strut(5, V3(a.x, 26, a.z), V3(b.x, 26, b.z), 1, p.red);
       beacon(a.x, 27.5, a.z, 0.7);
@@ -614,7 +621,8 @@ export async function buildWorld(c: WorldContext): Promise<World> {
     const h = w * BILLBOARD_RATIO;
     rail.cardAnchor(k, anchor, f);
     // It faces the camera's approach (back along the avenue), turned a little toward the avenue.
-    const ry = face(-f.T.x - 0.35 * f.R.x, -f.T.z - 0.35 * f.R.z);
+    const sd = cardSide(k);
+    const ry = face(-f.T.x - 0.35 * sd * f.R.x, -f.T.z - 0.35 * sd * f.R.z);
     const m = makeBillboard(k, w, h);
     m.position.copy(anchor);
     m.rotation.y = ry;
@@ -759,20 +767,27 @@ export async function buildWorld(c: WorldContext): Promise<World> {
         k.mesh.instanceMatrix.needsUpdate = true;
       }
     }
-    // Two trains, one on each track of the viaduct, head and tail cars facing out, shuttling along it.
-    const head = reduce ? 0.35 : (time * 0.03) % 1;
+    // Two trains, one on each track, shuttle along the viaduct: each eases to a stop at an end, waits, and comes back with the other
+    // end leading. Nothing wraps and nothing pops: a train is always on the viaduct and always whole.
     const length = 9.8;
+    const cars = MIDS + 2;
+    const room = ((cars - 1) * length) / viaductLength;
     for (let t = 0; t < TRAINS; t += 1) {
-      const cars = MIDS + 2;
+      const q = reduce ? 0.25 : (((time / TRAIN_CYCLE + t * 0.5) % 1) + 1) % 1;
+      const forward = q < 0.5;
+      const leg = forward ? q * 2 : (q - 0.5) * 2;
+      const eased = leg * leg * (3 - 2 * leg);
+      // The leading car's place on the viaduct, kept inside it so the whole train stays on the deck.
+      const lead = room + (1 - 2 * room) * (forward ? eased : 1 - eased);
+      const dir = forward ? 1 : -1;
       for (let slot = 0; slot < cars; slot += 1) {
-        const phase = (((head + t * 0.5 - (slot * length) / viaductLength) % 1) + 1) % 1;
-        rail.frameAt(vu0 + phase * (vu1 - vu0), f);
+        rail.frameAt(vu0 + (lead - dir * ((slot * length) / viaductLength)) * (vu1 - vu0), f);
         const offset = VIADUCT_LAT + (t ? LANE : -LANE);
         dummy.position.set(f.p.x + f.R.x * offset, VIADUCT_Y + (realTrain ? 0.35 : 0.1), f.p.z + f.R.z * offset);
         const isHead = slot === 0;
         const isTail = slot === cars - 1;
-        // A model faces +z. The first car leads with its own nose; the last one is the other end of the train: turned about, in the procedural train.
-        dummy.rotation.set(0, yaw(f.T) + (isTail && !realTrain ? Math.PI : 0), 0);
+        // A model faces +z, so a train going back turns every car about. The leading car is always the head, the last one the tail.
+        dummy.rotation.set(0, yaw(f.T) + (forward ? 0 : Math.PI) + (isTail && !realTrain ? Math.PI : 0), 0);
         dummy.scale.setScalar(1);
         dummy.updateMatrix();
         if (isHead) heads.setMatrixAt(realTrain ? t : t * 2, dummy.matrix);

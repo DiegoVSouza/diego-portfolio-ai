@@ -49,6 +49,8 @@ const DWELL = 0.12;
 const SWING_SHIFT = 5;
 const SWING_PAN = 0.4;
 const BANK = 0.28;
+/** Screen pixels the left menu takes, with its gap: a card never slides under it. */
+const MENU_CLEAR = 330;
 const smooth = (x: number) => x * x * (3 - 2 * x);
 
 export async function start(canvas: HTMLCanvasElement, options: SceneOptions): Promise<SceneController> {
@@ -89,6 +91,9 @@ export async function start(canvas: HTMLCanvasElement, options: SceneOptions): P
     el.style.setProperty(name, value);
   };
   const cardWidth: number[] = [];
+  const cardHeight: number[] = [];
+  /** The header's bottom edge in page pixels: it scrolls away, so on screen it is this minus the scroll. A card never rides up under it. */
+  let headerBottom = 0;
 
   // State.
   let motion = options.mode === "3d" && !fixed;
@@ -210,7 +215,10 @@ export async function start(canvas: HTMLCanvasElement, options: SceneOptions): P
     options.stops.forEach((stop, k) => {
       cards[k] = document.querySelector<HTMLElement>(`[data-stop="${stop.id}"] .stop-card`);
       cardWidth[k] = stop.wide ? 640 : 520;
+      cardHeight[k] = cards[k]?.offsetHeight || 420;
     });
+    const head = document.querySelector<HTMLElement>("header");
+    headerBottom = head ? Math.max(0, head.getBoundingClientRect().bottom + window.scrollY) : 0;
     const ys = options.stops.map((d) => found.get(d.id)).filter((y): y is number => y !== undefined);
     const maxScroll = Math.max(1, document.documentElement.scrollHeight - height);
     if (ys.length === count) {
@@ -352,14 +360,22 @@ export async function start(canvas: HTMLCanvasElement, options: SceneOptions): P
       }
       projected.copy(anchor).project(camera);
       const px = ((projected.x + 1) / 2) * width;
-      const py = ((1 - projected.y) / 2) * height;
+      let py = ((1 - projected.y) / 2) * height;
       const world = options.stops[k]!.wide ? BILLBOARD_WIDTH_WIDE : BILLBOARD_WIDTH;
       const pxPerUnit = height / (2 * depth * tan);
-      const scale = Math.min(1.12, Math.max(0.08, (world * pxPerUnit) / cardWidth[k]!));
+      // The card fits between the header and the bottom of the screen: it shrinks if it is too tall, and slides down if it would touch the header.
+      const top = Math.max(0, headerBottom - window.scrollY);
+      const room = height - top - 28;
+      const scale = Math.min(1.12, room / cardHeight[k]!, Math.max(0.08, (world * pxPerUnit) / cardWidth[k]!));
+      const half = (cardHeight[k]! * scale) / 2;
+      py = Math.min(height - 14 - half, Math.max(top + 14 + half, py));
       const near = ad < 0.22;
       // Previews fade in from the distance; the card at its stop is fully there.
       const o = near ? 1 : Math.max(0, 0.9 * (1 - (ad - 0.22) / 0.9));
-      put(el, "--x", px.toFixed(1));
+      // A card on the left keeps clear of the district menu (272 px wide at the screen's left edge, from 1200 px up).
+      const halfW = (cardWidth[k]! * scale) / 2;
+      const cx = Math.max(px, MENU_CLEAR + halfW);
+      put(el, "--x", cx.toFixed(1));
       put(el, "--y", py.toFixed(1));
       put(el, "--s", scale.toFixed(3));
       put(el, "--o", o.toFixed(2));

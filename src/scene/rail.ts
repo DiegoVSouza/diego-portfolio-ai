@@ -21,7 +21,7 @@ export interface Rail {
   pose(c: number, pos: THREE.Vector3, look: THREE.Vector3): void;
   /** Street frame at u in [0, 1] along the whole path (stop k is at u = k / count; u = 1 is the overrun point past the last stop). */
   frameAt(u: number, out?: Frame): Frame;
-  /** Where stop k's card hangs: ahead of the stop, right of the avenue, at eye height. */
+  /** Where stop k's card hangs: ahead of the stop, on its side of the avenue, at eye height. */
   cardAnchor(k: number, out: THREE.Vector3, frame?: Frame): THREE.Vector3;
   /** Ground path length in world units. */
   length: number;
@@ -34,12 +34,19 @@ const SPACING = 85;
 const SWAY = 26;
 const CAMERA_HEIGHT = 16;
 const LOOK_HEIGHT = 9;
-/** The look-at point is a little right of the avenue, so the card on the right sits in the right third and the avenue stays in the middle. */
+/** The look-at point leans toward the side of the stop's card, so that card sits in its third of the screen and the avenue stays in the middle. */
 const LOOK_RIGHT = 6;
+const LOOK_LEFT = 11;
 const LOOK_AHEAD = 0.32;
 export const CARD_AHEAD = 0.32;
 export const CARD_LATERAL = 20;
 export const CARD_HEIGHT = 9.5;
+
+/**
+ * Which side of the avenue stop k's card hangs on: +1 right, -1 left. They alternate, so two projects of one district face each other
+ * across the street instead of standing in a row. The arrival is on the right (the gate), the harbour at the end mirrors the left.
+ */
+export const cardSide = (k: number): 1 | -1 => (k % 2 === 0 ? 1 : -1);
 
 export function createRail(count: number): Rail {
   const n = Math.max(2, count);
@@ -72,7 +79,9 @@ export function createRail(count: number): Rail {
       tan.y = 0;
       tan.normalize();
       right.crossVectors(tan, up).normalize();
-      return V3(g.x + right.x * LOOK_RIGHT, LOOK_HEIGHT, g.z + right.z * LOOK_RIGHT);
+      // A left card leans further: the menu takes the left of the screen, so the card sits nearer the middle (about 0.43 of the width).
+      const lean = k < n ? (cardSide(k) > 0 ? LOOK_RIGHT : -LOOK_LEFT) : 0;
+      return V3(g.x + right.x * lean, LOOK_HEIGHT, g.z + right.z * lean);
     }),
     false,
     "catmullrom",
@@ -92,7 +101,7 @@ export function createRail(count: number): Rail {
     },
     cardAnchor(k, out, frame) {
       const f = frameOf((k + CARD_AHEAD) / n, frame ?? stopFrame);
-      tmp.copy(f.p).addScaledVector(f.R, CARD_LATERAL);
+      tmp.copy(f.p).addScaledVector(f.R, CARD_LATERAL * cardSide(k));
       return out.set(tmp.x, CARD_HEIGHT, tmp.z);
     },
   };
