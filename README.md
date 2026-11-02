@@ -48,6 +48,7 @@ python scripts/check_full.py     # plus build, per-route budget, Playwright + ax
 
 - `vite build` makes the client, `vite build --ssr` makes the server bundle, and `scripts/prerender.mjs` writes every route to `dist/<path>/index.html` with its own title, description, Open Graph tags, hreflang links and a modulepreload for the chunks that route needs.
 - `src/content/cases/*.ts` is case text (EN and pt-BR). A digit that states a result must come through an `{ev:id}` token. `src/content/profile.ts` holds the CV, labelled as career history.
+- Each card seal is derived, never typed: `scripts/catalog.mjs` reads the `docs/harness/feature_list.json` of P00 to P08 and of the lab, and `src/content/seal.ts` turns verified counts and open `status` tokens into a phrase in both languages. A new open axis needs words in `seal.ts`, or `src/status-truth.test.ts` fails. Case text marks code with backticks, drawn as code by `src/site/Inline.tsx`. The review notes are in `docs/harness/content-review-2026-11-02.md`.
 - `functions/api/*` are Cloudflare Pages Functions: `status` (reads Fly with a read-only token, wakes nothing), `demo/start` (Turnstile, kill switch, per-visitor limit, then wakes in dependency order) and `runs/latest` (recorded runs, no visitor text). Tested with mocks; not deployed.
 - `elkjs` is a build-time dev dependency (EPL-2.0 OR GPL-3.0). It is imported only by `scripts/flows.mjs`, never by anything under `src/`.
 

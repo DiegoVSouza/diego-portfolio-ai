@@ -14,6 +14,8 @@
 
 Site React estático de Diego Vieira Gonçalves de Souza, AI Engineer. O texto do CV em inglês em `src/content/profile.ts` é rascunho até o dono revisar; o arquivo do CV nunca entra no Git. O telefone de contato e o link de WhatsApp são publicados de propósito, por instrução explícita do dono em 2026-10-31.
 
+Cada selo de card é derivado, nunca digitado: `scripts/catalog.mjs` lê o `docs/harness/feature_list.json` de P00 a P08 e do lab, e `src/content/seal.ts` transforma contagens verificadas e tokens de `status` em aberto em uma frase nos dois idiomas. Uma pendência nova precisa de palavras em `seal.ts`, ou `src/status-truth.test.ts` falha. As notas da revisão de conteúdo estão em `docs/harness/content-review-2026-11-02.md`.
+
 ## Desenvolvimento
 
 ```powershell

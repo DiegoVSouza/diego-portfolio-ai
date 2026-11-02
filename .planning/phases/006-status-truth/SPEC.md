@@ -1,6 +1,6 @@
 # Phase 006: status truth
 
-Status: in progress. Owner request (2026-11-02): map every wrong or stale status label on the published projects, fix them, and build what is still missing. Roadmap: lab `docs/harness/portfolio/PLANO-CORRECAO-STATUS.pt-BR.md`.
+Status: done, with the open items listed in VERIFY.md. Owner request (2026-11-02): map every wrong or stale status label on the published projects, fix them, and build what is still missing. Roadmap: lab `docs/harness/portfolio/PLANO-CORRECAO-STATUS.pt-BR.md`.
 
 ## Contract
 
