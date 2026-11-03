@@ -135,6 +135,8 @@ export interface Strings {
   metroNext: string;
   metroIndex: string;
   simpleVersion: string;
+  simpleShort: string;
+  creditsToggle: string;
   backToSurface: string;
   stepsLabel: string;
   stepDemo: string;
@@ -334,6 +336,8 @@ const en: Strings = {
   metroNext: "Next project",
   metroIndex: "All projects: open the list",
   simpleVersion: "Simple version",
+  simpleShort: "Simple",
+  creditsToggle: "Credits and licences",
   backToSurface: "Back to the surface",
   stepsLabel: "Stops of this project",
   stepDemo: "Live demo",
@@ -540,6 +544,8 @@ const pt: Strings = {
   metroNext: "Próximo projeto",
   metroIndex: "Todos os projetos: abrir a lista",
   simpleVersion: "Versão simples",
+  simpleShort: "Simples",
+  creditsToggle: "Créditos e licenças",
   backToSurface: "Voltar à superfície",
   stepsLabel: "Paradas deste projeto",
   stepDemo: "Demo ao vivo",

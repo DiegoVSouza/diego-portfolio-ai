@@ -44,7 +44,8 @@ function Header() {
       nav={<Link to={hrefFor({ page: "case", slug: caseCards[0]!.slug }, lang)} aria-current={route.page === "case" || route.page === "demo" ? "page" : undefined}>{t.navTour}</Link>}
     >
       <button type="button" className="tg simple-toggle" aria-pressed={simple} onClick={() => setSimple(!simple)}>
-        {t.simpleVersion}
+        <span className="simple-long">{t.simpleVersion}</span>
+        <span className="simple-short" aria-hidden="true">{t.simpleShort}</span>
       </button>
       <nav aria-label={t.language} className="langs">
         <Link to={otherLanguage(route, "en")} className="tg" hrefLang="en" lang="en" aria-current={lang === "en" ? "true" : undefined}>EN</Link>
@@ -85,7 +86,7 @@ export function Shell({ children, hud, ghost }: { children: ReactNode; hud?: str
       {route.page === "home" && <DistrictMenu />}
       {hud && <Hud>{hud}</Hud>}
       <main id="main" className="wrap" tabIndex={-1} data-page={route.page}>{children}</main>
-      <AppFooter credits={t.credits}>
+      <AppFooter>
         <p>
           {t.creditsStation} <a href="https://loafbrr.itch.io/modular-underground-metro" rel="noopener noreferrer">Modular Underground Metro</a> {t.creditsStationBy} loafbrr, <a href="https://creativecommons.org/licenses/by/1.0/" rel="noopener noreferrer">CC BY</a>.
         </p>
@@ -93,6 +94,10 @@ export function Shell({ children, hud, ghost }: { children: ReactNode; hud?: str
           <Link to={hrefFor({ page: "evidence" }, lang)}>{t.navEvidence}</Link> · <Link to={hrefFor({ page: "method" }, lang)}>{t.navMethod}</Link> · <Link to={hrefFor({ page: "experience" }, lang)}>{t.navExperience}</Link> · <Link to={hrefFor({ page: "design-system" }, lang)}>{t.navDesign}</Link> · <a href="/llms.txt">llms.txt</a> · <a href="/resume.md">{t.resume}</a>
         </p>
         <p><LazyPalette /></p>
+        <details className="credits-more">
+          <summary>{t.creditsToggle}</summary>
+          <p className="credits">{t.credits}</p>
+        </details>
       </AppFooter>
     </>
   );

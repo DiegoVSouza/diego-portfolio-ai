@@ -209,6 +209,11 @@ footer.foot { padding-bottom: 72px; }
 /* Hover everywhere it was missing. Colour and shadow only: nothing shifts the layout. */
 a:not(.btn):not(.card-link) { transition: color 160ms; }
 a:not(.btn):hover { color: var(--paper); text-decoration-thickness: 3px; }
+/* The default hover colour is for dark surfaces. A link on a light (paper) surface inverts instead, and a link on red keeps its on-red text,
+   so a hovered link never ends up paper on paper (contrast 1.0) or paper on red (4.06). Audited with a hover contrast sweep, 2026-11-02. */
+.foot a:hover, .foot a:focus-visible, .tldr a:hover, .tldr a:focus-visible, .flow-hint a:hover, .chapter-head a:hover, .modal a:hover, .districts-desc a:hover,
+.cw.focus .item a:hover { background: var(--ink); color: var(--paper); }
+.trio a:hover, .tg[aria-current="true"]:hover, .step-rail a[aria-current="step"]:hover, .metro-on a:hover { color: var(--on-red); }
 .card-link { text-decoration: none; background: linear-gradient(var(--red), var(--red)) 0 100% / 0 4px no-repeat; transition: background-size 280ms var(--ease-out); }
 .card-link:hover, .card-link:focus-visible { background-size: 100% 4px; }
 .cw { transition: transform 280ms var(--ease-out); }
@@ -437,4 +442,25 @@ a:not(.btn):hover { color: var(--paper); text-decoration-thickness: 3px; }
 @media (min-width: 1200px) {
   [data-page="home"] .stop-card { margin-left: auto; margin-right: 7vw; }
   [data-page="home"].wrap > section.stop:first-of-type { padding-top: 9vh; }
+}
+
+/* ================= UX pass 2026-11-02 ================= */
+/* The long credits line is a disclosure: the station credit and the links stay in view, the licence list opens on demand. */
+.credits-more { margin-top: var(--space-3); }
+.credits-more > summary { cursor: pointer; display: flex; align-items: center; min-height: var(--hit); font-weight: 700; text-decoration: underline; text-underline-offset: 3px; }
+.credits-more > summary:hover { background: var(--ink); color: var(--paper); }
+.credits-more[open] > summary { margin-bottom: var(--space-2); }
+.credits-more .credits { max-width: 80ch; line-height: 1.6; }
+/* Narrow header: "Simple version" wrapped onto two lines. The short label shows on a narrow screen; the long one stays for screen readers. */
+.simple-short { display: none; }
+@media (max-width: 520px) {
+  .simple-long { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+  .simple-short { display: inline; }
+  .simple-toggle { white-space: nowrap; }
+}
+/* The fixed bottom bar took 60 px of a 800 px screen. Tighter padding keeps the 44 px targets and gives 8 px back; the safe area keeps it clear of a home indicator. */
+@media (max-width: 1199px) {
+  .metro-bar, .districts-bar { padding: 4px 12px calc(4px + env(safe-area-inset-bottom, 0px)); }
+  .wrap { padding-bottom: 60px; }
+  footer.foot { padding-bottom: 60px; }
 }
