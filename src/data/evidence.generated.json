@@ -91,10 +91,10 @@
       "mode": "live",
       "command": "recorded in the P00 progress log",
       "exitCode": 0,
-      "commit": "6b84f9aeed126519671d5e5066bafc0b46ce95c4",
+      "commit": "01cbe4cba50f928c565783ae76dd940b2fce79fc",
       "path": "docs/harness/progress.md",
       "repo": "https://github.com/DiegoVSouza/supportops-foundation",
-      "recordedAt": "2026-10-30"
+      "recordedAt": "2026-11-02"
     },
     {
       "id": "p00-trials",
@@ -147,10 +147,10 @@
       "mode": "live",
       "command": "accounted local operation, phase 027, as recorded in progress.md",
       "exitCode": 0,
-      "commit": "6c8e06d885b80437ba4ebad293aa9659485adc16",
+      "commit": "5cd1e8973824f2d2773f36bb9d6b823a538cde14",
       "path": "docs/harness/progress.md",
       "repo": "https://github.com/DiegoVSouza/supportops-agents",
-      "recordedAt": "2026-10-30",
+      "recordedAt": "2026-11-02",
       "caveat": {
         "en": "Transport and accounting only. Says nothing about answer quality.",
         "pt": "Só transporte e contabilidade. Nada sobre a qualidade da resposta."
