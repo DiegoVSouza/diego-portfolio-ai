@@ -8,7 +8,7 @@
 - **Measured.** Real Chrome with axe and contrast passes on all 28 routes (14 pages in each language) at 1000 and 360 px. The worst route loads 95.1 KB gzip of JavaScript against a 100 KB budget. Source: `artifacts/evidence/portfolio-w7/check-full.txt`.
 - **Run it.** `npm ci && python scripts/check_fast.py` (then `python scripts/check_full.py` with Chrome installed).
 - **Live.** https://diego-portfolio-ai.pages.dev (Cloudflare Pages). The same Playwright suite passes against it: `artifacts/evidence/portfolio-w7/public-e2e.txt`.
-- **Limits.** The live demo stack is not deployed, so `/demo/` shows its empty state. The 3D scene (`SCENE-*`) is not built, frame rate on a phone is not measured, and the live demo has not run against a deployed stack.
+- **Limits.** The 3D scene is deployed, but frame rate on a physical phone is not measured. The live run log has one run; the Turnstile start flow remains pending. Screen-reader and owner visual review remain pending.
 - **Docs.** [Architecture](docs/architecture.md), [phase 003](.planning/phases/003-real-portfolio/SPEC.md).
 <!-- case:end -->
 
