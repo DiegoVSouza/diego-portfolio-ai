@@ -1,5 +1,7 @@
 # Progress
 
+2026-11-04 phase 007: a clean Linux fast gate exposed asynchronous GSAP imports continuing after Vitest teardown. Disclosure now loads animation on interaction; the local fast gate passes. Clean Linux revalidation and phase closure remain pending.
+
 - Kit initialization completed.
 - 2026-10-31: intake (`decisions.md`) and phase 001 SPEC/PLAN/VERIFY written.
 - 2026-10-31 phase 001: catalog generator, seven project pages, EN/pt-BR, axe at 1280 and 360 px. `check_full.py` exit 0, 76.2 KB gzip of 100 KB. Two defects found and fixed, recorded in VERIFY. Not deployed.

@@ -14,20 +14,27 @@ export function Disclosure({ summary, hint, children, hover = false, defaultOpen
   const root = useRef<HTMLDetailsElement>(null);
   const body = useRef<HTMLDivElement>(null);
   const gsap = useRef<typeof Gsap | null>(null);
+  const loading = useRef(false);
+
+  const loadAnimation = () => {
+    if (gsap.current || loading.current) return;
+    loading.current = true;
+    void import("gsap").then((m) => {
+      if (root.current) gsap.current = m.gsap;
+    }).catch(() => {
+      // Native details remains usable when the optional animation chunk is unavailable.
+    }).finally(() => { loading.current = false; });
+  };
 
   useEffect(() => {
-    let alive = true;
-    void import("gsap").then((m) => {
-      if (alive) gsap.current = m.gsap;
-    });
     const panel = body.current;
     return () => {
-      alive = false;
       if (panel && gsap.current) gsap.current.killTweensOf(panel);
     };
   }, []);
 
   const open = () => {
+    loadAnimation();
     const el = root.current;
     const panel = body.current;
     const g = gsap.current;
@@ -40,6 +47,7 @@ export function Disclosure({ summary, hint, children, hover = false, defaultOpen
   };
 
   const close = () => {
+    loadAnimation();
     const el = root.current;
     const panel = body.current;
     const g = gsap.current;

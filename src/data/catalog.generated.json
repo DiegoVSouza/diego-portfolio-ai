@@ -821,7 +821,7 @@
         "id": "linux-clean-check-script",
         "description": "scripts/harness/linux_clean_check.py runs a project's gates in a Linux container",
         "status": "PENDING",
-        "evidence": "docs/harness/portfolio/W2-W3-status.md: the script exists and is untested; hosted CI is the Linux proof today",
+        "evidence": "P00-P06 and P08 clean Linux fast gates pass in artifacts/evidence/linux-clean-20261104*.json; P07 has 75 passing assertions but a Vitest teardown error. Phase 007 in P07 addresses the failure.",
         "state": "open"
       }
     ]

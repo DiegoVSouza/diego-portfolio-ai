@@ -1,0 +1,6 @@
+{
+  "command": "python projects/p07/scripts/check_fast.py",
+  "cwd": "C:/estudo/Golpe/lab",
+  "exit_code": 0,
+  "output": "local-fast.txt"
+}
