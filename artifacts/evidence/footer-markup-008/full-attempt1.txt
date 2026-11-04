@@ -1,0 +1,9 @@
+catalog: PASS
+evidence: src/data/evidence.generated.json drifted from its sources; run npm run evidence:gen and review the diff
+lint: exit 0
+typecheck: exit 0
+catalog:check: exit 0
+evidence:check: exit 1
+check-fast: FAIL, run npm run evidence:check and fix the first error
+fast: exit 1
+check-full: FAIL at fast

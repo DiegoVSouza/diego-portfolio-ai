@@ -93,7 +93,7 @@ export function Shell({ children, hud, ghost }: { children: ReactNode; hud?: str
         <p>
           <Link to={hrefFor({ page: "evidence" }, lang)}>{t.navEvidence}</Link> · <Link to={hrefFor({ page: "method" }, lang)}>{t.navMethod}</Link> · <Link to={hrefFor({ page: "experience" }, lang)}>{t.navExperience}</Link> · <Link to={hrefFor({ page: "design-system" }, lang)}>{t.navDesign}</Link> · <a href="/llms.txt">llms.txt</a> · <a href="/resume.md">{t.resume}</a>
         </p>
-        <p><LazyPalette /></p>
+        <div><LazyPalette /></div>
         <details className="credits-more">
           <summary>{t.creditsToggle}</summary>
           <p className="credits">{t.credits}</p>

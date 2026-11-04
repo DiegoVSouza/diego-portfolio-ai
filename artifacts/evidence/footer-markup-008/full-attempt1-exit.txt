@@ -1,0 +1,1 @@
+command=python scripts/check_full.py; cwd=projects/p07; attempt=1; exit_code=1

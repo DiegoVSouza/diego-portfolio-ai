@@ -1,0 +1,1 @@
+command=node scripts/catalog.mjs gen; exit_code=0

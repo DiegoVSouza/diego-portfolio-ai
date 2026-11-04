@@ -1,5 +1,7 @@
 # Progress
 
+- 2026-11-04 phase 008: replaced the paragraph around LazyPalette with a neutral container, removing invalid dialog/paragraph nesting found in the clean Linux report. Refreshed catalog and evidence metadata after P00/P08 updates. Full local gate attempt 2 exited 0 (fast/build/budget; 60 browser tests); attempt 1 stopped at generated evidence drift. Evidence: `artifacts/evidence/footer-markup-008/`. No deployment or human review claimed.
+
 2026-11-04 phase 007: a clean Linux fast gate exposed asynchronous GSAP imports continuing after Vitest teardown. Disclosure now loads animation on interaction. The corrected clean Linux fast gate passes at commit `3fc3dfe` (exit 0), and the local fast gate passes after regenerating the lab status catalog. Evidence: `artifacts/evidence/linux-fast-gate-007/`.
 
 - Kit initialization completed.
