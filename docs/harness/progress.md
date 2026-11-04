@@ -1,6 +1,6 @@
 # Progress
 
-2026-11-04 phase 007: a clean Linux fast gate exposed asynchronous GSAP imports continuing after Vitest teardown. Disclosure now loads animation on interaction; the local fast gate passes. Clean Linux revalidation and phase closure remain pending.
+2026-11-04 phase 007: a clean Linux fast gate exposed asynchronous GSAP imports continuing after Vitest teardown. Disclosure now loads animation on interaction. The corrected clean Linux fast gate passes at commit `3fc3dfe` (exit 0), and the local fast gate passes after regenerating the lab status catalog. Evidence: `artifacts/evidence/linux-fast-gate-007/`.
 
 - Kit initialization completed.
 - 2026-10-31: intake (`decisions.md`) and phase 001 SPEC/PLAN/VERIFY written.
