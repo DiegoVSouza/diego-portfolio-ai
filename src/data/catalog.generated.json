@@ -753,13 +753,6 @@
         "state": "verified"
       },
       {
-        "id": "level-2-3d",
-        "description": "Level 2 Three.js scene belongs to P07; outside the P08 package scope",
-        "status": "OUT_OF_SCOPE_P08",
-        "evidence": "docs/harness/decisions.md and .planning/phases/001-colagem-ui/SPEC.md exclude the scene from P08; its implementation and acceptance belong to P07",
-        "state": "open"
-      },
-      {
         "id": "flow-diagram",
         "description": "FlowDiagram with build-time ELK layout, SVG in React, walkthrough, failure scenarios, text version and Mermaid export",
         "status": "PASS_LOCAL_REAL_CHROME_AXE",
@@ -799,8 +792,8 @@
       {
         "id": "sdd-phase-triple",
         "description": "Every phase of every project has SPEC, PLAN and VERIFY",
-        "status": "PASS_188_OF_188",
-        "evidence": "artifacts/evidence/status-truth-lab/sdd-phase-count.txt",
+        "status": "PASS_INVENTORIED_220_OF_220_20261104",
+        "evidence": "artifacts/evidence/current-triage-20261104/inventory.json; artifacts/evidence/individual-triage-20261104/triples.txt. Snapshot covers P00-P08 phase VERIFY files and their SPEC/PLAN companions; later phase creation requires a new inventory.",
         "state": "verified"
       },
       {
@@ -813,8 +806,8 @@
       {
         "id": "verify-checklists-closed",
         "description": "Every VERIFY.md has all its boxes ticked or states why one stays open",
-        "status": "PENDING",
-        "evidence": "artifacts/evidence/status-truth-lab/sdd-phase-count.txt: 34 of 188 VERIFY.md files still have unticked boxes (the older phases were not re-opened)",
+        "status": "TRIAGED_34_FILES; EVIDENCE_AND_INDEPENDENT_REVIEW_PENDING",
+        "evidence": "docs/harness/portfolio/verify-triage-20261104.md; inventory.json under artifacts/evidence/current-triage-20261104/: 34 of 220 files, 115 unchecked items. All 34 have individual dispositions; unresolved evidence and independent reviews remain explicit. Historical boxes are preserved.",
         "state": "open"
       },
       {

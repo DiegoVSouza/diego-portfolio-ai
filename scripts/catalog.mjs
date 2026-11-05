@@ -53,7 +53,7 @@ function build() {
     if (!existsSync(file)) return null;
     info[id] = meta(id);
     const list = JSON.parse(readFileSync(file, "utf8")).features;
-    projects[id] = list.map((f) => {
+    projects[id] = list.filter((f) => !String(f.status ?? "").startsWith("OUT_OF_SCOPE")).map((f) => {
       const boolean = f.status == null && typeof f.passes === "boolean";
       const status = boolean ? `passes: ${f.passes}` : f.status == null ? "" : String(f.status);
       return {

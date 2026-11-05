@@ -8,6 +8,9 @@ import { CARD_PROJECTS, axesOf, describeAxis, sealFor, type Catalog } from "./co
 const data = catalog as unknown as Catalog;
 
 describe("status truth (STAT-001 to STAT-006)", () => {
+  it("does not invent a P08 package-level 3D requirement", () => {
+    expect(data.projects.p08!.some((feature) => feature.id === "level-2-3d")).toBe(false);
+  });
   it("STAT-002: the catalog covers every project and the lab, each with a version or a repository", () => {
     for (const id of ["p00", "p01", "p02", "p03", "p04", "p05", "p06", "p07", "p08", "lab"]) {
       expect(data.projects[id], id).toBeDefined();
