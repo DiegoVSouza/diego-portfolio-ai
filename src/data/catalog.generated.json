@@ -296,9 +296,9 @@
       },
       {
         "id": "fly-trace-content-free",
-        "description": "Traces of a real triage on the Fly stack reach Jaeger with no content attributes",
-        "status": "PASS_FLY_ONE_RUN; PRODUCTION_METRICS_PENDING",
-        "evidence": "artifacts/evidence/status-reconcile/jaeger-p05-runtime-summary.json (60 traces, 287 spans, one full triage trace with agent.triage, four llm.inference, three MCP tool calls; the only attribute keys matching prompt/content/message/token are token counts)",
+        "description": "Real Fly triage trace read back from Jaeger; value-level log and failure privacy not established",
+        "status": "PASS_FLY_TRACE_READ_ONE_RUN; LOG_CONTENT_PRIVACY_AND_PRODUCTION_METRICS_PENDING",
+        "evidence": "artifacts/evidence/status-reconcile/jaeger-p05-runtime-summary.json: 60 traces, 287 spans, one triage with four inference spans and MCP calls. suspect_keys also includes database.ticket.get / log:exception.message; raw values are unavailable in this summary, so log-content and failure-path privacy remain unaccepted.",
         "state": "partial"
       }
     ],

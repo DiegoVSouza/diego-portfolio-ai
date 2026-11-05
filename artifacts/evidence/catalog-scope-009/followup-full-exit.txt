@@ -1,0 +1,1 @@
+command=python scripts/check_full.py; followup=P03 privacy metadata; exit_code=0

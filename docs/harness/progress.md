@@ -1,5 +1,7 @@
 # Progress
 
+- 2026-11-04 phase 009 follow-up: propagated P03's narrowed Fly trace claim and pending exception-log privacy review into the generated catalog and readable seals. Full local gate exited 0; output: `artifacts/evidence/catalog-scope-009/followup-full.txt`. No deploy.
+
 - 2026-11-04 phase 009: catalog generation excludes explicit OUT_OF_SCOPE entries, so P08's Three.js exclusion does not become an open package obligation. Refreshed lab triage status and readable pending-review axis. Full gate attempt 1 exited 0, including 60 browser tests and scope regression; evidence: `artifacts/evidence/catalog-scope-009/`. No deployment.
 
 - 2026-11-04 phase 008: replaced the paragraph around LazyPalette with a neutral container, removing invalid dialog/paragraph nesting found in the clean Linux report. Refreshed catalog and evidence metadata after P00/P08 updates. Full local gate attempt 2 exited 0 (fast/build/budget; 60 browser tests); attempt 1 stopped at generated evidence drift. Evidence: `artifacts/evidence/footer-markup-008/`. No deployment or human review claimed.

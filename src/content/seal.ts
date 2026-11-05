@@ -56,6 +56,7 @@ const GROUPS: Record<string, Text> = {
   findings: G("triage of the secret-scan findings", "triagem dos achados do scan de segredos"),
 };
 const AXIS_GROUP: Record<string, string> = {
+  "log content privacy and production metrics": "prodAcceptance",
   "triaged 34 files; evidence and independent review": "checklists",
   "triaged 34 files": "checklists", "evidence and independent review": "checklists",
   "third party idp": "idp", "external idp": "idp", "external idp acceptance": "idp", "external identity": "idp", "external idp and queued job revocation": "idp",
