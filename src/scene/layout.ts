@@ -37,14 +37,15 @@ export const BOARD_HEIGHT = (BOARD_WIDTH * 460) / 640;
 
 /**
  * Each stop is a shot, not only a place on the street: how the camera sits and where the board hangs.
- * post: the street, a board on two posts. facade: the street, a board on the end wall of a building.
- * side: the camera has turned into a side street and looks along it to a board on the building at its end.
+ * post: the street, a billboard on two posts. facade: the street, a board on the end wall of a building.
+ * side: the camera has turned into a side street (following it from the avenue) and looks at a board on the building beside it.
  * roof: the camera has climbed above the avenue and looks across to a billboard on top of a tower.
- * car: the camera sits low in a parked car (the scene draws the window) and looks across the street at a facade.
+ * curb: the camera sits low at the kerb and looks across the street at a facade.
+ * under: a small billboard under the metro viaduct, with the trains passing over it.
  * `ahead` is in stops along the avenue from the stop; `lat` is from the avenue's middle, signed by the stop's side;
  * `h` is the camera's height; `bottom` is the board's lower edge above the street.
  */
-export type ShotKind = "post" | "facade" | "side" | "roof" | "car";
+export type ShotKind = "post" | "facade" | "side" | "roof" | "curb" | "under";
 export interface Shot {
   kind: ShotKind;
   cam: { ahead: number; lat: number; h: number };
@@ -52,20 +53,26 @@ export interface Shot {
   /** Board size, as a multiple of BOARD_WIDTH: far shots get a bigger board so the card still fills the screen. */
   scale: number;
 }
-const KINDS: readonly ShotKind[] = ["post", "facade", "side", "roof", "car"];
+/** The shot of each of the ten stops, in order (the ninth and tenth are the last two). */
+const KINDS: readonly ShotKind[] = ["post", "facade", "side", "roof", "curb", "post", "under", "side", "roof", "curb"];
 export const shotKind = (k: number): ShotKind => KINDS[k % KINDS.length]!;
+/** Where a side street crosses the avenue, in stops past the stop (see crossUs in world.ts). */
+export const SIDE_JUNCTION = 0.62;
 export function shotOf(k: number): Shot {
   const s = sideOf(k);
   switch (shotKind(k)) {
     case "facade":
       return { kind: "facade", cam: { ahead: 0, lat: 9 * s, h: 12 }, board: { ahead: 0.27, lat: 34 * s, bottom: 3 }, scale: 1 };
     case "side":
-      // 0.62 is where the side street crosses the avenue (see crossUs in world.ts).
-      return { kind: "side", cam: { ahead: 0.62, lat: 46 * s, h: 5 }, board: { ahead: 0.62, lat: 86 * s, bottom: 3 }, scale: 1.25 };
+      // The camera stands in the side street; the board is on the building beside it, further out, so the street stays open.
+      return { kind: "side", cam: { ahead: SIDE_JUNCTION, lat: 40 * s, h: 5 }, board: { ahead: SIDE_JUNCTION + 0.33, lat: 78 * s, bottom: 3 }, scale: 1.25 };
     case "roof":
       return { kind: "roof", cam: { ahead: 0.05, lat: 2 * s, h: 30 }, board: { ahead: 0.3, lat: 36 * s, bottom: 26 }, scale: 1.1 };
-    case "car":
-      return { kind: "car", cam: { ahead: 0.3, lat: 6.5 * s, h: 1.7 }, board: { ahead: 0.3, lat: -36 * s, bottom: 3 }, scale: 1.3 };
+    case "curb":
+      return { kind: "curb", cam: { ahead: 0.3, lat: 6.5 * s, h: 1.7 }, board: { ahead: 0.3, lat: -36 * s, bottom: 3 }, scale: 1.3 };
+    case "under":
+      // A board under the viaduct deck (its underside is 12.6 high; the board tops out at 11.8) between the camera and the trains.
+      return { kind: "under", cam: { ahead: 0.2, lat: 24 * s, h: 6 }, board: { ahead: 0.2, lat: 41 * s, bottom: 1 }, scale: 0.5 };
     default:
       return { kind: "post", cam: { ahead: 0, lat: 9 * s, h: 12 }, board: { ahead: 0.27, lat: 20 * s, bottom: 2.5 }, scale: 1 };
   }

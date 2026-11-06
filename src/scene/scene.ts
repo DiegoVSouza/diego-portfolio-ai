@@ -7,7 +7,6 @@ import * as THREE from "three";
 import { V3, rng } from "./geometry";
 import { createPost } from "./post";
 import { createQuality, type Quality } from "./quality";
-import { shotKind } from "./layout";
 import { createRail } from "./rail";
 import { readPalette } from "./tokens";
 import { buildWorld } from "./world";
@@ -69,51 +68,6 @@ export async function start(canvas: HTMLCanvasElement, options: SceneOptions): P
   scene.fog = new THREE.Fog(p.ink, 70, 300);
   const camera = new THREE.PerspectiveCamera(58, 1, 0.5, 420);
   const rail = createRail(count);
-  scene.add(camera);
-
-  /**
-   * The inside of a parked car, for the stops whose shot is "car": a dashboard, a roof edge, two pillars and a mirror, drawn flat in front
-   * of the camera (no depth test, so nothing in the city can poke through). It slides in as the camera arrives and out as it leaves.
-   */
-  const carStops = options.stops.map((_, k) => k).filter((k) => shotKind(k) === "car" && k < options.stops.length);
-  const cabin = new THREE.Group();
-  cabin.visible = false;
-  cabin.renderOrder = 999;
-  const cabinParts: { mesh: THREE.Mesh; fx: number; fy: number; fw: number; fh: number; away: [number, number]; tilt: number }[] = [];
-  {
-    const inkMat = new THREE.MeshBasicMaterial({ color: p.mix(p.ink, p.paper, 0.14), depthTest: false, depthWrite: false });
-    const edgeMat = new THREE.MeshBasicMaterial({ color: p.red, depthTest: false, depthWrite: false });
-    // Fractions of the half-width and half-height at the cabin's distance: centre, size, which way it slides off, and its tilt.
-    const add = (mat: THREE.Material, fx: number, fy: number, fw: number, fh: number, away: [number, number], tilt = 0) => {
-      const mesh = new THREE.Mesh(new THREE.PlaneGeometry(1, 1), mat);
-      mesh.renderOrder = 999;
-      cabin.add(mesh);
-      cabinParts.push({ mesh, fx, fy, fw, fh, away, tilt });
-    };
-    add(inkMat, 0, -0.9, 2.2, 0.38, [0, -1]); // dashboard
-    add(edgeMat, 0, -0.71, 2.2, 0.03, [0, -1]); // its lit edge
-    add(inkMat, 0, 0.93, 2.2, 0.2, [0, 1]); // roof edge
-    add(edgeMat, 0, 0.83, 2.2, 0.02, [0, 1]);
-    add(inkMat, -0.97, 0, 0.2, 2.2, [-1, 0]); // A pillar
-    add(edgeMat, -0.865, 0, 0.014, 2.2, [-1, 0]);
-    add(inkMat, 0.98, 0, 0.16, 2.2, [1, 0]); // B pillar
-    add(edgeMat, 0.9, 0, 0.012, 2.2, [1, 0]);
-    add(inkMat, -0.5, 0.78, 0.22, 0.12, [0, 1]); // mirror
-    camera.add(cabin);
-  }
-  const CABIN_Z = -0.8;
-  const layoutCabin = (weight: number) => {
-    cabin.visible = weight > 0.001;
-    if (!cabin.visible) return;
-    const hh = Math.tan((camera.fov * Math.PI) / 360) * -CABIN_Z;
-    const hw = hh * camera.aspect;
-    const gone = 1 - weight;
-    for (const part of cabinParts) {
-      part.mesh.scale.set((part.fw * hw) / 1, part.fh * hh, 1);
-      part.mesh.position.set(part.fx * hw + part.away[0] * gone * hw * 0.8, part.fy * hh + part.away[1] * gone * hh * 0.8, CABIN_Z);
-      part.mesh.rotation.z = part.tilt;
-    }
-  };
 
   // Three lights at most: a flat fill, one key, and a red point that travels with the camera.
   scene.add(new THREE.AmbientLight(new THREE.Color().setScalar(1), 0.4));
@@ -500,7 +454,6 @@ export async function start(canvas: HTMLCanvasElement, options: SceneOptions): P
     post.finish.uniforms.uTime!.value = motion ? time : 0;
     if (glitch > 0.05 && canvas.dataset.splitSeen !== "1") canvas.dataset.splitSeen = "1";
     poseCamera();
-    layoutCabin(carStops.reduce((w, k) => Math.max(w, Math.min(1, Math.max(0, 1 - (Math.abs(cCur - k) - 0.12) / 0.3))), 0));
     announceShown();
     updateCards();
     renderer.info.reset();

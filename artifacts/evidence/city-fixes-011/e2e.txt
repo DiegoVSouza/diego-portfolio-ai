@@ -5,29 +5,51 @@
 [WebServer] - Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
 
 
-Running 23 tests using 1 worker
+Running 24 tests using 1 worker
 
-[1/23] e2e\city-fixes.spec.ts:8:1 › the menu follows the camera, and a jump of several stops cuts instead of passing the stops in between
-[2/23] e2e\city-fixes.spec.ts:35:1 › the street goes on past the last stop and the scene still draws
-[3/23] e2e\city-fixes.spec.ts:47:1 › the cards hang in different places: every stop is reachable and drawn, saved as evidence
-[4/23] e2e\scene.spec.ts:18:1 › SCENE-001/002/004: the 3d scene starts under the CSP, is hidden from assistive technology and takes no pointer events
-[5/23] e2e\scene.spec.ts:39:1 › SCENE-003: under reduced motion the scene is static and offers no motion toggle
-[6/23] e2e\scene.spec.ts:52:1 › SCENE-001: without WebGL the level 1 background stays, with no error
-[7/23] e2e\scene.spec.ts:71:1 › a case page holds the camera at its own project and does not scroll the scene
-[8/23] e2e\scene.spec.ts:86:1 › the scene stays off pages that do not use it
-[9/23] e2e\scene.spec.ts:92:1 › a portrait screen keeps the level 1 background and mounts no canvas
-[10/23] e2e\scene.spec.ts:104:1 › static frame of the contact section (scene S5)
-[11/23] e2e\scene.spec.ts:112:1 › the half-tone pass is on by default, the h key and the button turn it off, and the choice is remembered
-[12/23] e2e\scene.spec.ts:133:1 › SCENE-003: the RGB split fires only after a selection settles, and never under reduced motion
-[13/23] e2e\v2.spec.ts:21:1 › the demo is ready on arrival: a clear call to action and the accounts with copy buttons
-[14/23] e2e\v2.spec.ts:35:1 › a guided-tour step opens on click and by keyboard, and never on hover
-[15/23] e2e\v2.spec.ts:57:1 › a project page is three separate chapters, each with a banner, a body and one action; the flow has its navigation and its scenarios on two rows
-[16/23] e2e\v2.spec.ts:92:1 › a wide diagram is folded into rows so its boxes are drawn large, and nothing is cut
-[17/23] e2e\v2.spec.ts:110:1 › a diagram fills its stop (no sideways scroll), says where to click, plays itself, and keeps its text version only for screen readers
-[18/23] e2e\v2.spec.ts:135:1 › under reduced motion the diagram does not play itself and nothing pulses
-[19/23] e2e\v2.spec.ts:148:1 › the home is a wide stage: the menu on the left, the card as a sign filling most of the screen, no text spilling out
-[20/23] e2e\v2.spec.ts:169:1 › travelling: the camera parks on each card, swings between stops, and each card hangs in its own part of the city
-[21/23] e2e\v2.spec.ts:203:1 › travelling under reduced motion: no swing, no events, the scroll still reaches every stop
-[22/23] e2e\v2.spec.ts:223:1 › the scene is built from the real downloaded models, not the fallbacks (assets: buildings, cars, metro stations)
-[23/23] e2e\v2.spec.ts:247:1 › the CC BY credit for the metro station is on every page, with links to the pack and to the licence
-  23 passed (1.1m)
+[1/24] e2e\city-fixes.spec.ts:8:1 › the menu follows the camera, and a jump of several stops cuts instead of passing the stops in between
+[2/24] e2e\city-fixes.spec.ts:35:1 › the street goes on past the last stop and the scene still draws
+[3/24] e2e\city-fixes.spec.ts:47:1 › the cards hang in different places: every stop is reachable and drawn, saved as evidence
+[4/24] e2e\city-fixes.spec.ts:64:1 › the wheel leaves the last card even when its text scrolls, once the text is at its top
+[5/24] e2e\scene.spec.ts:18:1 › SCENE-001/002/004: the 3d scene starts under the CSP, is hidden from assistive technology and takes no pointer events
+[6/24] e2e\scene.spec.ts:39:1 › SCENE-003: under reduced motion the scene is static and offers no motion toggle
+[7/24] e2e\scene.spec.ts:52:1 › SCENE-001: without WebGL the level 1 background stays, with no error
+[8/24] e2e\scene.spec.ts:71:1 › a case page holds the camera at its own project and does not scroll the scene
+[9/24] e2e\scene.spec.ts:86:1 › the scene stays off pages that do not use it
+[10/24] e2e\scene.spec.ts:92:1 › a portrait screen keeps the level 1 background and mounts no canvas
+[11/24] e2e\scene.spec.ts:104:1 › static frame of the contact section (scene S5)
+[12/24] e2e\scene.spec.ts:112:1 › the half-tone pass is on by default, the h key and the button turn it off, and the choice is remembered
+[13/24] e2e\scene.spec.ts:133:1 › SCENE-003: the RGB split fires only after a selection settles, and never under reduced motion
+[14/24] e2e\v2.spec.ts:21:1 › the demo is ready on arrival: a clear call to action and the accounts with copy buttons
+[15/24] e2e\v2.spec.ts:35:1 › a guided-tour step opens on click and by keyboard, and never on hover
+[16/24] e2e\v2.spec.ts:57:1 › a project page is three separate chapters, each with a banner, a body and one action; the flow has its navigation and its scenarios on two rows
+[17/24] e2e\v2.spec.ts:92:1 › a wide diagram is folded into rows so its boxes are drawn large, and nothing is cut
+[18/24] e2e\v2.spec.ts:110:1 › a diagram fills its stop (no sideways scroll), says where to click, plays itself, and keeps its text version only for screen readers
+[19/24] e2e\v2.spec.ts:135:1 › under reduced motion the diagram does not play itself and nothing pulses
+[20/24] e2e\v2.spec.ts:148:1 › the home is a wide stage: the menu on the left, the card as a sign filling most of the screen, no text spilling out
+[21/24] e2e\v2.spec.ts:169:1 › travelling: the camera parks on each card, swings between stops, and each card hangs in its own part of the city
+[22/24] e2e\v2.spec.ts:203:1 › travelling under reduced motion: no swing, no events, the scroll still reaches every stop
+[23/24] e2e\v2.spec.ts:223:1 › the scene is built from the real downloaded models, not the fallbacks (assets: buildings, cars, metro stations)
+  1) e2e\v2.spec.ts:223:1 › the scene is built from the real downloaded models, not the fallbacks (assets: buildings, cars, metro stations) 
+
+    Error: expect(received).toBeLessThanOrEqual(expected)
+
+    Expected: <= 100
+    Received:    164
+
+      238 |   await expect.poll(async () => canvas.getAttribute("data-train"), { timeout: 15_000 }).toBe("kenney");
+      239 |   // The city stays inside its draw-call budget (phase 005: at most 100 on the first frame).
+    > 240 |   expect(Number(await canvas.getAttribute("data-draws"))).toBeLessThanOrEqual(100);
+          |                                                           ^
+      241 |   // No model fell back to a generated one: a fallback logs a warning.
+      242 |   expect(problems.filter((p) => /did not load/.test(p))).toEqual([]);
+      243 |   // Nothing sits at the origin (the known stacking bug) and the scene is not empty.
+        at C:\estudo\Golpe\lab\projects\p07\e2e\v2.spec.ts:240:59
+
+    Error Context: test-results\v2-the-scene-is-built-from-93781-ldings-cars-metro-stations-\error-context.md
+
+
+[24/24] e2e\v2.spec.ts:247:1 › the CC BY credit for the metro station is on every page, with links to the pack and to the licence
+  1 failed
+    e2e\v2.spec.ts:223:1 › the scene is built from the real downloaded models, not the fallbacks (assets: buildings, cars, metro stations) 
+  23 passed (1.2m)

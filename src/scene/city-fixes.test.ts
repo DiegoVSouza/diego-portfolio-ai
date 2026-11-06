@@ -51,9 +51,9 @@ describe("rail", () => {
 });
 
 describe("shots", () => {
-  it("vary: the street, a facade, a side street, a roof and a car window all appear, and few boards stand on posts", () => {
+  it("vary: the street, a facade, a side street, a roof, the kerb and the viaduct all appear, and few boards stand on posts", () => {
     const kinds = Array.from({ length: 10 }, (_, k) => shotKind(k));
-    expect(new Set(kinds).size).toBe(5);
+    expect(new Set(kinds).size).toBe(6);
     expect(kinds.filter((m) => m === "post").length).toBeLessThanOrEqual(2);
   });
   it("keeps boards on buildings clear of the avenue and the camera in the right place", () => {
@@ -62,7 +62,7 @@ describe("shots", () => {
       if (shot.kind === "facade" || shot.kind === "roof") expect(Math.abs(shot.board.lat) - (BOARD_WIDTH * shot.scale) / 2 - 1).toBeGreaterThan(12);
       if (shot.kind === "side") expect(Math.abs(shot.cam.lat)).toBeGreaterThan(30);
       if (shot.kind === "roof") expect(shot.cam.h).toBeGreaterThan(20);
-      if (shot.kind === "car") {
+      if (shot.kind === "curb") {
         expect(shot.cam.h).toBeLessThan(3);
         // The board is across the avenue from the car.
         expect(Math.sign(shot.board.lat)).toBe(-Math.sign(shot.cam.lat));

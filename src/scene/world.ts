@@ -103,7 +103,7 @@ export async function buildWorld(c: WorldContext): Promise<World> {
     // The board faces the camera of its shot, turned a little toward the avenue.
     const ry = Math.atan2(cam.x - at.x, cam.z - at.z) + 0.1 * cardSide(k);
     shotYaw[k] = ry;
-    if (shot.kind === "post") return null;
+    if (shot.kind === "post" || shot.kind === "under") return null;
     const boardW = BOARD_WIDTH * shot.scale;
     const boardH = Math.min(BOARD_MAX_HEIGHT, boardW * BILLBOARD_RATIO);
     const roof = shot.kind === "roof";
@@ -418,7 +418,7 @@ export async function buildWorld(c: WorldContext): Promise<World> {
     for (let k = 0; k < stops.length; k += 1) {
       const shot = shotOf(k);
       // Shots that look across the avenue or down a side street lose the lamps on both sides near them.
-      const both = shot.kind === "side" || shot.kind === "car" || shot.kind === "roof";
+      const both = shot.kind === "side" || shot.kind === "curb" || shot.kind === "roof" || shot.kind === "under";
       if (!both && cardSide(k) !== side) continue;
       const from = rail.u(k, Math.min(shot.cam.ahead, shot.board.ahead));
       const to = rail.u(k, Math.max(shot.cam.ahead, shot.board.ahead));
@@ -529,7 +529,13 @@ export async function buildWorld(c: WorldContext): Promise<World> {
       solid(3, 14, 1.4, 7.6, x, VIADUCT_Y - 1.4, z, ry, grey(0.24), false);
       // Two tracks, two rails each.
       for (const lane of [-LANE, LANE]) for (const s of [-1, 1]) solid(3, 0.3, 0.3, 7.6, x + f.R.x * (lane + s * 1.8), VIADUCT_Y, z + f.R.z * (lane + s * 1.8), ry, grey(0.5), false);
-      if (i % 2 === 0) solid(3, 3, VIADUCT_Y - 1.4, 2.4, x, 0, z, ry, grey(0.18), false);
+      // The pillar is left out where a board stands under the deck (it would stand in the board).
+      const uSeg = vu0 + ((i + 0.5) / segments) * (vu1 - vu0);
+      const blocked = stops.some((_, k) => {
+        const shot = shotOf(k);
+        return shot.kind === "under" && Math.sign(shot.board.lat) === side && Math.abs(uSeg - rail.u(k, shot.board.ahead)) * rail.length < 12;
+      });
+      if (i % 2 === 0 && !blocked) solid(3, 3, VIADUCT_Y - 1.4, 2.4, x, 0, z, ry, grey(0.18), false);
     }
   }
   let stationCount = 0;
@@ -807,6 +813,71 @@ export async function buildWorld(c: WorldContext): Promise<World> {
   }
   const frameMat = new THREE.MeshBasicMaterial({ color: p.red });
   const unitBox = new THREE.BoxGeometry(1, 1, 1);
+  /**
+   * What makes a board a billboard: a row of floodlights on arms over its top edge, each with a cone of light on the face, a row of bulbs
+   * along the top and bottom beams, a catwalk with a rail under it, and a steel brace behind. The metro-viaduct board has the bulbs only
+   * (the deck is right over it).
+   */
+  const lampMat = new THREE.MeshBasicMaterial({ color: p.paper });
+  const glowMat = new THREE.MeshBasicMaterial({ color: p.paper, transparent: true, opacity: 0.17, blending: THREE.AdditiveBlending, depthWrite: false, side: THREE.DoubleSide });
+  const steelMat = new THREE.MeshBasicMaterial({ color: grey(0.32) });
+  const dress = (b: Board, kind: string, bottom: number) => {
+    const g = b.group;
+    const w = b.width;
+    const top = bottom + b.height;
+    const box = (mat: THREE.Material, sx: number, sy: number, sz: number, x: number, y: number, z: number) => {
+      const m = new THREE.Mesh(unitBox, mat);
+      m.scale.set(sx, sy, sz);
+      m.position.set(x, y, z);
+      g.add(m);
+      return m;
+    };
+    // Bulbs along the top and bottom beams, one draw call.
+    const bulbCount = Math.max(6, Math.round(w / 2.4));
+    const bulbs = new THREE.InstancedMesh(unitBox, lampMat, bulbCount * 2);
+    for (let i = 0; i < bulbCount; i += 1) {
+      for (const [row, y] of [[0, top + 0.3], [1, bottom - 0.3]] as const) {
+        dummy.position.set(-w / 2 - 0.3 + ((i + 0.5) / bulbCount) * (w + 0.6), y, -0.05);
+        dummy.rotation.set(0, 0, 0);
+        dummy.scale.set(0.34, 0.34, 0.3);
+        dummy.updateMatrix();
+        bulbs.setMatrixAt(row * bulbCount + i, dummy.matrix);
+      }
+    }
+    g.add(bulbs);
+    if (kind === "under") return;
+    // Floodlights over the top edge, lighting the face.
+    const lamps = Math.max(3, Math.round(w / 6));
+    const coneH = Math.min(11, b.height * 0.7);
+    for (let i = 0; i < lamps; i += 1) {
+      const x = -w / 2 + ((i + 0.5) / lamps) * w;
+      box(steelMat, 0.22, 0.22, 2.4, x, top + 0.7, 1.2);
+      box(lampMat, 0.9, 0.5, 0.9, x, top + 0.55, 2.4);
+      const pivot = new THREE.Object3D();
+      pivot.position.set(x, top + 0.4, 2.4);
+      pivot.rotation.x = Math.atan(2.4 / coneH);
+      const cone = new THREE.Mesh(new THREE.ConeGeometry(Math.min(3.4, w / lamps / 2 + 0.6), coneH, 14, 1, true), glowMat);
+      cone.position.y = -coneH / 2;
+      pivot.add(cone);
+      g.add(pivot);
+    }
+    // Catwalk under the face, with a rail.
+    box(steelMat, w + 2, 0.25, 1.9, 0, bottom - 0.55, 1);
+    box(steelMat, w + 2, 0.12, 0.12, 0, bottom + 0.55, 1.9);
+    for (const x of [-w / 2 - 0.9, -w / 6, w / 6, w / 2 + 0.9]) box(steelMat, 0.12, 1.1, 0.12, x, bottom, 1.9);
+    // A brace behind each end, from the ground (or the roof) up to the top beam.
+    const footing = kind === "roof" ? bottom : 0;
+    for (const x of [-w / 3, w / 3]) {
+      const from = V3(x, footing, -4);
+      const to = V3(x, top, -0.7);
+      const brace = new THREE.Mesh(unitBox, steelMat);
+      const len = from.distanceTo(to);
+      brace.scale.set(0.3, 0.3, len);
+      brace.position.copy(from).add(to).multiplyScalar(0.5);
+      brace.quaternion.setFromUnitVectors(V3(0, 0, 1), to.clone().sub(from).normalize());
+      g.add(brace);
+    }
+  };
   const boards: Board[] = stops.map((_, k) => {
     rail.cardAnchor(k, anchor);
     const shot = shotOf(k);
@@ -825,13 +896,10 @@ export async function buildWorld(c: WorldContext): Promise<World> {
     const block = blocks[k];
     if (block) {
       solid(stops[k]!.district, block.width, block.height, block.depth, block.x, 0, block.z, block.ry, block.roof ? grey(0.26) : grey(0.2));
-      if (!block.roof) {
-        solid(stops[k]!.district, block.width * 0.6, 10, block.depth * 0.6, block.x, block.height, block.z, block.ry, grey(0.24));
-        beacon(block.x, block.height + 10.4, block.z, 0.9);
-      } else {
-        beacon(block.x, block.height + 0.4, block.z);
-      }
+      // A beacon on a corner of the roof (never a box in the middle: it would show behind the card as a building inside a building).
+      beacon(block.x + Math.cos(block.ry) * block.width * 0.4, block.height + 0.4, block.z - Math.sin(block.ry) * block.width * 0.4);
     }
+    if (shot.kind === "post" || shot.kind === "roof" || shot.kind === "under") dress(board, shot.kind, shot.board.bottom);
     return board;
   });
   function fitBoard(b: Board, baseWidth: number, ratio: number, bottom: number, kind: string) {
@@ -844,7 +912,7 @@ export async function buildWorld(c: WorldContext): Promise<World> {
     b.panel.scale.set(w, h, 1);
     b.panel.position.set(0, mid, 0);
     // Posts run from the ground (post board) or from the roof (roof billboard); a board on a wall has none, the wall holds it.
-    const hasPosts = kind === "post" || kind === "roof";
+    const hasPosts = kind === "post" || kind === "roof" || kind === "under";
     const footing = kind === "roof" ? bottom : 0;
     b.posts.forEach((post, i) => {
       const side = i ? 1 : -1;

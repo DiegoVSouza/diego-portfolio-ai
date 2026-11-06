@@ -28,3 +28,15 @@ Out of scope: copy changes, new assets, deploy (needs owner go).
 | C9 | Every stop is the same shot; want side streets, climbing to rooftop billboards, a parked car's window. | Each stop is a `shotOf(k)`: post, facade, side street, roof (camera at height 30) or car (camera at 1.7 inside a drawn cabin). The rail's camera and look points come from the shots. | Unit tests on `shotOf`/rail; e2e `stop-*.png`, `flight-*.png`. |
 | C10 | The buildings that hold boards are too thin. | `blocks`: a whole building (board width + 12, depth 34 to 36, setback and beacon). | Screenshots. |
 | C11 | Some city blocks glitch. | Probable cause: overlapping boxes (z-fighting where faces meet). Towers and landmarks now avoid every existing footprint and the board buildings. | No overlap by construction (`collides`); not every block was inspected by eye. |
+
+## Addendum 3 (owner review of the ten stops)
+
+| Stop | Complaint | Change |
+| --- | --- | --- |
+| 5, 10 | The car-window frame is ugly. | Cabin removed; the shot is a low kerb view (`curb`). |
+| all outdoors | Make them real billboards, on top of the building, with lights. | `dress()`: floodlights with light cones, bulbs on the beams, catwalk and rail, braces. No CC0 billboard model exists in the owned packs and polyhaven has none; procedural. |
+| 2 | A building inside the building behind the card. | The setback box is gone; only a beacon on the roof corner. |
+| 3, 8 | The building closes the street; the camera cuts across blocks. | The board is on the building beside the side street (street stays open); the camera follows the avenue to the junction and turns in (two extra rail knots). |
+| 7 | The train crosses the building. | No building: a small billboard under the viaduct deck, pillars left out where it stands. |
+| 4, 9 | A proper billboard on a tower. | Roof billboards get `dress()`. |
+| 10 | Scroll up does not work at the last stop. | A card that scrolls keeps the wheel only while it can still scroll that way (`DistrictMenu.tsx`). Red test first. |

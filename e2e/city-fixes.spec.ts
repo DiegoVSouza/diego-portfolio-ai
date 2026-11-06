@@ -60,3 +60,30 @@ test("the cards hang in different places: every stop is reachable and drawn, sav
   }
   expect(Number(await canvas.getAttribute("data-at-origin"))).toBe(0);
 });
+
+test("the wheel leaves the last card even when its text scrolls, once the text is at its top", async ({ page }) => {
+  await page.setViewportSize({ width: 1280, height: 800 });
+  await page.goto("/");
+  const canvas = page.locator("canvas.scene");
+  await expect(canvas).toHaveAttribute("data-scene", "3d", { timeout: 20_000 });
+  await page.keyboard.press("6");
+  await expect.poll(() => canvas.getAttribute("data-shown"), { timeout: 8000 }).toBe("9");
+  // Make the last card's text longer than the card, so it scrolls on its own.
+  await page.evaluate(() => {
+    const sc = document.querySelector<HTMLElement>("#s-terminal .sc")!;
+    sc.style.setProperty("overflow-y", "auto", "important");
+    sc.style.setProperty("max-height", "200px", "important");
+    const filler = document.createElement("div");
+    filler.style.height = "600px";
+    filler.style.flex = "none";
+    sc.append(filler);
+  });
+  const box = (await page.locator("#s-terminal .sc").boundingBox())!;
+  await page.mouse.move(box.x + box.width / 2, box.y + 40);
+  // Scrolling down moves the text; scrolling up at the top moves to the previous stop.
+  await page.mouse.wheel(0, 120);
+  await expect.poll(() => page.evaluate(() => document.querySelector("#s-terminal .sc")!.scrollTop), { timeout: 4000 }).toBeGreaterThan(0);
+  await page.evaluate(() => { document.querySelector("#s-terminal .sc")!.scrollTop = 0; });
+  await page.mouse.wheel(0, -120);
+  await expect.poll(() => canvas.getAttribute("data-shown"), { timeout: 8000 }).toBe("8");
+});

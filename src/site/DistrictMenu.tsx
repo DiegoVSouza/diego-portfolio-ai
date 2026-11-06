@@ -164,7 +164,13 @@ export function DistrictMenu() {
       if (document.querySelector("dialog[open]")) return;
       // A card whose content scrolls on its own keeps its wheel.
       for (let el = event.target as HTMLElement | null; el && el !== document.body; el = el.parentElement) {
-        if (el.scrollHeight > el.clientHeight + 2 && /(auto|scroll)/.test(getComputedStyle(el).overflowY)) return;
+        if (el.scrollHeight > el.clientHeight + 2 && /(auto|scroll)/.test(getComputedStyle(el).overflowY)) {
+          // It keeps the wheel only while it can still scroll that way; at its top or bottom the wheel moves the stop (otherwise the
+          // last card, with a long text, held the wheel for good and the visitor could not leave it).
+          const atTop = el.scrollTop <= 0;
+          const atBottom = el.scrollTop + el.clientHeight >= el.scrollHeight - 1;
+          if ((event.deltaY < 0 && !atTop) || (event.deltaY > 0 && !atBottom)) return;
+        }
       }
       event.preventDefault();
       const now = performance.now();

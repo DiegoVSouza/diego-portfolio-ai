@@ -1,6 +1,6 @@
 import * as THREE from "three";
 import { V3 } from "./geometry";
-import { type Shot, ROAD_EXTRA, boardMid, shotOf, sideOf } from "./layout";
+import { type Shot, ROAD_EXTRA, SIDE_JUNCTION, boardMid, shotOf, sideOf } from "./layout";
 
 /**
  * The camera rail. One stop per card; the camera flies a spline that passes exactly through the stops, and a second spline carries the
@@ -91,16 +91,41 @@ export function createRail(count: number): Rail {
     right.crossVectors(dir, up);
     return V3(b.x - right.x * LOOK_SHIFT, b.y, b.z - right.z * LOOK_SHIFT);
   });
-  const camera = new THREE.CatmullRomCurve3(camPts, false, "catmullrom", 0.5);
-  const look = new THREE.CatmullRomCurve3(lookPts, false, "catmullrom", 0.5);
+  // The camera's path is a spline through knots. Each stop is a knot at its own integer c. A stop in a side street gets two more, on the
+  // avenue just before and just after the junction, so the camera follows the street to the turn instead of cutting across the blocks.
+  interface Knot {
+    c: number;
+    cam: THREE.Vector3;
+    look: THREE.Vector3;
+  }
+  const knots: Knot[] = [];
+  centres.forEach((_, k) => {
+    const sh = shotAt(k);
+    if (sh?.kind === "side") {
+      const s = sideOf(k);
+      knots.push({ c: k - 0.4, cam: at(k, SIDE_JUNCTION - 0.08, 7 * s, CAMERA_HEIGHT), look: lookPts[k]!.clone() });
+      knots.push({ c: k, cam: camPts[k]!, look: lookPts[k]! });
+      knots.push({ c: k + 0.4, cam: at(k, SIDE_JUNCTION + 0.08, 7 * s, CAMERA_HEIGHT), look: lookPts[k]!.clone() });
+    } else knots.push({ c: k, cam: camPts[k]!, look: lookPts[k]! });
+  });
+  const camera = new THREE.CatmullRomCurve3(knots.map((x) => x.cam), false, "catmullrom", 0.5);
+  const look = new THREE.CatmullRomCurve3(knots.map((x) => x.look), false, "catmullrom", 0.5);
+  /** The spline parameter for stop parameter c: knots are not evenly spaced in c, the curve's segments are. */
+  const tOf = (c: number): number => {
+    const cc = Math.min(knots.at(-1)!.c, Math.max(0, c));
+    let i = 0;
+    while (i < knots.length - 2 && knots[i + 1]!.c <= cc) i += 1;
+    const span = knots[i + 1]!.c - knots[i]!.c;
+    return (i + (cc - knots[i]!.c) / span) / (knots.length - 1);
+  };
   return {
     count: n,
     length: ground.getLength(),
     u: (k, ahead = 0) => Math.min(1, Math.max(0, (k + ahead) / total)),
     pose(c, pos, lookAt) {
-      const u = Math.min(1, Math.max(0, c / total));
-      camera.getPoint(u, pos);
-      look.getPoint(u, lookAt);
+      const t = tOf(c);
+      camera.getPoint(t, pos);
+      look.getPoint(t, lookAt);
     },
     frameAt(u, out) {
       return frameOf(u, out ?? { p: V3(0, 0, 0), T: V3(0, 0, 0), R: V3(0, 0, 0) });
