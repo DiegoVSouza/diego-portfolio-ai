@@ -20,3 +20,11 @@ Out of scope: copy changes, new assets, deploy (needs owner go).
 | --- | --- | --- | --- |
 | C3b | The lamp posts (not the board posts) stand behind the card but in front of the sign. | Lamps are left out between the camera and a board. | No lamp in the line to a board (e2e screenshots). |
 | C8 | Every section is still a billboard on the street. | Boards use four mounts: facade (street level) and wall (high) on the end wall of a building, on a roof, on posts (`mountOf`). Camera look-at follows each board's height. | `mountOf` yields four kinds, at most 2 of 10 on posts; stop screenshots `stop-1..9.png` show wall and roof mounts. |
+
+## Addendum 2 (owner follow-up)
+
+| # | Complaint | Change | Acceptance |
+| --- | --- | --- | --- |
+| C9 | Every stop is the same shot; want side streets, climbing to rooftop billboards, a parked car's window. | Each stop is a `shotOf(k)`: post, facade, side street, roof (camera at height 30) or car (camera at 1.7 inside a drawn cabin). The rail's camera and look points come from the shots. | Unit tests on `shotOf`/rail; e2e `stop-*.png`, `flight-*.png`. |
+| C10 | The buildings that hold boards are too thin. | `blocks`: a whole building (board width + 12, depth 34 to 36, setback and beacon). | Screenshots. |
+| C11 | Some city blocks glitch. | Probable cause: overlapping boxes (z-fighting where faces meet). Towers and landmarks now avoid every existing footprint and the board buildings. | No overlap by construction (`collides`); not every block was inspected by eye. |

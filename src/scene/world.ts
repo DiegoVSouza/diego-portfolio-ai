@@ -1,7 +1,7 @@
 import * as THREE from "three";
 import { V3, bar, fit, mergeGeometries, tick, tint } from "./geometry";
 import { loadModel } from "./loaders";
-import { BOARD_BEAM_DEPTH, BOARD_BEAM_Z, BOARD_POST_DEPTH, BOARD_POST_Z, BOARD_WIDTH, MOUNT_SPEC, ROAD_EXTRA, mountOf, trainLead } from "./layout";
+import { BOARD_BEAM_DEPTH, BOARD_BEAM_Z, BOARD_POST_DEPTH, BOARD_POST_Z, BOARD_WIDTH, ROAD_EXTRA, shotOf, trainLead } from "./layout";
 import { cardSide, type Frame, type Rail } from "./rail";
 import { truckFallback } from "./symbols";
 import type { Palette } from "./tokens";
@@ -77,6 +77,44 @@ export async function buildWorld(c: WorldContext): Promise<World> {
   const endStop = stops.length - 1 + ROAD_EXTRA;
   /** Cross streets: u of each one, kept clear of towers. Filled when the street is built, read by `lane`. */
   const crossUs: number[] = [];
+  const shotYaw: number[] = [];
+  /** Where something already stands (a circle on the ground): a tower is not placed on top of another, or on a board's building. */
+  const footprints: { x: number; z: number; r: number }[] = [];
+  const collides = (x: number, z: number, r: number): boolean => footprints.some((q) => Math.hypot(q.x - x, q.z - z) < q.r + r);
+  /**
+   * The building a board hangs on (none for a post board). It is a whole building, not a slab: as wide as the board plus a margin,
+   * deep, with a setback on top, standing behind the board. Computed before the towers so they keep clear of it.
+   */
+  interface Block {
+    x: number;
+    z: number;
+    ry: number;
+    width: number;
+    depth: number;
+    height: number;
+    bottom: number;
+    roof: boolean;
+    boardH: number;
+  }
+  const blocks: (Block | null)[] = stops.map((_, k) => {
+    const shot = shotOf(k);
+    const at = rail.cardAnchor(k, V3(0, 0, 0));
+    const cam = rail.cameraAt(k, V3(0, 0, 0));
+    // The board faces the camera of its shot, turned a little toward the avenue.
+    const ry = Math.atan2(cam.x - at.x, cam.z - at.z) + 0.1 * cardSide(k);
+    shotYaw[k] = ry;
+    if (shot.kind === "post") return null;
+    const boardW = BOARD_WIDTH * shot.scale;
+    const boardH = Math.min(BOARD_MAX_HEIGHT, boardW * BILLBOARD_RATIO);
+    const roof = shot.kind === "roof";
+    const width = boardW + (roof ? 14 : 12);
+    const depth = roof ? 36 : 34;
+    const height = roof ? shot.board.bottom : shot.board.bottom + boardH + 16;
+    const back = 1 + depth / 2;
+    const block = { x: at.x - Math.sin(ry) * back, z: at.z - Math.cos(ry) * back, ry, width, depth, height, bottom: shot.board.bottom, roof, boardH };
+    footprints.push({ x: block.x, z: block.z, r: Math.max(width, depth) * 0.62 + 3 });
+    return block;
+  });
   const last = Array.from({ length: D }, (_, d) => stops.map((s) => s.district).lastIndexOf(d));
 
   /* ---------- window texture and materials ---------- */
@@ -159,7 +197,7 @@ export async function buildWorld(c: WorldContext): Promise<World> {
       g.computeBoundingBox();
       const bb = g.boundingBox!;
       g.translate(-(bb.min.x + bb.max.x) / 2, -bb.min.y, -(bb.min.z + bb.max.z) / 2);
-      return { g, height: bb.max.y - bb.min.y };
+      return { g, height: bb.max.y - bb.min.y, span: Math.max(bb.max.x - bb.min.x, bb.max.z - bb.min.z) };
     });
   let landmarkCount = 0;
   let heavyUsed = 0;
@@ -169,9 +207,11 @@ export async function buildWorld(c: WorldContext): Promise<World> {
     const i = landmarkCount % protos.length;
     // The heavy sample model (23k triangles) is used at most twice.
     if (i === protos.length - 1 && protos.length > 3 && heavyUsed >= 2) return false;
-    if (i === protos.length - 1 && protos.length > 3) heavyUsed += 1;
     const proto = protos[i]!;
     const s = height / proto.height;
+    if (collides(x, z, (s * proto.span) / 2)) return false;
+    if (i === protos.length - 1 && protos.length > 3) heavyUsed += 1;
+    footprints.push({ x, z, r: (s * proto.span) / 2 });
     const g = proto.g.clone().scale(s, s, s);
     g.rotateY(face(towardsX, towardsZ));
     g.translate(x, 0, z);
@@ -218,7 +258,7 @@ export async function buildWorld(c: WorldContext): Promise<World> {
     let signsLeft = o.signs ?? 0;
     let wallsLeft = o.walls ?? 0;
     // A tower whose footprint would cross a side street is skipped and another is drawn, up to three tries per tower.
-    for (let attempt = 0, n = 0; n < o.count && attempt < o.count * 3; attempt += 1) {
+    for (let attempt = 0, n = 0; n < o.count && attempt < o.count * 6; attempt += 1) {
       const uPick = u0 + rnd() * (u1 - u0);
       rail.frameAt(uPick, f);
       const s = o.side ?? (n % 2 ? 1 : -1);
@@ -231,8 +271,8 @@ export async function buildWorld(c: WorldContext): Promise<World> {
       const x = f.p.x + f.R.x * s * lat;
       const z = f.p.z + f.R.z * s * lat + (rnd() - 0.5) * 5;
       const ry = yaw(f.T);
-      // A tower must not pierce the building a board hangs on (wall and roof mounts stand beside the avenue ahead of their stop).
-      if (stops.some((_, k) => mountOf(k) !== "post" && cardSide(k) === s && Math.abs(uPick - rail.u(k, 0.45)) * rail.length < 30 + dd / 2)) continue;
+      // Nothing stands on top of another tower or on the building a board hangs on: overlapping boxes flicker where their faces meet.
+      if (collides(x, z, Math.max(w, dd) * 0.62)) continue;
       if (o.clear !== false && crossUs.some((cu) => Math.abs(uPick - cu) * rail.length < CROSS_HALF + SIDEWALK + Math.max(dd, 9) / 2 + 3)) continue;
       n += 1;
       if (o.realEvery && (n - 1) % o.realEvery === 0 && landmark(d, x, z, -f.R.x * s, -f.R.z * s, h)) {
@@ -241,6 +281,7 @@ export async function buildWorld(c: WorldContext): Promise<World> {
         continue;
       }
       solid(d, w, h, dd, x, 0, z, ry, toneTower());
+      footprints.push({ x, z, r: Math.max(w, dd) * 0.62 });
       if (rnd() < 0.5) beacon(x + (rnd() - 0.5) * w * 0.6, h + 0.3, z);
       if (signsLeft > 0 && h > 24) {
         signSpots.push({ x: f.p.x + f.R.x * s * (lat - w / 2 - 0.12), y: h * (0.4 + rnd() * 0.3), z: f.p.z + f.R.z * s * (lat - w / 2 - 0.12), ry: face(-f.R.x * s, -f.R.z * s) });
@@ -375,9 +416,14 @@ export async function buildWorld(c: WorldContext): Promise<World> {
    */
   const blocksBoard = (u: number, side: number): boolean => {
     for (let k = 0; k < stops.length; k += 1) {
-      if (cardSide(k) !== side) continue;
-      const along = (u - rail.u(k)) * rail.length / 85;
-      if (along > -0.3 && along < 0.55) return true;
+      const shot = shotOf(k);
+      // Shots that look across the avenue or down a side street lose the lamps on both sides near them.
+      const both = shot.kind === "side" || shot.kind === "car" || shot.kind === "roof";
+      if (!both && cardSide(k) !== side) continue;
+      const from = rail.u(k, Math.min(shot.cam.ahead, shot.board.ahead));
+      const to = rail.u(k, Math.max(shot.cam.ahead, shot.board.ahead));
+      const slack = 0.3 / (rail.length / 85);
+      if (u > from - slack && u < to + slack + (both ? 0.1 : 0)) return true;
     }
     return false;
   };
@@ -762,12 +808,11 @@ export async function buildWorld(c: WorldContext): Promise<World> {
   const frameMat = new THREE.MeshBasicMaterial({ color: p.red });
   const unitBox = new THREE.BoxGeometry(1, 1, 1);
   const boards: Board[] = stops.map((_, k) => {
-    rail.cardAnchor(k, anchor, f);
-    // It faces the camera's approach (back along the avenue), turned a little toward the avenue.
-    const sd = cardSide(k);
+    rail.cardAnchor(k, anchor);
+    const shot = shotOf(k);
     const group = new THREE.Group();
     group.position.set(anchor.x, 0, anchor.z);
-    group.rotation.y = face(-f.T.x - 0.3 * sd * f.R.x, -f.T.z - 0.3 * sd * f.R.z);
+    group.rotation.y = shotYaw[k]!;
     const painted = makeBillboardMap(k);
     const panel = new THREE.Mesh(new THREE.PlaneGeometry(1, 1), new THREE.MeshBasicMaterial({ map: painted.map, polygonOffset: true, polygonOffsetFactor: -2, polygonOffsetUnits: -2 }));
     const posts = [0, 1].map(() => new THREE.Mesh(unitBox, frameMat));
@@ -775,22 +820,21 @@ export async function buildWorld(c: WorldContext): Promise<World> {
     group.add(panel, ...posts, ...beams);
     scene.add(group);
     const board: Board = { group, panel, posts, beams, repaint: painted.paint, width: 1, height: 1 };
-    const mount = mountOf(k);
-    fitBoard(board, BILLBOARD_WIDTH, BILLBOARD_RATIO, MOUNT_SPEC[mount].bottom, mount);
-    // A wall or a roof mount stands on a building: its footprint is behind the board (local -z is along the avenue, away from the camera).
-    if (mount !== "post") {
-      const bottom = MOUNT_SPEC[mount].bottom;
-      const depth = mount === "roof" ? 16 : 24;
-      const height = mount === "roof" ? bottom : bottom + board.height + (mount === "wall" ? 9 : 22);
-      const back = 1 + depth / 2;
-      const ry = group.rotation.y;
-      solid(stops[k]!.district, board.width + 2, height, depth, anchor.x - Math.sin(ry) * back, 0, anchor.z - Math.cos(ry) * back, ry, mount === "roof" ? grey(0.26) : grey(0.2));
-      // A beacon on the corner of the wall, a red band under the roof board.
-      beacon(anchor.x - Math.sin(ry) * back, height + 0.4, anchor.z - Math.cos(ry) * back);
+    fitBoard(board, BILLBOARD_WIDTH * shot.scale, BILLBOARD_RATIO, shot.board.bottom, shot.kind);
+    // A board on a building: the whole building stands behind it (see `blocks`), with a setback on top and a beacon.
+    const block = blocks[k];
+    if (block) {
+      solid(stops[k]!.district, block.width, block.height, block.depth, block.x, 0, block.z, block.ry, block.roof ? grey(0.26) : grey(0.2));
+      if (!block.roof) {
+        solid(stops[k]!.district, block.width * 0.6, 10, block.depth * 0.6, block.x, block.height, block.z, block.ry, grey(0.24));
+        beacon(block.x, block.height + 10.4, block.z, 0.9);
+      } else {
+        beacon(block.x, block.height + 0.4, block.z);
+      }
     }
     return board;
   });
-  function fitBoard(b: Board, baseWidth: number, ratio: number, bottom: number, mount: "facade" | "wall" | "roof" | "post") {
+  function fitBoard(b: Board, baseWidth: number, ratio: number, bottom: number, kind: string) {
     // Keep the card's proportions; a tall card makes a narrower board so it never grows past the screen.
     const h = Math.min(BOARD_MAX_HEIGHT, baseWidth * ratio);
     const w = h / ratio;
@@ -799,11 +843,12 @@ export async function buildWorld(c: WorldContext): Promise<World> {
     const mid = bottom + h / 2;
     b.panel.scale.set(w, h, 1);
     b.panel.position.set(0, mid, 0);
-    // Posts run from the ground (post) or from the roof (roof); a wall or facade mount has none, the wall holds the board.
-    const footing = mount === "roof" ? bottom : 0;
+    // Posts run from the ground (post board) or from the roof (roof billboard); a board on a wall has none, the wall holds it.
+    const hasPosts = kind === "post" || kind === "roof";
+    const footing = kind === "roof" ? bottom : 0;
     b.posts.forEach((post, i) => {
       const side = i ? 1 : -1;
-      post.visible = mount === "post" || mount === "roof";
+      post.visible = hasPosts;
       post.scale.set(0.7, bottom + h - footing, BOARD_POST_DEPTH);
       post.position.set(side * (w / 2 + 0.35), footing + (bottom + h - footing) / 2, BOARD_POST_Z);
     });

@@ -1,6 +1,6 @@
 import * as THREE from "three";
 import { V3 } from "./geometry";
-import { MOUNT_SPEC, ROAD_EXTRA, boardMid, mountOf } from "./layout";
+import { type Shot, ROAD_EXTRA, boardMid, shotOf, sideOf } from "./layout";
 
 /**
  * The camera rail. One stop per card; the camera flies a spline that passes exactly through the stops, and a second spline carries the
@@ -22,8 +22,10 @@ export interface Rail {
   pose(c: number, pos: THREE.Vector3, look: THREE.Vector3): void;
   /** Street frame at u in [0, 1] along the whole path (stop k is at u = k / (count + ROAD_EXTRA); u = 1 is the end of the street). */
   frameAt(u: number, out?: Frame): Frame;
-  /** Where stop k's card hangs: ahead of the stop, on its side of the avenue, at eye height. */
-  cardAnchor(k: number, out: THREE.Vector3, frame?: Frame): THREE.Vector3;
+  /** Where stop k's board hangs (its middle). */
+  cardAnchor(k: number, out: THREE.Vector3): THREE.Vector3;
+  /** Where the camera rests at stop k. */
+  cameraAt(k: number, out: THREE.Vector3): THREE.Vector3;
   /** Ground path length in world units. */
   length: number;
   /** u of stop k plus `ahead` stops. */
@@ -35,10 +37,8 @@ const SPACING = 85;
 const SWAY = 26;
 /** The camera rides low and to the side of its board, close enough for the card to fill most of the screen. */
 const CAMERA_HEIGHT = 12;
-/** How far the camera moves toward its board's side at a stop (the stops alternate sides, so it weaves down the avenue). */
-const CAMERA_LATERAL = 9;
 /** The look-at point is the board's middle, a little toward the avenue, so the board sits a touch right of the screen's middle (clear of the menu). */
-const LOOK_SHIFT = -2;
+const LOOK_SHIFT = 3.5;
 /** Ahead of the stop, along the avenue: with the board's width this puts the card at about 60% of the screen. */
 export const CARD_AHEAD = 0.27;
 export const CARD_LATERAL = 20;
@@ -49,10 +49,7 @@ export const CARD_HEIGHT = 11.5;
  * Which side of the avenue stop k's card hangs on: +1 right, -1 left. They alternate, so two projects of one district face each other
  * across the street instead of standing in a row.
  */
-export const cardSide = (k: number): 1 | -1 => (k % 2 === 0 ? 1 : -1);
-/** Signed lateral distance of stop k's board from the avenue's middle (zero for a board that hangs over the avenue). */
-export const cardLateral = (k: number): number => cardSide(k) * MOUNT_SPEC[mountOf(k)].lateral;
-
+export const cardSide = sideOf;
 export function createRail(count: number): Rail {
   const n = Math.max(2, count);
   // The street goes on for ROAD_EXTRA stops past the last stop, so the last stop looks down a street, not at a square.
@@ -62,8 +59,6 @@ export function createRail(count: number): Rail {
   const centres = Array.from({ length: total + 1 }, (_, k) => V3(SWAY * Math.sin(k * 0.85), 0, -SPACING * k + 26));
   const ground = new THREE.CatmullRomCurve3(centres, false, "catmullrom", 0.5);
   const up = V3(0, 1, 0);
-  const tmp = V3(0, 0, 0);
-  const tan = V3(0, 0, 0);
   const right = V3(0, 0, 0);
   const frameOf = (u: number, out: { p: THREE.Vector3; T: THREE.Vector3; R: THREE.Vector3 }) => {
     const uu = Math.min(1, Math.max(0, u));
@@ -75,35 +70,29 @@ export function createRail(count: number): Rail {
     return out;
   };
   const stopFrame = { p: V3(0, 0, 0), T: V3(0, 0, 0), R: V3(0, 0, 0) };
-  // The camera and its look-at point are splines through one control point per stop, built from the street frame at that stop.
-  const sample = (k: number, build: (f: { p: THREE.Vector3; T: THREE.Vector3; R: THREE.Vector3 }, side: number) => THREE.Vector3) => {
-    const f = frameOf(Math.min(1, k / total), stopFrame);
-    return build(f, k < n ? cardSide(k) : 0);
+  /** A point on the street frame `ahead` stops past stop k, `lat` to the right, `y` high. */
+  const at = (k: number, ahead: number, lat: number, y: number): THREE.Vector3 => {
+    const f = frameOf(Math.min(1, (k + ahead) / total), stopFrame);
+    return V3(f.p.x + f.R.x * lat, y, f.p.z + f.R.z * lat);
   };
-  const camera = new THREE.CatmullRomCurve3(
-    centres.map((_, k) => sample(k, (f, side) => V3(f.p.x + f.R.x * side * CAMERA_LATERAL, CAMERA_HEIGHT, f.p.z + f.R.z * side * CAMERA_LATERAL))),
-    false,
-    "catmullrom",
-    0.5,
-  );
-  const look = new THREE.CatmullRomCurve3(
-    centres.map((_, k) => {
-      const ahead = (k + CARD_AHEAD) / total;
-      const g = ground.getPoint(Math.min(1, ahead));
-      // Past the end of the path (the last stop) the look-at point carries on along the final direction.
-      if (ahead > 1) g.addScaledVector(ground.getTangent(1), (ahead - 1) * ground.getLength());
-      tan.copy(ground.getTangent(Math.min(1, ahead)));
-      tan.y = 0;
-      tan.normalize();
-      right.crossVectors(tan, up).normalize();
-      // The board's middle (lateral CARD_LATERAL on its side), nudged toward the avenue by LOOK_SHIFT.
-      const lateral = k < n ? cardLateral(k) + LOOK_SHIFT : 0;
-      return V3(g.x + right.x * lateral, k < n ? boardMid(k) : CARD_HEIGHT, g.z + right.z * lateral);
-    }),
-    false,
-    "catmullrom",
-    0.5,
-  );
+  const shotAt = (k: number): Shot | null => (k < n ? shotOf(k) : null);
+  const camPts = centres.map((_, k) => {
+    const sh = shotAt(k);
+    return sh ? at(k, sh.cam.ahead, sh.cam.lat, sh.cam.h) : at(k, 0, 0, CAMERA_HEIGHT);
+  });
+  const boardPts = centres.map((_, k) => {
+    const sh = shotAt(k);
+    return sh ? at(k, sh.board.ahead, sh.board.lat, boardMid(k)) : at(k, CARD_AHEAD, 0, CARD_HEIGHT);
+  });
+  /** The camera looks a little to the left of the board's middle, so the board sits right of the screen's middle, clear of the menu. */
+  const lookPts = boardPts.map((b, k) => {
+    if (k >= n) return b.clone();
+    const dir = V3(b.x - camPts[k]!.x, 0, b.z - camPts[k]!.z).normalize();
+    right.crossVectors(dir, up);
+    return V3(b.x - right.x * LOOK_SHIFT, b.y, b.z - right.z * LOOK_SHIFT);
+  });
+  const camera = new THREE.CatmullRomCurve3(camPts, false, "catmullrom", 0.5);
+  const look = new THREE.CatmullRomCurve3(lookPts, false, "catmullrom", 0.5);
   return {
     count: n,
     length: ground.getLength(),
@@ -116,10 +105,11 @@ export function createRail(count: number): Rail {
     frameAt(u, out) {
       return frameOf(u, out ?? { p: V3(0, 0, 0), T: V3(0, 0, 0), R: V3(0, 0, 0) });
     },
-    cardAnchor(k, out, frame) {
-      const f = frameOf((k + CARD_AHEAD) / total, frame ?? stopFrame);
-      tmp.copy(f.p).addScaledVector(f.R, cardLateral(k));
-      return out.set(tmp.x, boardMid(k), tmp.z);
+    cardAnchor(k, out) {
+      return out.copy(boardPts[k]!);
+    },
+    cameraAt(k, out) {
+      return out.copy(camPts[k]!);
     },
   };
 }

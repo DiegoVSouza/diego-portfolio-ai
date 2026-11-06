@@ -4,6 +4,6 @@
 
  Test Files  9 passed (9)
       Tests  84 passed (84)
-   Start at  17:32:09
-   Duration  5.84s (environment 74%, setup 16%, tests 6%, import 2%, transform 2%, worker 1%)
+   Start at  17:56:16
+   Duration  4.88s (environment 74%, setup 14%, tests 6%, import 2%, transform 2%, worker 1%)
 

@@ -30,4 +30,4 @@ Running 23 tests using 1 worker
 [21/23] e2e\v2.spec.ts:203:1 › travelling under reduced motion: no swing, no events, the scroll still reaches every stop
 [22/23] e2e\v2.spec.ts:223:1 › the scene is built from the real downloaded models, not the fallbacks (assets: buildings, cars, metro stations)
 [23/23] e2e\v2.spec.ts:247:1 › the CC BY credit for the metro station is on every page, with links to the pack and to the licence
-  23 passed (1.2m)
+  23 passed (1.1m)

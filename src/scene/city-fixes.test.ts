@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import * as THREE from "three";
-import { BOARD_PANEL_Z, BOARD_WIDTH, MOUNT_SPEC, ROAD_EXTRA, boardMid, frameFront, mountOf, trainLead } from "./layout";
+import { BOARD_PANEL_Z, BOARD_WIDTH, ROAD_EXTRA, boardMid, frameFront, shotKind, shotOf, trainLead } from "./layout";
 import { createRail } from "./rail";
 
 describe("shuttle train", () => {
@@ -50,24 +50,33 @@ describe("rail", () => {
   });
 });
 
-describe("board mounts", () => {
-  it("hang the cards in more than one kind of place, and not all on posts", () => {
-    const kinds = new Set(Array.from({ length: 10 }, (_, k) => mountOf(k)));
-    expect(kinds.size).toBe(4);
-    expect(Array.from({ length: 10 }, (_, k) => mountOf(k)).filter((m) => m === "post").length).toBeLessThanOrEqual(2);
+describe("shots", () => {
+  it("vary: the street, a facade, a side street, a roof and a car window all appear, and few boards stand on posts", () => {
+    const kinds = Array.from({ length: 10 }, (_, k) => shotKind(k));
+    expect(new Set(kinds).size).toBe(5);
+    expect(kinds.filter((m) => m === "post").length).toBeLessThanOrEqual(2);
   });
-  it("keeps building mounts clear of the avenue", () => {
-    for (const m of ["facade", "wall", "roof"] as const) {
-      expect(MOUNT_SPEC[m].lateral - BOARD_WIDTH / 2 - 1).toBeGreaterThan(12);
+  it("keeps boards on buildings clear of the avenue and the camera in the right place", () => {
+    for (let k = 0; k < 10; k += 1) {
+      const shot = shotOf(k);
+      if (shot.kind === "facade" || shot.kind === "roof") expect(Math.abs(shot.board.lat) - (BOARD_WIDTH * shot.scale) / 2 - 1).toBeGreaterThan(12);
+      if (shot.kind === "side") expect(Math.abs(shot.cam.lat)).toBeGreaterThan(30);
+      if (shot.kind === "roof") expect(shot.cam.h).toBeGreaterThan(20);
+      if (shot.kind === "car") {
+        expect(shot.cam.h).toBeLessThan(3);
+        // The board is across the avenue from the car.
+        expect(Math.sign(shot.board.lat)).toBe(-Math.sign(shot.cam.lat));
+      }
     }
   });
-  it("points the camera at the middle of each board", () => {
+  it("points the camera past the board's middle, never at the ground", () => {
     const rail = createRail(10);
     const look = new THREE.Vector3();
     const pos = new THREE.Vector3();
     for (let k = 0; k < 10; k += 1) {
       rail.pose(k, pos, look);
       expect(look.y).toBeCloseTo(boardMid(k), 5);
+      expect(pos.y).toBeCloseTo(shotOf(k).cam.h, 5);
     }
   });
 });

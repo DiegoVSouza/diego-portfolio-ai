@@ -28,24 +28,49 @@ export const frameFront = (): number => Math.max(BOARD_POST_Z + BOARD_POST_DEPTH
 /** Stops of plain avenue added after the last stop, so the street goes on instead of ending at a square. */
 export const ROAD_EXTRA = 3;
 
-/** How a stop's board is mounted. The cards hang in different places, not all on posts beside the street. */
-export type Mount = "facade" | "wall" | "roof" | "post";
-const MOUNTS: readonly Mount[] = ["facade", "wall", "roof", "post"];
-export const mountOf = (k: number): Mount => MOUNTS[k % MOUNTS.length]!;
+/** Which side of the avenue stop k's shot belongs to: +1 right, -1 left. They alternate. */
+export const sideOf = (k: number): 1 | -1 => (k % 2 === 0 ? 1 : -1);
 
-/** A board's size in world units: 30 wide, as tall as the 640 by 460 card. */
+/** A board's size in world units before a shot scales it: 30 wide, as tall as the 640 by 460 card. */
 export const BOARD_WIDTH = 30;
 export const BOARD_HEIGHT = (BOARD_WIDTH * 460) / 640;
 
 /**
- * Where the board's lower edge is above the street, and how far its middle is from the avenue's middle (unsigned; the sign is the side).
- * facade: on the end wall of a building, at street level. wall: on the same wall, higher up on a tall building.
- * roof: on top of a low building. post: on two posts beside the street.
+ * Each stop is a shot, not only a place on the street: how the camera sits and where the board hangs.
+ * post: the street, a board on two posts. facade: the street, a board on the end wall of a building.
+ * side: the camera has turned into a side street and looks along it to a board on the building at its end.
+ * roof: the camera has climbed above the avenue and looks across to a billboard on top of a tower.
+ * car: the camera sits low in a parked car (the scene draws the window) and looks across the street at a facade.
+ * `ahead` is in stops along the avenue from the stop; `lat` is from the avenue's middle, signed by the stop's side;
+ * `h` is the camera's height; `bottom` is the board's lower edge above the street.
  */
-export const MOUNT_SPEC: Record<Mount, { bottom: number; lateral: number }> = {
-  facade: { bottom: 3, lateral: 29 },
-  wall: { bottom: 8, lateral: 29 },
-  roof: { bottom: 15, lateral: 29 },
-  post: { bottom: 2.5, lateral: 20 },
+export type ShotKind = "post" | "facade" | "side" | "roof" | "car";
+export interface Shot {
+  kind: ShotKind;
+  cam: { ahead: number; lat: number; h: number };
+  board: { ahead: number; lat: number; bottom: number };
+  /** Board size, as a multiple of BOARD_WIDTH: far shots get a bigger board so the card still fills the screen. */
+  scale: number;
+}
+const KINDS: readonly ShotKind[] = ["post", "facade", "side", "roof", "car"];
+export const shotKind = (k: number): ShotKind => KINDS[k % KINDS.length]!;
+export function shotOf(k: number): Shot {
+  const s = sideOf(k);
+  switch (shotKind(k)) {
+    case "facade":
+      return { kind: "facade", cam: { ahead: 0, lat: 9 * s, h: 12 }, board: { ahead: 0.27, lat: 34 * s, bottom: 3 }, scale: 1 };
+    case "side":
+      // 0.62 is where the side street crosses the avenue (see crossUs in world.ts).
+      return { kind: "side", cam: { ahead: 0.62, lat: 46 * s, h: 5 }, board: { ahead: 0.62, lat: 86 * s, bottom: 3 }, scale: 1.25 };
+    case "roof":
+      return { kind: "roof", cam: { ahead: 0.05, lat: 2 * s, h: 30 }, board: { ahead: 0.3, lat: 36 * s, bottom: 26 }, scale: 1.1 };
+    case "car":
+      return { kind: "car", cam: { ahead: 0.3, lat: 6.5 * s, h: 1.7 }, board: { ahead: 0.3, lat: -36 * s, bottom: 3 }, scale: 1.3 };
+    default:
+      return { kind: "post", cam: { ahead: 0, lat: 9 * s, h: 12 }, board: { ahead: 0.27, lat: 20 * s, bottom: 2.5 }, scale: 1 };
+  }
+}
+export const boardMid = (k: number): number => {
+  const shot = shotOf(k);
+  return shot.board.bottom + (BOARD_HEIGHT * shot.scale) / 2;
 };
-export const boardMid = (k: number): number => MOUNT_SPEC[mountOf(k)].bottom + BOARD_HEIGHT / 2;
