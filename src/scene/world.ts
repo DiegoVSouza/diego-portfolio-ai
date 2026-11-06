@@ -368,19 +368,36 @@ export async function buildWorld(c: WorldContext): Promise<World> {
     new THREE.BoxGeometry(2.6, 0.25, 0.25).translate(1.2, 6.9, 0),
     new THREE.BoxGeometry(0.8, 0.4, 0.8).translate(2.5, 6.7, 0),
   ])!;
-  const lampCount = Math.floor(rail.length / 22) * 2;
-  const lamps = new THREE.InstancedMesh(lampGeo, new THREE.MeshStandardMaterial({ flatShading: true, roughness: 0.7, metalness: 0.2 }), lampCount);
-  lamps.frustumCulled = false;
-  for (let i = 0; i < lampCount; i += 1) {
+  const lampSlots = Math.floor(rail.length / 22) * 2;
+  /**
+   * A lamp post on a board's side of the avenue, between the camera's stop and the board, would stand in front of the board in 3D while
+   * the card (drawn over the canvas) hides it: it flickers in front of the sign as the card fades. Those lamps are left out.
+   */
+  const blocksBoard = (u: number, side: number): boolean => {
+    for (let k = 0; k < stops.length; k += 1) {
+      if (cardSide(k) !== side) continue;
+      const along = (u - rail.u(k)) * rail.length / 85;
+      if (along > -0.3 && along < 0.55) return true;
+    }
+    return false;
+  };
+  const lampList: { u: number; s: 1 | -1; i: number }[] = [];
+  for (let i = 0; i < lampSlots; i += 1) {
     const s = i % 2 ? 1 : -1;
-    rail.frameAt((Math.floor(i / 2) + 0.5) / (lampCount / 2), f);
+    const u = (Math.floor(i / 2) + 0.5) / (lampSlots / 2);
+    if (!blocksBoard(u, s)) lampList.push({ u, s, i });
+  }
+  const lamps = new THREE.InstancedMesh(lampGeo, new THREE.MeshStandardMaterial({ flatShading: true, roughness: 0.7, metalness: 0.2 }), lampList.length);
+  lamps.frustumCulled = false;
+  lampList.forEach(({ u, s, i }, n) => {
+    rail.frameAt(u, f);
     dummy.position.set(f.p.x + f.R.x * s * 11.5, 0, f.p.z + f.R.z * s * 11.5);
     dummy.rotation.set(0, Math.atan2(f.R.z * s, -f.R.x * s), 0);
     dummy.scale.setScalar(1);
     dummy.updateMatrix();
-    lamps.setMatrixAt(i, dummy.matrix);
-    lamps.setColorAt(i, col.copy(i % 6 < 2 ? p.red : grey(0.3)));
-  }
+    lamps.setMatrixAt(n, dummy.matrix);
+    lamps.setColorAt(n, col.copy(i % 6 < 2 ? p.red : grey(0.3)));
+  });
   scene.add(lamps);
 
   /* ---------- district 0, ARRIVAL: the avenue into town, with a gate ---------- */
