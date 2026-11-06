@@ -1,0 +1,13 @@
+[WebServer] [plugin builtin:vite-reporter] 
+[WebServer] (!) Some chunks are larger than 500 kB after minification. Consider:
+[WebServer] - Using dynamic import() to code-split the application
+[WebServer] - Use build.rolldownOptions.output.codeSplitting to improve chunking: https://rolldown.rs/reference/OutputOptions.codeSplitting
+[WebServer] - Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+
+
+Running 2 tests using 1 worker
+
+[1/2] e2e\city-fixes.spec.ts:8:1 › the menu follows the camera, and a jump of several stops cuts instead of passing the stops in between
+[2/2] e2e\city-fixes.spec.ts:35:1 › the street goes on past the last stop and the scene still draws
+  2 passed (13.7s)
+exit 0

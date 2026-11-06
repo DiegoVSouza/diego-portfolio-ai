@@ -1,5 +1,6 @@
 import * as THREE from "three";
 import { V3 } from "./geometry";
+import { ROAD_EXTRA } from "./layout";
 
 /**
  * The camera rail. One stop per card; the camera flies a spline that passes exactly through the stops, and a second spline carries the
@@ -19,7 +20,7 @@ export interface Rail {
   count: number;
   /** Camera position and look-at point for the stop parameter c in [0, count - 1] (an integer is a stop). */
   pose(c: number, pos: THREE.Vector3, look: THREE.Vector3): void;
-  /** Street frame at u in [0, 1] along the whole path (stop k is at u = k / count; u = 1 is the overrun point past the last stop). */
+  /** Street frame at u in [0, 1] along the whole path (stop k is at u = k / (count + ROAD_EXTRA); u = 1 is the end of the street). */
   frameAt(u: number, out?: Frame): Frame;
   /** Where stop k's card hangs: ahead of the stop, on its side of the avenue, at eye height. */
   cardAnchor(k: number, out: THREE.Vector3, frame?: Frame): THREE.Vector3;
@@ -52,9 +53,11 @@ export const cardSide = (k: number): 1 | -1 => (k % 2 === 0 ? 1 : -1);
 
 export function createRail(count: number): Rail {
   const n = Math.max(2, count);
+  // The street goes on for ROAD_EXTRA stops past the last stop, so the last stop looks down a street, not at a square.
+  // `total` is the length of the whole path in stop units; u = k / total.
+  const total = n + ROAD_EXTRA;
   // The camera sits 26 units in front of the stop's centre (the city is ahead of it, -z).
-  // One control point beyond the last stop (the overrun), so the last stop also has a street ahead of it: the harbour is there.
-  const centres = Array.from({ length: n + 1 }, (_, k) => V3(SWAY * Math.sin(k * 0.85), 0, -SPACING * k + 26));
+  const centres = Array.from({ length: total + 1 }, (_, k) => V3(SWAY * Math.sin(k * 0.85), 0, -SPACING * k + 26));
   const ground = new THREE.CatmullRomCurve3(centres, false, "catmullrom", 0.5);
   const up = V3(0, 1, 0);
   const tmp = V3(0, 0, 0);
@@ -72,7 +75,7 @@ export function createRail(count: number): Rail {
   const stopFrame = { p: V3(0, 0, 0), T: V3(0, 0, 0), R: V3(0, 0, 0) };
   // The camera and its look-at point are splines through one control point per stop, built from the street frame at that stop.
   const sample = (k: number, build: (f: { p: THREE.Vector3; T: THREE.Vector3; R: THREE.Vector3 }, side: number) => THREE.Vector3) => {
-    const f = frameOf(Math.min(1, k / n), stopFrame);
+    const f = frameOf(Math.min(1, k / total), stopFrame);
     return build(f, k < n ? cardSide(k) : 0);
   };
   const camera = new THREE.CatmullRomCurve3(
@@ -83,7 +86,7 @@ export function createRail(count: number): Rail {
   );
   const look = new THREE.CatmullRomCurve3(
     centres.map((_, k) => {
-      const ahead = (k + CARD_AHEAD) / n;
+      const ahead = (k + CARD_AHEAD) / total;
       const g = ground.getPoint(Math.min(1, ahead));
       // Past the end of the path (the last stop) the look-at point carries on along the final direction.
       if (ahead > 1) g.addScaledVector(ground.getTangent(1), (ahead - 1) * ground.getLength());
@@ -102,9 +105,9 @@ export function createRail(count: number): Rail {
   return {
     count: n,
     length: ground.getLength(),
-    u: (k, ahead = 0) => Math.min(1, Math.max(0, (k + ahead) / n)),
+    u: (k, ahead = 0) => Math.min(1, Math.max(0, (k + ahead) / total)),
     pose(c, pos, lookAt) {
-      const u = Math.min(1, Math.max(0, c / n));
+      const u = Math.min(1, Math.max(0, c / total));
       camera.getPoint(u, pos);
       look.getPoint(u, lookAt);
     },
@@ -112,7 +115,7 @@ export function createRail(count: number): Rail {
       return frameOf(u, out ?? { p: V3(0, 0, 0), T: V3(0, 0, 0), R: V3(0, 0, 0) });
     },
     cardAnchor(k, out, frame) {
-      const f = frameOf((k + CARD_AHEAD) / n, frame ?? stopFrame);
+      const f = frameOf((k + CARD_AHEAD) / total, frame ?? stopFrame);
       tmp.copy(f.p).addScaledVector(f.R, CARD_LATERAL * cardSide(k));
       return out.set(tmp.x, CARD_HEIGHT, tmp.z);
     },

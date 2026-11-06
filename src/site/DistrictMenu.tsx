@@ -31,12 +31,24 @@ export function DistrictMenu() {
     return card ? card.name[lang] : districts[stop.district]!.name[lang];
   };
 
-  // The active stop follows the section that crosses the middle of the screen. No layout reads on scroll.
+  // With the city running, the active stop is the one the camera is at (the scene says so); that is what the screen shows.
+  useEffect(() => {
+    const onShown = (event: Event) => {
+      if (document.documentElement.dataset.stage !== "3d") return;
+      const index = (event as CustomEvent<number>).detail;
+      if (Number.isInteger(index)) setActive(index);
+    };
+    window.addEventListener("scene-shown", onShown);
+    return () => window.removeEventListener("scene-shown", onShown);
+  }, []);
+
+  // Without the city the active stop follows the section that crosses the middle of the screen. No layout reads on scroll.
   useEffect(() => {
     if (typeof IntersectionObserver === "undefined") return undefined;
     const seen = new Map<number, boolean>();
     const observer = new IntersectionObserver(
       (entries) => {
+        if (document.documentElement.dataset.stage === "3d") return;
         for (const entry of entries) seen.set(stops.findIndex((s) => `s-${s.id}` === entry.target.id), entry.isIntersecting);
         const open = [...seen.entries()].filter(([, on]) => on).map(([i]) => i);
         if (open.length) setActive(Math.min(...open));
@@ -59,6 +71,8 @@ export function DistrictMenu() {
   // Where the last move is heading, and whether a flight is under way. A wheel turn or a key moves exactly one stop and is ignored while
   // a flight lasts (and until the wheel has been quiet for a moment, so a trackpad's long tail cannot start another).
   const heading = useRef(0);
+  const shownRef = useRef(0);
+  shownRef.current = active;
   const flying = useRef(false);
   const frame = useRef(0);
   useEffect(() => {
@@ -79,14 +93,23 @@ export function DistrictMenu() {
       // The scene measures each section's middle and writes it here; without a scene the section's own middle is used.
       const station = Number(el.dataset.stationY);
       const top = Math.max(0, (Number.isFinite(station) && station > 0 ? station : el.getBoundingClientRect().top + window.scrollY + el.offsetHeight / 2) - window.innerHeight / 2);
-      heading.current = i;
       cancelAnimationFrame(frame.current);
       const from = window.scrollY;
+      const here = shownRef.current;
+      heading.current = i;
       // Without the city (or with reduced motion) the page scrolls the ordinary way.
       if (reduced() || document.documentElement.dataset.stage !== "3d") {
         flying.current = false;
         setFlight(false);
         window.scrollTo({ top, behavior: reduced() ? "auto" : "smooth" });
+        return;
+      }
+      // More than one stop away: the camera cuts there. Flying would pass every stop in between and show them all.
+      if (Math.abs(i - here) > 1) {
+        flying.current = false;
+        setFlight(false);
+        window.scrollTo({ top, behavior: "instant" });
+        window.dispatchEvent(new Event("scene-cut"));
         return;
       }
       flying.current = true;

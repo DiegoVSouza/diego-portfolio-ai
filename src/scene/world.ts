@@ -1,6 +1,7 @@
 import * as THREE from "three";
 import { V3, bar, fit, mergeGeometries, tick, tint } from "./geometry";
 import { loadModel } from "./loaders";
+import { BOARD_BEAM_DEPTH, BOARD_BEAM_Z, BOARD_POST_DEPTH, BOARD_POST_Z, ROAD_EXTRA, trainLead } from "./layout";
 import { cardSide, type Frame, type Rail } from "./rail";
 import { truckFallback } from "./symbols";
 import type { Palette } from "./tokens";
@@ -74,6 +75,10 @@ export async function buildWorld(c: WorldContext): Promise<World> {
   const face = (x: number, z: number) => Math.atan2(x, z);
   /** First and last stop of each district. */
   const first = Array.from({ length: D }, (_, d) => stops.findIndex((s) => s.district === d));
+  /** The street goes on ROAD_EXTRA stops past the last stop; the harbour waits at the far end of it. */
+  const endStop = stops.length - 1 + ROAD_EXTRA;
+  /** Cross streets: u of each one, kept clear of towers. Filled when the street is built, read by `lane`. */
+  const crossUs: number[] = [];
   const last = Array.from({ length: D }, (_, d) => stops.map((s) => s.district).lastIndexOf(d));
 
   /* ---------- window texture and materials ---------- */
@@ -121,6 +126,8 @@ export async function buildWorld(c: WorldContext): Promise<World> {
   const realParts: Part[][] = Array.from({ length: D }, () => []);
   const beacons: Part[] = [];
   const signSpots: { x: number; y: number; z: number; ry: number }[] = [];
+  /** Horizontal signs on the avenue-facing wall of a building, at street height. */
+  const wallSpots: { x: number; y: number; z: number; ry: number }[] = [];
 
   /** A box with the window texture mapped to its sides (the top and bottom sample the dark corner), tinted, turned and placed. */
   const solid = (d: number, w: number, h: number, dd: number, x: number, y0: number, z: number, ry: number, tone: THREE.Color, windows = true) => {
@@ -192,16 +199,30 @@ export async function buildWorld(c: WorldContext): Promise<World> {
     /** Only this side (+1 right, -1 left); both when omitted. */
     side?: 1 | -1;
     signs?: number;
+    /** Horizontal signs on walls facing the avenue, low enough to read from the street. */
+    walls?: number;
+    /** Tower id stays free of cross streets (default true). */
+    clear?: boolean;
+    /** Stop the lane at this u instead of the district's end. */
+    until?: number;
   }
+  /** Side streets: half the carriageway, the pavement on each side of it, and how far they reach from the avenue. */
+  const CROSS_HALF = 6;
+  const SIDEWALK = 3;
+  const CROSS_REACH = 150;
   /** Both sides keep clear for the billboards (they alternate): nothing stands closer than this to the avenue. */
   const SIDE_CLEAR = 34;
   /** Towers on both sides of the avenue for district d. Returns where they stood, for features that sit on roofs. */
   const lane = (d: number, o: Lane) => {
-    const [u0, u1] = span(d);
+    const [u0, u1Span] = span(d);
+    const u1 = o.until ?? u1Span;
     const placed: { x: number; z: number; w: number; dd: number; h: number; ry: number; s: number }[] = [];
     let signsLeft = o.signs ?? 0;
-    for (let n = 0; n < o.count; n += 1) {
-      rail.frameAt(u0 + rnd() * (u1 - u0), f);
+    let wallsLeft = o.walls ?? 0;
+    // A tower whose footprint would cross a side street is skipped and another is drawn, up to three tries per tower.
+    for (let attempt = 0, n = 0; n < o.count && attempt < o.count * 3; attempt += 1) {
+      const uPick = u0 + rnd() * (u1 - u0);
+      rail.frameAt(uPick, f);
       const s = o.side ?? (n % 2 ? 1 : -1);
       const w = o.wMin + rnd() * (o.wMax - o.wMin);
       const dd = o.wMin + rnd() * (o.wMax - o.wMin);
@@ -212,7 +233,9 @@ export async function buildWorld(c: WorldContext): Promise<World> {
       const x = f.p.x + f.R.x * s * lat;
       const z = f.p.z + f.R.z * s * lat + (rnd() - 0.5) * 5;
       const ry = yaw(f.T);
-      if (o.realEvery && n % o.realEvery === 0 && landmark(d, x, z, -f.R.x * s, -f.R.z * s, h)) {
+      if (o.clear !== false && crossUs.some((cu) => Math.abs(uPick - cu) * rail.length < CROSS_HALF + SIDEWALK + Math.max(dd, 9) / 2 + 3)) continue;
+      n += 1;
+      if (o.realEvery && (n - 1) % o.realEvery === 0 && landmark(d, x, z, -f.R.x * s, -f.R.z * s, h)) {
         if (rnd() < 0.5) beacon(x, h + 0.3, z);
         placed.push({ x, z, w, dd, h, ry, s });
         continue;
@@ -223,6 +246,10 @@ export async function buildWorld(c: WorldContext): Promise<World> {
         signSpots.push({ x: f.p.x + f.R.x * s * (lat - w / 2 - 0.12), y: h * (0.4 + rnd() * 0.3), z: f.p.z + f.R.z * s * (lat - w / 2 - 0.12), ry: face(-f.R.x * s, -f.R.z * s) });
         signsLeft -= 1;
       }
+      if (wallsLeft > 0 && h > 10 && w > 5) {
+        wallSpots.push({ x: f.p.x + f.R.x * s * (lat - w / 2 - 0.12), y: 5 + rnd() * Math.min(10, h - 9), z: f.p.z + f.R.z * s * (lat - w / 2 - 0.12) + (rnd() - 0.5) * 2, ry: face(-f.R.x * s, -f.R.z * s) });
+        wallsLeft -= 1;
+      }
       placed.push({ x, z, w, dd, h, ry, s });
     }
     return placed;
@@ -231,7 +258,7 @@ export async function buildWorld(c: WorldContext): Promise<World> {
   await tick();
   /* ---------- the street: ground, avenue, sidewalks, lane marks, lamps ---------- */
   rail.frameAt(1, f2);
-  rail.frameAt(rail.u(stops.length - 1, 0.55), f);
+  rail.frameAt(rail.u(endStop, 0.55), f);
   const shoreZ = f.p.z;
   const groundDepth = 160 - shoreZ;
   const ground = (() => {
@@ -276,6 +303,54 @@ export async function buildWorld(c: WorldContext): Promise<World> {
   scene.add(ribbon(8, 12, 0.1, grey(0.1)));
   scene.add(ribbon(-12, -8, 0.1, grey(0.1)));
 
+  /* ---------- side streets: one in every gap between two stops, on both sides of the avenue ---------- */
+  {
+    const asphalt = { pos: [] as number[], idx: [] as number[] };
+    const pavement = { pos: [] as number[], idx: [] as number[] };
+    const slab = (to: typeof asphalt, latA: number, latB: number, alongA: number, alongB: number, y: number) => {
+      const base = to.pos.length / 3;
+      for (const [lat, along] of [[latA, alongA], [latB, alongA], [latB, alongB], [latA, alongB]] as const) {
+        to.pos.push(f.p.x + f.R.x * lat + f.T.x * along, y, f.p.z + f.R.z * lat + f.T.z * along);
+      }
+      to.idx.push(base, base + 1, base + 2, base, base + 2, base + 3);
+    };
+    const dashes: { x: number; z: number; ry: number }[] = [];
+    for (let k = 0; k <= endStop - 2; k += 1) {
+      const u = rail.u(k, 0.62);
+      crossUs.push(u);
+      rail.frameAt(u, f);
+      for (const side of [-1, 1]) {
+        const a = side * 8;
+        const b = side * CROSS_REACH;
+        slab(asphalt, a, b, -CROSS_HALF, CROSS_HALF, 0.12);
+        slab(pavement, a, b, CROSS_HALF, CROSS_HALF + SIDEWALK, 0.13);
+        slab(pavement, a, b, -CROSS_HALF - SIDEWALK, -CROSS_HALF, 0.13);
+        for (let lat = 18; lat < CROSS_REACH; lat += 9) dashes.push({ x: f.p.x + f.R.x * side * lat, z: f.p.z + f.R.z * side * lat, ry: yaw(f.T) });
+      }
+    }
+    const build = (src: typeof asphalt, tone: THREE.Color) => {
+      const g = new THREE.BufferGeometry();
+      g.setAttribute("position", new THREE.Float32BufferAttribute(src.pos, 3));
+      g.setIndex(src.idx);
+      g.computeVertexNormals();
+      const m = new THREE.Mesh(g, new THREE.MeshBasicMaterial({ color: tone, side: THREE.DoubleSide }));
+      m.frustumCulled = false;
+      scene.add(m);
+    };
+    build(asphalt, p.ink2);
+    build(pavement, grey(0.1));
+    const dashMesh = new THREE.InstancedMesh(new THREE.BoxGeometry(3, 0.05, 0.35), new THREE.MeshBasicMaterial({ color: p.paper }), dashes.length);
+    dashMesh.frustumCulled = false;
+    dashes.forEach((d, i) => {
+      dummy.position.set(d.x, 0.15, d.z);
+      dummy.rotation.set(0, d.ry, 0);
+      dummy.scale.setScalar(1);
+      dummy.updateMatrix();
+      dashMesh.setMatrixAt(i, dummy.matrix);
+    });
+    scene.add(dashMesh);
+  }
+
   const marks = new THREE.InstancedMesh(new THREE.BoxGeometry(0.4, 0.05, 2.4), new THREE.MeshBasicMaterial({ color: p.paper }), Math.floor(rail.length / 6));
   marks.frustumCulled = false;
   for (let i = 0; i < marks.count; i += 1) {
@@ -310,7 +385,18 @@ export async function buildWorld(c: WorldContext): Promise<World> {
 
   /* ---------- district 0, ARRIVAL: the avenue into town, with a gate ---------- */
   await tick();
-  lane(0, { count: 20, latMin: 17, latMax: 50, hMin: 16, hMax: 58, wMin: 4, wMax: 9, realEvery: 3, signs: 4 });
+  const roofSigns: { x: number; y: number; z: number; ry: number }[] = [];
+  /** A frame on a roof that carries a horizontal sign, turned a little toward the avenue. */
+  const roofFrame = (d: number, b: { x: number; z: number; h: number; ry: number; s: number }, i: number) => {
+    const frame = (dx: number, dy: number) => V3(b.x + Math.cos(b.ry) * dx, b.h + dy, b.z - Math.sin(b.ry) * dx);
+    for (const dx of [-5, 5]) strut(d, frame(dx, 0), frame(dx, 6.5), 0.35, grey(0.5));
+    strut(d, frame(-5, 6.5), frame(5, 6.5), 0.35, p.red);
+    roofSigns.push({ x: b.x, y: b.h + 3.4, z: b.z, ry: face(-b.s, 0) + (i % 2 ? 0.2 : -0.2) });
+  };
+  const roofsOf = (d: number, list: { x: number; z: number; h: number; ry: number; s: number; w: number }[], minH: number, count: number) =>
+    list.filter((b) => b.h > minH && b.w >= 6).slice(0, count).forEach((b, i) => roofFrame(d, b, i));
+  const l0 = lane(0, { count: 20, latMin: 17, latMax: 50, hMin: 16, hMax: 58, wMin: 4, wMax: 9, realEvery: 3, signs: 4, walls: 8 });
+  roofsOf(0, l0, 20, 3);
   {
     rail.frameAt(rail.u(0, 0.5), f);
     const ry = yaw(f.T);
@@ -325,7 +411,8 @@ export async function buildWorld(c: WorldContext): Promise<World> {
 
   /* ---------- district 1, OPS: a control tower with setbacks and a beacon ---------- */
   await tick();
-  lane(1, { count: 14, latMin: 18, latMax: 48, hMin: 14, hMax: 36, wMin: 5, wMax: 9, realEvery: 3, signs: 2 });
+  const l1 = lane(1, { count: 14, latMin: 18, latMax: 48, hMin: 14, hMax: 36, wMin: 5, wMax: 9, realEvery: 3, signs: 2, walls: 6 });
+  roofsOf(1, l1, 18, 3);
   {
     rail.frameAt(rail.u(first[1]!, 0.4), f);
     const ry = yaw(f.T);
@@ -343,7 +430,8 @@ export async function buildWorld(c: WorldContext): Promise<World> {
 
   /* ---------- district 2, CORE: a dense glass core joined by sky bridges ---------- */
   await tick();
-  lane(2, { count: 46, latMin: 15, latMax: 62, hMin: 44, hMax: 98, wMin: 5, wMax: 11, realEvery: 4, signs: 5 });
+  const l2 = lane(2, { count: 46, latMin: 15, latMax: 62, hMin: 44, hMax: 98, wMin: 5, wMax: 11, realEvery: 4, signs: 5, walls: 10 });
+  roofsOf(2, l2, 60, 4);
   for (let k = first[2]!; k <= last[2]!; k += 1) {
     rail.frameAt(rail.u(k, -0.3), f);
     const ry = yaw(f.T);
@@ -355,7 +443,7 @@ export async function buildWorld(c: WorldContext): Promise<World> {
 
   /* ---------- district 3, PLATFORM: an elevated viaduct beside the avenue, a metro station and trains ---------- */
   await tick();
-  lane(3, { count: 22, latMin: 56, latMax: 82, hMin: 20, hMax: 54, wMin: 5, wMax: 10, realEvery: 4, side: -1, signs: 2 });
+  lane(3, { count: 22, latMin: 56, latMax: 82, hMin: 20, hMax: 54, wMin: 5, wMax: 10, realEvery: 4, side: -1, signs: 2, walls: 6 });
   lane(3, { count: 8, latMin: 56, latMax: 80, hMin: 14, hMax: 30, wMin: 5, wMax: 9, side: 1 });
   /**
    * A viaduct on each side of the avenue, past the boards, at about eye height: from the street the trains cross the view at an angle
@@ -430,14 +518,8 @@ export async function buildWorld(c: WorldContext): Promise<World> {
 
   /* ---------- district 4, CRAFT: low rooftops with billboards, scaffolding and a crane ---------- */
   await tick();
-  const low = lane(4, { count: 40, latMin: 14, latMax: 58, hMin: 7, hMax: 22, wMin: 6, wMax: 14, signs: 0 });
-  const roofSigns: { x: number; y: number; z: number; ry: number }[] = [];
-  low.filter((b) => b.h > 12).slice(0, 6).forEach((b, i) => {
-    const frame = (dx: number, dy: number) => V3(b.x + Math.cos(b.ry) * dx, b.h + dy, b.z - Math.sin(b.ry) * dx);
-    for (const dx of [-5, 5]) strut(4, frame(dx, 0), frame(dx, 6.5), 0.35, grey(0.5));
-    strut(4, frame(-5, 6.5), frame(5, 6.5), 0.35, p.red);
-    roofSigns.push({ x: b.x, y: b.h + 3.4, z: b.z, ry: face(-b.s, 0) + (i % 2 ? 0.2 : -0.2) });
-  });
+  const low = lane(4, { count: 40, latMin: 14, latMax: 58, hMin: 7, hMax: 22, wMin: 6, wMax: 14, signs: 0, walls: 8 });
+  roofsOf(4, low, 12, 6);
   low.filter((b) => b.h > 9).slice(6, 9).forEach((b) => {
     for (let level = 0; level < 4; level += 1) {
       const y = b.h + level * 3;
@@ -459,14 +541,16 @@ export async function buildWorld(c: WorldContext): Promise<World> {
     beacon(cx, 47.2, cz, 0.9);
   }
 
-  /* ---------- district 5, TERMINAL: a harbour, container stacks, cranes and a lighthouse ---------- */
+  /* ---------- district 5, TERMINAL: the avenue goes on past the last stop, towers on both sides, and the harbour waits at its far end ---------- */
   await tick();
+  const l5 = lane(5, { count: 64, latMin: 17, latMax: 62, hMin: 14, hMax: 64, wMin: 5, wMax: 11, realEvery: 4, signs: 3, walls: 8, until: rail.u(endStop, -0.7) });
+  roofsOf(5, l5, 24, 5);
   const water = new THREE.Mesh(new THREE.PlaneGeometry(1000, 480), new THREE.MeshBasicMaterial({ color: p.mix(p.ink, p.dred, 0.5) }));
   water.rotation.x = -Math.PI / 2;
   water.position.set(0, -0.4, shoreZ - 240);
   scene.add(water);
   {
-    rail.frameAt(rail.u(stops.length - 1, 0.55), f);
+    rail.frameAt(rail.u(endStop, 0.55), f);
     const quay = new THREE.Mesh(new THREE.BoxGeometry(46, 0.7, 170), new THREE.MeshBasicMaterial({ color: grey(0.12) }));
     quay.position.set(f.p.x, -0.1, shoreZ - 65);
     scene.add(quay);
@@ -485,7 +569,7 @@ export async function buildWorld(c: WorldContext): Promise<World> {
     const stacks = new THREE.InstancedMesh(new THREE.BoxGeometry(2.8, 2.8, 6.4), new THREE.MeshStandardMaterial({ flatShading: true, roughness: 0.8, metalness: 0.1 }), stackCount);
     stacks.frustumCulled = false;
     const tones = [p.red, p.paper, grey(0.32), p.dred, grey(0.18)];
-    const lastStop = stops.length - 1;
+    const lastStop = endStop;
     for (let i = 0; i < stackCount; i += 1) {
       const s = i % 2 ? 1 : -1;
       const row = Math.floor(i / 2) % 8;
@@ -543,7 +627,18 @@ export async function buildWorld(c: WorldContext): Promise<World> {
   /* ---------- one billboard per stop: the card's place in the city ---------- */
   const signPairs: [THREE.Color, THREE.Color][] = [[p.red, p.paper], [p.paper, p.ink2], [p.ink2, p.red], [p.red, p.ink2], [p.paper, p.red], [p.ink2, p.paper]];
   const painters: (() => void)[] = [];
+  /** Signs with the same text and colours share one texture and one material; the geometry is shared per size. */
+  const signMaterials = new Map<string, THREE.MeshBasicMaterial>();
+  const signGeometries = new Map<string, THREE.PlaneGeometry>();
   const makeSign = (text: string, w: number, h: number, bg: THREE.Color, fg: THREE.Color, vertical: boolean): THREE.Mesh => {
+    const key = `${text}|${bg.getHexString()}|${fg.getHexString()}|${vertical ? "v" : "h"}`;
+    const known = signMaterials.get(key);
+    if (known) {
+      const sizeKey = `${w}x${h}`;
+      let geometry = signGeometries.get(sizeKey);
+      if (!geometry) signGeometries.set(sizeKey, (geometry = new THREE.PlaneGeometry(w, h)));
+      return new THREE.Mesh(geometry, known);
+    }
     const cv = document.createElement("canvas");
     cv.width = vertical ? 128 : 512;
     cv.height = vertical ? 512 : 128;
@@ -573,7 +668,12 @@ export async function buildWorld(c: WorldContext): Promise<World> {
     };
     paint();
     painters.push(paint);
-    return new THREE.Mesh(new THREE.PlaneGeometry(w, h), new THREE.MeshBasicMaterial({ map }));
+    const material = new THREE.MeshBasicMaterial({ map });
+    signMaterials.set(key, material);
+    const sizeKey = `${w}x${h}`;
+    let geometry = signGeometries.get(sizeKey);
+    if (!geometry) signGeometries.set(sizeKey, (geometry = new THREE.PlaneGeometry(w, h)));
+    return new THREE.Mesh(geometry, material);
   };
   /** The painted face of a board: the number outlined, the name in up to three lines, a line under it. The card hides it when it is near. */
   const boardRatio: number[] = stops.map(() => BILLBOARD_RATIO);
@@ -652,7 +752,7 @@ export async function buildWorld(c: WorldContext): Promise<World> {
     group.position.set(anchor.x, 0, anchor.z);
     group.rotation.y = face(-f.T.x - 0.3 * sd * f.R.x, -f.T.z - 0.3 * sd * f.R.z);
     const painted = makeBillboardMap(k);
-    const panel = new THREE.Mesh(new THREE.PlaneGeometry(1, 1), new THREE.MeshBasicMaterial({ map: painted.map }));
+    const panel = new THREE.Mesh(new THREE.PlaneGeometry(1, 1), new THREE.MeshBasicMaterial({ map: painted.map, polygonOffset: true, polygonOffsetFactor: -2, polygonOffsetUnits: -2 }));
     const posts = [0, 1].map(() => new THREE.Mesh(unitBox, frameMat));
     const beams = [0, 1].map(() => new THREE.Mesh(unitBox, frameMat));
     group.add(panel, ...posts, ...beams);
@@ -672,12 +772,12 @@ export async function buildWorld(c: WorldContext): Promise<World> {
     b.panel.position.set(0, mid, 0);
     b.posts.forEach((post, i) => {
       const side = i ? 1 : -1;
-      post.scale.set(0.7, BOARD_BOTTOM + h, 0.7);
-      post.position.set(side * (w / 2 + 0.35), (BOARD_BOTTOM + h) / 2, -0.4);
+      post.scale.set(0.7, BOARD_BOTTOM + h, BOARD_POST_DEPTH);
+      post.position.set(side * (w / 2 + 0.35), (BOARD_BOTTOM + h) / 2, BOARD_POST_Z);
     });
     b.beams.forEach((beam, i) => {
-      beam.scale.set(w + 1.4, 0.6, 0.6);
-      beam.position.set(0, i ? BOARD_BOTTOM + h + 0.3 : BOARD_BOTTOM - 0.3, -0.2);
+      beam.scale.set(w + 1.4, 0.6, BOARD_BEAM_DEPTH);
+      beam.position.set(0, i ? BOARD_BOTTOM + h + 0.3 : BOARD_BOTTOM - 0.3, BOARD_BEAM_Z);
     });
     b.group.updateMatrixWorld(true);
   }
@@ -700,6 +800,15 @@ export async function buildWorld(c: WorldContext): Promise<World> {
   signSpots.slice(0, 16).forEach((s, i) => {
     const [bg, fg] = signPairs[i % signPairs.length]!;
     const m = makeSign(words[i % words.length]!, 2.2, 8.8, bg, fg, true);
+    m.position.set(s.x, s.y, s.z);
+    m.rotation.y = s.ry;
+    scene.add(m);
+  });
+  // Horizontal signs on walls facing the avenue, so the city has lettering at street height and not only on the road and the roofs.
+  const wallWords = [...words, "OPEN", "24H", "TRACE", "EVAL", "AGENTS", "RAG", "MCP"];
+  wallSpots.forEach((s, i) => {
+    const [bg, fg] = signPairs[(i * 5 + 1) % signPairs.length]!;
+    const m = makeSign(wallWords[(i * 3) % wallWords.length]!, 9, 2.25, bg, fg, false);
     m.position.set(s.x, s.y, s.z);
     m.rotation.y = s.ry;
     scene.add(m);
@@ -819,11 +928,8 @@ export async function buildWorld(c: WorldContext): Promise<World> {
     const room = ((cars - 1) * length) / viaductLength;
     for (let t = 0; t < TRAINS; t += 1) {
       const q = reduce ? 0.25 + (t % 2) * 0.2 : (((time / TRAIN_CYCLE + t * 0.37) % 1) + 1) % 1;
-      const forward = q < 0.5;
-      const leg = forward ? q * 2 : (q - 0.5) * 2;
-      const eased = leg * leg * (3 - 2 * leg);
-      // The leading car's place on the viaduct, kept inside it so the whole train stays on the deck.
-      const lead = room + (1 - 2 * room) * (forward ? eased : 1 - eased);
+      // The leading car's place on the viaduct, kept inside it so the whole train stays on the deck (and does not jump at the turnaround).
+      const { lead, forward } = trainLead(q, room);
       const dir = forward ? 1 : -1;
       for (let slot = 0; slot < cars; slot += 1) {
         rail.frameAt(vu0 + (lead - dir * ((slot * length) / viaductLength)) * (vu1 - vu0), f);

@@ -1,0 +1,15 @@
+
+C:\estudo\Golpe\lab\projects\p07\scripts\a11y-reader.mjs
+  31:44  error  'document' is not defined  no-undef
+  34:11  error  'document' is not defined  no-undef
+  36:11  error  'document' is not defined  no-undef
+  38:60  error  'document' is not defined  no-undef
+  41:51  error  'document' is not defined  no-undef
+  48:19  error  'document' is not defined  no-undef
+  49:25  error  'document' is not defined  no-undef
+  50:91  error  'document' is not defined  no-undef
+
+✖ 8 problems (8 errors, 0 warnings)
+
+lint: exit 1
+check-fast: FAIL, run npm run lint and fix the first error

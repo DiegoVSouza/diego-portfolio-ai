@@ -281,6 +281,29 @@ export async function start(canvas: HTMLCanvasElement, options: SceneOptions): P
     schedule();
   };
 
+  /** The stop the camera is at (the nearest one). The menu follows this, so it always names what the screen shows. */
+  let shown = -1;
+  const announceShown = () => {
+    const now = Math.min(count - 1, Math.max(0, Math.round(cCur)));
+    if (now === shown) return;
+    shown = now;
+    canvas.dataset.shown = String(now);
+    window.dispatchEvent(new CustomEvent("scene-shown", { detail: now }));
+  };
+  /** The menu jumped more than one stop: the camera cuts to the stop instead of flying past every stop in between. */
+  const onCut = () => {
+    if (fixed) return;
+    select(rawIndex());
+    cCur = motion ? flightC() : Math.max(0, active);
+    vel = 0;
+    if (motion) {
+      glitch = 1;
+      shake = 0.6;
+    }
+    dirty = true;
+    schedule();
+  };
+
   let lastTravel = 1;
   const camPos = V3(0, 0, 0);
   const camLook = V3(0, 0, 0);
@@ -430,6 +453,7 @@ export async function start(canvas: HTMLCanvasElement, options: SceneOptions): P
     post.finish.uniforms.uTime!.value = motion ? time : 0;
     if (glitch > 0.05 && canvas.dataset.splitSeen !== "1") canvas.dataset.splitSeen = "1";
     poseCamera();
+    announceShown();
     updateCards();
     renderer.info.reset();
     post.composer.render();
@@ -478,6 +502,7 @@ export async function start(canvas: HTMLCanvasElement, options: SceneOptions): P
   observer.observe(document.body);
   window.addEventListener("scroll", onScroll, { passive: true });
   window.addEventListener("pointermove", onPointer);
+  window.addEventListener("scene-cut", onCut);
   document.addEventListener("visibilitychange", onVisibility);
   canvas.addEventListener("webglcontextlost", onLost);
 
@@ -503,6 +528,7 @@ export async function start(canvas: HTMLCanvasElement, options: SceneOptions): P
     observer.disconnect();
     window.removeEventListener("scroll", onScroll);
     window.removeEventListener("pointermove", onPointer);
+    window.removeEventListener("scene-cut", onCut);
     document.removeEventListener("visibilitychange", onVisibility);
     canvas.removeEventListener("webglcontextlost", onLost);
     scene.traverse((o) => {

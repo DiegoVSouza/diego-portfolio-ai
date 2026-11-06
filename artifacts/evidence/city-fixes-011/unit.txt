@@ -1,0 +1,9 @@
+
+ RUN  v5.0.5 C:/estudo/Golpe/lab/projects/p07
+
+
+ Test Files  9 passed (9)
+      Tests  81 passed (81)
+   Start at  17:00:16
+   Duration  5.38s (environment 76%, setup 13%, tests 6%, import 2%, transform 2%, worker 1%)
+
