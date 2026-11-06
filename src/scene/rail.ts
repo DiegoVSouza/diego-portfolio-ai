@@ -1,6 +1,6 @@
 import * as THREE from "three";
 import { V3 } from "./geometry";
-import { ROAD_EXTRA } from "./layout";
+import { MOUNT_SPEC, ROAD_EXTRA, boardMid, mountOf } from "./layout";
 
 /**
  * The camera rail. One stop per card; the camera flies a spline that passes exactly through the stops, and a second spline carries the
@@ -50,6 +50,8 @@ export const CARD_HEIGHT = 11.5;
  * across the street instead of standing in a row.
  */
 export const cardSide = (k: number): 1 | -1 => (k % 2 === 0 ? 1 : -1);
+/** Signed lateral distance of stop k's board from the avenue's middle (zero for a board that hangs over the avenue). */
+export const cardLateral = (k: number): number => cardSide(k) * MOUNT_SPEC[mountOf(k)].lateral;
 
 export function createRail(count: number): Rail {
   const n = Math.max(2, count);
@@ -95,8 +97,8 @@ export function createRail(count: number): Rail {
       tan.normalize();
       right.crossVectors(tan, up).normalize();
       // The board's middle (lateral CARD_LATERAL on its side), nudged toward the avenue by LOOK_SHIFT.
-      const lateral = k < n ? cardSide(k) * CARD_LATERAL + LOOK_SHIFT : 0;
-      return V3(g.x + right.x * lateral, CARD_HEIGHT, g.z + right.z * lateral);
+      const lateral = k < n ? cardLateral(k) + LOOK_SHIFT : 0;
+      return V3(g.x + right.x * lateral, k < n ? boardMid(k) : CARD_HEIGHT, g.z + right.z * lateral);
     }),
     false,
     "catmullrom",
@@ -116,8 +118,8 @@ export function createRail(count: number): Rail {
     },
     cardAnchor(k, out, frame) {
       const f = frameOf((k + CARD_AHEAD) / total, frame ?? stopFrame);
-      tmp.copy(f.p).addScaledVector(f.R, CARD_LATERAL * cardSide(k));
-      return out.set(tmp.x, CARD_HEIGHT, tmp.z);
+      tmp.copy(f.p).addScaledVector(f.R, cardLateral(k));
+      return out.set(tmp.x, boardMid(k), tmp.z);
     },
   };
 }

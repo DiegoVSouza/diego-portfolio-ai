@@ -1,7 +1,7 @@
 import * as THREE from "three";
 import { V3, bar, fit, mergeGeometries, tick, tint } from "./geometry";
 import { loadModel } from "./loaders";
-import { BOARD_BEAM_DEPTH, BOARD_BEAM_Z, BOARD_POST_DEPTH, BOARD_POST_Z, ROAD_EXTRA, trainLead } from "./layout";
+import { BOARD_BEAM_DEPTH, BOARD_BEAM_Z, BOARD_POST_DEPTH, BOARD_POST_Z, BOARD_WIDTH, MOUNT_SPEC, ROAD_EXTRA, mountOf, trainLead } from "./layout";
 import { cardSide, type Frame, type Rail } from "./rail";
 import { truckFallback } from "./symbols";
 import type { Palette } from "./tokens";
@@ -47,12 +47,10 @@ export interface World {
 }
 
 /** World width of a board, in units, before it is fitted to its card; the board is never taller than BOARD_MAX_HEIGHT. */
-export const BILLBOARD_WIDTH = 25;
+export const BILLBOARD_WIDTH = BOARD_WIDTH;
 /** Height over width: the card is 640 by 460 px (src/styles/site.css), so the board has the same proportions. */
 const BILLBOARD_RATIO = 460 / 640;
 const BOARD_MAX_HEIGHT = 30;
-/** The board's lower edge above the street. */
-const BOARD_BOTTOM = 2.5;
 
 type Part = THREE.BufferGeometry;
 
@@ -233,6 +231,8 @@ export async function buildWorld(c: WorldContext): Promise<World> {
       const x = f.p.x + f.R.x * s * lat;
       const z = f.p.z + f.R.z * s * lat + (rnd() - 0.5) * 5;
       const ry = yaw(f.T);
+      // A tower must not pierce the building a board hangs on (wall and roof mounts stand beside the avenue ahead of their stop).
+      if (stops.some((_, k) => mountOf(k) !== "post" && cardSide(k) === s && Math.abs(uPick - rail.u(k, 0.45)) * rail.length < 30 + dd / 2)) continue;
       if (o.clear !== false && crossUs.some((cu) => Math.abs(uPick - cu) * rail.length < CROSS_HALF + SIDEWALK + Math.max(dd, 9) / 2 + 3)) continue;
       n += 1;
       if (o.realEvery && (n - 1) % o.realEvery === 0 && landmark(d, x, z, -f.R.x * s, -f.R.z * s, h)) {
@@ -775,26 +775,41 @@ export async function buildWorld(c: WorldContext): Promise<World> {
     group.add(panel, ...posts, ...beams);
     scene.add(group);
     const board: Board = { group, panel, posts, beams, repaint: painted.paint, width: 1, height: 1 };
-    fitBoard(board, BILLBOARD_WIDTH, BILLBOARD_RATIO);
+    const mount = mountOf(k);
+    fitBoard(board, BILLBOARD_WIDTH, BILLBOARD_RATIO, MOUNT_SPEC[mount].bottom, mount);
+    // A wall or a roof mount stands on a building: its footprint is behind the board (local -z is along the avenue, away from the camera).
+    if (mount !== "post") {
+      const bottom = MOUNT_SPEC[mount].bottom;
+      const depth = mount === "roof" ? 16 : 24;
+      const height = mount === "roof" ? bottom : bottom + board.height + (mount === "wall" ? 9 : 22);
+      const back = 1 + depth / 2;
+      const ry = group.rotation.y;
+      solid(stops[k]!.district, board.width + 2, height, depth, anchor.x - Math.sin(ry) * back, 0, anchor.z - Math.cos(ry) * back, ry, mount === "roof" ? grey(0.26) : grey(0.2));
+      // A beacon on the corner of the wall, a red band under the roof board.
+      beacon(anchor.x - Math.sin(ry) * back, height + 0.4, anchor.z - Math.cos(ry) * back);
+    }
     return board;
   });
-  function fitBoard(b: Board, baseWidth: number, ratio: number) {
+  function fitBoard(b: Board, baseWidth: number, ratio: number, bottom: number, mount: "facade" | "wall" | "roof" | "post") {
     // Keep the card's proportions; a tall card makes a narrower board so it never grows past the screen.
     const h = Math.min(BOARD_MAX_HEIGHT, baseWidth * ratio);
     const w = h / ratio;
     b.width = w;
     b.height = h;
-    const mid = BOARD_BOTTOM + h / 2;
+    const mid = bottom + h / 2;
     b.panel.scale.set(w, h, 1);
     b.panel.position.set(0, mid, 0);
+    // Posts run from the ground (post) or from the roof (roof); a wall or facade mount has none, the wall holds the board.
+    const footing = mount === "roof" ? bottom : 0;
     b.posts.forEach((post, i) => {
       const side = i ? 1 : -1;
-      post.scale.set(0.7, BOARD_BOTTOM + h, BOARD_POST_DEPTH);
-      post.position.set(side * (w / 2 + 0.35), (BOARD_BOTTOM + h) / 2, BOARD_POST_Z);
+      post.visible = mount === "post" || mount === "roof";
+      post.scale.set(0.7, bottom + h - footing, BOARD_POST_DEPTH);
+      post.position.set(side * (w / 2 + 0.35), footing + (bottom + h - footing) / 2, BOARD_POST_Z);
     });
     b.beams.forEach((beam, i) => {
       beam.scale.set(w + 1.4, 0.6, BOARD_BEAM_DEPTH);
-      beam.position.set(0, i ? BOARD_BOTTOM + h + 0.3 : BOARD_BOTTOM - 0.3, BOARD_BEAM_Z);
+      beam.position.set(0, i ? bottom + h + 0.3 : bottom - 0.3, BOARD_BEAM_Z);
     });
     b.group.updateMatrixWorld(true);
   }

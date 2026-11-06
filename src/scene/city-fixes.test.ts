@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import * as THREE from "three";
-import { BOARD_PANEL_Z, ROAD_EXTRA, frameFront, trainLead } from "./layout";
+import { BOARD_PANEL_Z, BOARD_WIDTH, MOUNT_SPEC, ROAD_EXTRA, boardMid, frameFront, mountOf, trainLead } from "./layout";
 import { createRail } from "./rail";
 
 describe("shuttle train", () => {
@@ -47,5 +47,27 @@ describe("rail", () => {
     const end = rail.frameAt(1).p;
     // The camera at the last stop is about ROAD_EXTRA stops of street away from the end of the road.
     expect(pos.distanceTo(end)).toBeGreaterThan(80 * ROAD_EXTRA);
+  });
+});
+
+describe("board mounts", () => {
+  it("hang the cards in more than one kind of place, and not all on posts", () => {
+    const kinds = new Set(Array.from({ length: 10 }, (_, k) => mountOf(k)));
+    expect(kinds.size).toBe(4);
+    expect(Array.from({ length: 10 }, (_, k) => mountOf(k)).filter((m) => m === "post").length).toBeLessThanOrEqual(2);
+  });
+  it("keeps building mounts clear of the avenue", () => {
+    for (const m of ["facade", "wall", "roof"] as const) {
+      expect(MOUNT_SPEC[m].lateral - BOARD_WIDTH / 2 - 1).toBeGreaterThan(12);
+    }
+  });
+  it("points the camera at the middle of each board", () => {
+    const rail = createRail(10);
+    const look = new THREE.Vector3();
+    const pos = new THREE.Vector3();
+    for (let k = 0; k < 10; k += 1) {
+      rail.pose(k, pos, look);
+      expect(look.y).toBeCloseTo(boardMid(k), 5);
+    }
   });
 });

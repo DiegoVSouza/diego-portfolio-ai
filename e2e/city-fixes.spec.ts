@@ -43,3 +43,20 @@ test("the street goes on past the last stop and the scene still draws", async ({
   await page.screenshot({ path: `${evidence}/last-stop.png` });
   expect(Number(await canvas.getAttribute("data-at-origin"))).toBe(0);
 });
+
+test("the cards hang in different places: every stop is reachable and drawn, saved as evidence", async ({ page }) => {
+  await page.setViewportSize({ width: 1280, height: 800 });
+  await page.goto("/");
+  const canvas = page.locator("canvas.scene");
+  await expect(canvas).toHaveAttribute("data-scene", "3d", { timeout: 20_000 });
+  for (let k = 1; k <= 9; k += 1) {
+    await page.keyboard.press("j");
+    await expect.poll(() => canvas.getAttribute("data-shown"), { timeout: 8000 }).toBe(String(k));
+    // A key is ignored while a flight lasts, so wait for it to end before the next press.
+    await expect.poll(() => page.evaluate(() => document.documentElement.dataset.flight ?? ""), { timeout: 8000 }).toBe("");
+    await expect(page.locator(".stop-card[data-near='1']")).toHaveCount(1, { timeout: 8000 });
+    await page.waitForTimeout(600);
+    await page.screenshot({ path: `${evidence}/stop-${k}.png` });
+  }
+  expect(Number(await canvas.getAttribute("data-at-origin"))).toBe(0);
+});

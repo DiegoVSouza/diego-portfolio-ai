@@ -13,3 +13,10 @@ Source: the owner's review of the deployed 3D home, in their own words (pt-BR, p
 | C7 | The square at the end is lifeless; maybe just continue the street. | The harbour sits 0.55 stops past the last stop. | The avenue continues three more stops past the last stop with towers, cross streets and traffic; the harbour moves to the far end of the road. |
 
 Out of scope: copy changes, new assets, deploy (needs owner go).
+
+## Addendum (owner follow-up)
+
+| # | Complaint | Change | Acceptance |
+| --- | --- | --- | --- |
+| C3b | The lamp posts (not the board posts) stand behind the card but in front of the sign. | Lamps are left out between the camera and a board. | No lamp in the line to a board (e2e screenshots). |
+| C8 | Every section is still a billboard on the street. | Boards use four mounts: facade (street level) and wall (high) on the end wall of a building, on a roof, on posts (`mountOf`). Camera look-at follows each board's height. | `mountOf` yields four kinds, at most 2 of 10 on posts; stop screenshots `stop-1..9.png` show wall and roof mounts. |

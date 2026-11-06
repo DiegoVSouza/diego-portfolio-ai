@@ -388,6 +388,7 @@ export async function start(canvas: HTMLCanvasElement, options: SceneOptions): P
       const hide = () => {
         if (el.dataset.shown !== "0") {
           el.dataset.shown = "0";
+          delete el.dataset.near;
           put(el, "--o", "0");
           el.inert = true;
         }
