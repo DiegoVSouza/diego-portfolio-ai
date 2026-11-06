@@ -30,26 +30,5 @@ Running 24 tests using 1 worker
 [21/24] e2e\v2.spec.ts:169:1 › travelling: the camera parks on each card, swings between stops, and each card hangs in its own part of the city
 [22/24] e2e\v2.spec.ts:203:1 › travelling under reduced motion: no swing, no events, the scroll still reaches every stop
 [23/24] e2e\v2.spec.ts:223:1 › the scene is built from the real downloaded models, not the fallbacks (assets: buildings, cars, metro stations)
-  1) e2e\v2.spec.ts:223:1 › the scene is built from the real downloaded models, not the fallbacks (assets: buildings, cars, metro stations) 
-
-    Error: expect(received).toBeLessThanOrEqual(expected)
-
-    Expected: <= 100
-    Received:    164
-
-      238 |   await expect.poll(async () => canvas.getAttribute("data-train"), { timeout: 15_000 }).toBe("kenney");
-      239 |   // The city stays inside its draw-call budget (phase 005: at most 100 on the first frame).
-    > 240 |   expect(Number(await canvas.getAttribute("data-draws"))).toBeLessThanOrEqual(100);
-          |                                                           ^
-      241 |   // No model fell back to a generated one: a fallback logs a warning.
-      242 |   expect(problems.filter((p) => /did not load/.test(p))).toEqual([]);
-      243 |   // Nothing sits at the origin (the known stacking bug) and the scene is not empty.
-        at C:\estudo\Golpe\lab\projects\p07\e2e\v2.spec.ts:240:59
-
-    Error Context: test-results\v2-the-scene-is-built-from-93781-ldings-cars-metro-stations-\error-context.md
-
-
 [24/24] e2e\v2.spec.ts:247:1 › the CC BY credit for the metro station is on every page, with links to the pack and to the licence
-  1 failed
-    e2e\v2.spec.ts:223:1 › the scene is built from the real downloaded models, not the fallbacks (assets: buildings, cars, metro stations) 
-  23 passed (1.2m)
+  24 passed (1.3m)

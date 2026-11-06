@@ -825,58 +825,58 @@ export async function buildWorld(c: WorldContext): Promise<World> {
     const g = b.group;
     const w = b.width;
     const top = bottom + b.height;
-    const box = (mat: THREE.Material, sx: number, sy: number, sz: number, x: number, y: number, z: number) => {
-      const m = new THREE.Mesh(unitBox, mat);
-      m.scale.set(sx, sy, sz);
-      m.position.set(x, y, z);
-      g.add(m);
-      return m;
+    // Everything is merged: three meshes per billboard (steel, lamps and bulbs, light cones), so the draw-call budget holds.
+    const steel: Part[] = [];
+    const lit: Part[] = [];
+    const glow: Part[] = [];
+    const place = (geo: Part, x: number, y: number, z: number, sx = 1, sy = 1, sz = 1, quat?: THREE.Quaternion): Part => {
+      dummy.position.set(x, y, z);
+      dummy.scale.set(sx, sy, sz);
+      dummy.rotation.set(0, 0, 0);
+      if (quat) dummy.quaternion.copy(quat);
+      dummy.updateMatrix();
+      return geo.clone().applyMatrix4(dummy.matrix);
     };
-    // Bulbs along the top and bottom beams, one draw call.
+    const cube = new THREE.BoxGeometry(1, 1, 1);
+    // Bulbs along the top and bottom beams.
     const bulbCount = Math.max(6, Math.round(w / 2.4));
-    const bulbs = new THREE.InstancedMesh(unitBox, lampMat, bulbCount * 2);
     for (let i = 0; i < bulbCount; i += 1) {
-      for (const [row, y] of [[0, top + 0.3], [1, bottom - 0.3]] as const) {
-        dummy.position.set(-w / 2 - 0.3 + ((i + 0.5) / bulbCount) * (w + 0.6), y, -0.05);
-        dummy.rotation.set(0, 0, 0);
-        dummy.scale.set(0.34, 0.34, 0.3);
+      for (const y of [top + 0.3, bottom - 0.3]) lit.push(place(cube, -w / 2 - 0.3 + ((i + 0.5) / bulbCount) * (w + 0.6), y, -0.05, 0.34, 0.34, 0.3));
+    }
+    if (kind !== "under") {
+      // Floodlights over the top edge, lighting the face.
+      const lamps = Math.max(3, Math.round(w / 6));
+      const coneH = Math.min(11, b.height * 0.7);
+      const tilt = new THREE.Quaternion().setFromAxisAngle(V3(1, 0, 0), Math.atan(2.4 / coneH));
+      for (let i = 0; i < lamps; i += 1) {
+        const x = -w / 2 + ((i + 0.5) / lamps) * w;
+        steel.push(place(cube, x, top + 0.7, 1.2, 0.22, 0.22, 2.4));
+        lit.push(place(cube, x, top + 0.55, 2.4, 0.9, 0.5, 0.9));
+        // The cone's apex is at the lamp: tilt it about the lamp, then lay it down toward the face.
+        const cone = new THREE.ConeGeometry(Math.min(3.4, w / lamps / 2 + 0.6), coneH, 14, 1, true).translate(0, -coneH / 2, 0);
+        dummy.position.set(x, top + 0.4, 2.4);
+        dummy.scale.set(1, 1, 1);
+        dummy.quaternion.copy(tilt);
         dummy.updateMatrix();
-        bulbs.setMatrixAt(row * bulbCount + i, dummy.matrix);
+        glow.push(cone.applyMatrix4(dummy.matrix));
+      }
+      // Catwalk under the face, with a rail.
+      steel.push(place(cube, 0, bottom - 0.55, 1, w + 2, 0.25, 1.9));
+      steel.push(place(cube, 0, bottom + 0.55, 1.9, w + 2, 0.12, 0.12));
+      for (const x of [-w / 2 - 0.9, -w / 6, w / 6, w / 2 + 0.9]) steel.push(place(cube, x, bottom, 1.9, 0.12, 1.1, 0.12));
+      // A brace behind each end, from the ground (or the roof) up to the top beam.
+      const footing = kind === "roof" ? bottom : 0;
+      for (const x of [-w / 3, w / 3]) {
+        const from = V3(x, footing, -4);
+        const to = V3(x, top, -0.7);
+        const mid = from.clone().add(to).multiplyScalar(0.5);
+        const quat = new THREE.Quaternion().setFromUnitVectors(V3(0, 0, 1), to.clone().sub(from).normalize());
+        steel.push(place(cube, mid.x, mid.y, mid.z, 0.3, 0.3, from.distanceTo(to), quat));
       }
     }
-    g.add(bulbs);
-    if (kind === "under") return;
-    // Floodlights over the top edge, lighting the face.
-    const lamps = Math.max(3, Math.round(w / 6));
-    const coneH = Math.min(11, b.height * 0.7);
-    for (let i = 0; i < lamps; i += 1) {
-      const x = -w / 2 + ((i + 0.5) / lamps) * w;
-      box(steelMat, 0.22, 0.22, 2.4, x, top + 0.7, 1.2);
-      box(lampMat, 0.9, 0.5, 0.9, x, top + 0.55, 2.4);
-      const pivot = new THREE.Object3D();
-      pivot.position.set(x, top + 0.4, 2.4);
-      pivot.rotation.x = Math.atan(2.4 / coneH);
-      const cone = new THREE.Mesh(new THREE.ConeGeometry(Math.min(3.4, w / lamps / 2 + 0.6), coneH, 14, 1, true), glowMat);
-      cone.position.y = -coneH / 2;
-      pivot.add(cone);
-      g.add(pivot);
-    }
-    // Catwalk under the face, with a rail.
-    box(steelMat, w + 2, 0.25, 1.9, 0, bottom - 0.55, 1);
-    box(steelMat, w + 2, 0.12, 0.12, 0, bottom + 0.55, 1.9);
-    for (const x of [-w / 2 - 0.9, -w / 6, w / 6, w / 2 + 0.9]) box(steelMat, 0.12, 1.1, 0.12, x, bottom, 1.9);
-    // A brace behind each end, from the ground (or the roof) up to the top beam.
-    const footing = kind === "roof" ? bottom : 0;
-    for (const x of [-w / 3, w / 3]) {
-      const from = V3(x, footing, -4);
-      const to = V3(x, top, -0.7);
-      const brace = new THREE.Mesh(unitBox, steelMat);
-      const len = from.distanceTo(to);
-      brace.scale.set(0.3, 0.3, len);
-      brace.position.copy(from).add(to).multiplyScalar(0.5);
-      brace.quaternion.setFromUnitVectors(V3(0, 0, 1), to.clone().sub(from).normalize());
-      g.add(brace);
-    }
+    if (steel.length) g.add(new THREE.Mesh(mergeGeometries(steel)!, steelMat));
+    g.add(new THREE.Mesh(mergeGeometries(lit)!, lampMat));
+    if (glow.length) g.add(new THREE.Mesh(mergeGeometries(glow)!, glowMat));
   };
   const boards: Board[] = stops.map((_, k) => {
     rail.cardAnchor(k, anchor);
