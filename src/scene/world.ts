@@ -826,7 +826,7 @@ export async function buildWorld(c: WorldContext): Promise<World> {
    * (the deck is right over it).
    */
   const lampMat = new THREE.MeshBasicMaterial({ color: p.paper });
-  const glowMat = new THREE.MeshBasicMaterial({ color: p.paper, transparent: true, opacity: 0.17, blending: THREE.AdditiveBlending, depthWrite: false, side: THREE.DoubleSide });
+  const glowMat = new THREE.MeshBasicMaterial({ color: p.paper, transparent: true, opacity: 0.04, blending: THREE.AdditiveBlending, depthWrite: false, side: THREE.DoubleSide });
   const steelMat = new THREE.MeshBasicMaterial({ color: grey(0.32) });
   const dress = (b: Board, kind: string, bottom: number) => {
     const g = b.group;
@@ -883,7 +883,11 @@ export async function buildWorld(c: WorldContext): Promise<World> {
     }
     if (steel.length) g.add(new THREE.Mesh(mergeGeometries(steel)!, steelMat));
     g.add(new THREE.Mesh(mergeGeometries(lit)!, lampMat));
-    if (glow.length) g.add(new THREE.Mesh(mergeGeometries(glow)!, glowMat));
+    if (glow.length) {
+      const beams = new THREE.Mesh(mergeGeometries(glow)!, glowMat);
+      beams.layers.enable(1);
+      g.add(beams);
+    }
   };
   const boards: Board[] = stops.map((_, k) => {
     rail.cardAnchor(k, anchor);
@@ -982,7 +986,7 @@ export async function buildWorld(c: WorldContext): Promise<World> {
   });
 
   /* ---------- the fleet and the station: models that load after the first frame ---------- */
-  type Fleet = { mesh: THREE.InstancedMesh; n: number; base: number; lift: number };
+  type Fleet = { mesh: THREE.InstancedMesh; wheels?: THREE.InstancedMesh; n: number; base: number; lift: number };
   let fleet: Fleet[] | null = null;
   let kindsLoaded = 0;
   const VEHICLES = 13;
@@ -1009,7 +1013,19 @@ export async function buildWorld(c: WorldContext): Promise<World> {
       const tones = [p.red, p.paper, grey(0.17), p.red];
       for (let i = 0; i < k.n; i += 1) mesh.setColorAt(i, col.copy(tones[(i + base) % 4]!));
       scene.add(mesh);
-      const entry = { mesh, n: k.n, base, lift: k.lift };
+      // The S64 source contains a body shell only. Fill its four wheel arches with dark wheels.
+      let wheels: THREE.InstancedMesh | undefined;
+      if (cars[1] && k.g === cars[1]) {
+        const wheelParts: THREE.BufferGeometry[] = [];
+        for (const x of [-1.36, 1.36]) for (const z of [-2.47, 2.52]) {
+          wheelParts.push(new THREE.CylinderGeometry(0.53, 0.53, 0.35, 12).rotateZ(Math.PI / 2).translate(x, -0.72, z));
+        }
+        wheels = new THREE.InstancedMesh(mergeGeometries(wheelParts)!, new THREE.MeshStandardMaterial({ color: p.ink, flatShading: true, roughness: 0.9 }), k.n);
+        wheels.frustumCulled = false;
+        wheels.layers.enable(1);
+        scene.add(wheels);
+      }
+      const entry: Fleet = { mesh, wheels, n: k.n, base, lift: k.lift };
       base += k.n;
       return entry;
     });
@@ -1083,8 +1099,10 @@ export async function buildWorld(c: WorldContext): Promise<World> {
           dummy.scale.setScalar(1);
           dummy.updateMatrix();
           k.mesh.setMatrixAt(i, dummy.matrix);
+          k.wheels?.setMatrixAt(i, dummy.matrix);
         }
         k.mesh.instanceMatrix.needsUpdate = true;
+        if (k.wheels) k.wheels.instanceMatrix.needsUpdate = true;
       }
     }
     // Two trains, one on each track, shuttle along the viaduct: each eases to a stop at an end, waits, and comes back with the other

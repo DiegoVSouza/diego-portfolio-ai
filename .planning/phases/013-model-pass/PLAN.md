@@ -29,3 +29,5 @@ Owner requested improvements to the remaining generated models and the world ove
 Follow-up: add a faint non-interactive light wash above the projected HTML card, which otherwise covers the WebGL billboard lights. Restrict it to the 3D stage and retain the projected card transform.
 
 Follow-up: render traffic in a transparent foreground layer, clipped to the camera-facing side of the active billboard plane, while keeping card controls clickable. Preserve renderer cleanup, resizing and first-frame budget; test crossing and scene lifecycle.
+
+Follow-up: repair the wheel-less S64 body with four instanced low-poly wheels and render the actual billboard light cones above the projected card using the foreground layer. Validate the wheel geometry, light compositing, scene budget and screenshots.

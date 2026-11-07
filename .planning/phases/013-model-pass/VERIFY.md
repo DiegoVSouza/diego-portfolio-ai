@@ -11,3 +11,5 @@ Evidence: `artifacts/evidence/model-pass-013/run-log.md` and `artifacts/evidence
 Technical acceptance: PARTIAL. Agent visual acceptance: PARTIAL. Human acceptance: PENDING. Other model groups remain PENDING.
 
 World follow-up: procedural tower and lamp geometry refined; 90 unit and 24 browser tests passed, lint and audit passed. Evidence and limitations: `artifacts/evidence/model-pass-013/world-pass.md`. Full gate remains blocked by unrelated phase 010 lint errors.
+
+S64/floodlight correction: four separate low-poly wheels added to the wheel-less S64 source, and actual floodlight cones rendered over the card. Full gate passed (90 unit, 64 browser); see `artifacts/evidence/model-pass-013/fix-wheel-light.md` for visual evidence and limits. Human review remains pending.
