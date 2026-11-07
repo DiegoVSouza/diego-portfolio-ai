@@ -1,8 +1,10 @@
 import * as THREE from "three";
-import { V3, bar, fit, groundLift, mergeGeometries, tick, tint } from "./geometry";
+import { V3, bar, fit, groundLift, mergeGeometries, rng, tick, tint } from "./geometry";
 import { VIADUCT_OFFSET, clearRun, obbOverlap, viaductSegments } from "./corridor";
+import { fadeMaterial } from "./fade";
+import { FAR_FADE, skylineBlocks } from "./horizon";
 import { loadModel } from "./loaders";
-import { BOARD_BEAM_DEPTH, BOARD_BEAM_Z, BOARD_POST_DEPTH, BOARD_POST_Z, BOARD_WIDTH, ROAD_EXTRA, TRAIN_CAR_SPACING, shotOf, trafficAt, trainLead } from "./layout";
+import { BOARD_BEAM_DEPTH, BOARD_BEAM_Z, BOARD_POST_DEPTH, BOARD_POST_Z, BOARD_WIDTH, ROAD_EXTRA, SURROUNDINGS, TRAIN_CAR_SPACING, shotOf, trafficAt, trainLead } from "./layout";
 import { cardSide, type Frame, type Rail } from "./rail";
 import { truckFallback } from "./symbols";
 import type { Palette } from "./tokens";
@@ -760,6 +762,34 @@ export async function buildWorld(c: WorldContext): Promise<World> {
     for (let row = 0; row < 4; row += 1) for (let col = 0; col < 2; col += 1) {
       solid(5, 5, 3, 7, shipX + (col ? 3 : -3), 4.2 + (row % 2 ? 3 : 0), shipZ - 14 + row * 8, 0, deck[(row + col) % deck.length]!, false);
     }
+  }
+
+  /* ---------- the surroundings: two rings of dark silhouettes past the streets, so the world does not end in a void ---------- */
+  if (SURROUNDINGS) {
+    // Its own random source: the town's skyline above does not change when the surroundings are switched on or off.
+    const blocks = skylineBlocks(rail, rng(23), { shoreZ });
+    const boxes = (layer: "near" | "far", tone: () => THREE.Color, windows: boolean): Part[] =>
+      blocks.filter((b) => b.layer === layer).map((b) => {
+        const g = new THREE.BoxGeometry(b.w, b.h, b.d);
+        const uv = g.attributes.uv!;
+        for (let i = 0; i < uv.count; i += 1) {
+          const side = Math.floor(i / 4);
+          if (!windows || side === 2 || side === 3) uv.setXY(i, 0.02, 0.02);
+          else uv.setXY(i, (uv.getX(i) * (side < 2 ? b.d : b.w)) / 3.2, (uv.getY(i) * b.h) / 4);
+        }
+        g.rotateY(b.ry);
+        g.translate(b.x, b.h / 2, b.z);
+        auditBoxes.push({ kind: `skyline-${layer}`, x: b.x, z: b.z, w: b.w, d: b.d, ry: b.ry, y0: 0, y1: b.h });
+        return tint(g, tone());
+      });
+    // The near ring is inside the fog and fades with it. The far ring stands near the camera's far plane, where the fog has long since
+    // turned everything to the background: it is drawn without fog and fades to the background by distance instead.
+    const nearMesh = new THREE.Mesh(mergeGeometries(boxes("near", () => grey(0.1 + rnd() * 0.08), true))!, windowMat);
+    nearMesh.name = "skyline-near";
+    const farMaterial = fadeMaterial(p.ink, FAR_FADE.start, FAR_FADE.end);
+    const farMesh = new THREE.Mesh(mergeGeometries(boxes("far", () => p.mix(p.ink, p.dred, 0.16 + rnd() * 0.1), false))!, farMaterial);
+    farMesh.name = "skyline-far";
+    scene.add(nearMesh, farMesh);
   }
 
   /* ---------- one billboard per stop: the card's place in the city ---------- */

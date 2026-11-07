@@ -25,6 +25,9 @@ export const BOARD_BEAM_DEPTH = 0.6;
 /** The frame's nearest face to the camera (the largest z of any frame part). It must stay behind the panel. */
 export const frameFront = (): number => Math.max(BOARD_POST_Z + BOARD_POST_DEPTH / 2, BOARD_BEAM_Z + BOARD_BEAM_DEPTH / 2);
 
+/** The silhouette rings past the streets (horizon.ts). One switch: `false` gives back the city without its surroundings. */
+export const SURROUNDINGS = true;
+
 /** Stops of plain avenue added after the last stop, so the street goes on instead of ending at a square. */
 export const ROAD_EXTRA = 3;
 
