@@ -95,7 +95,7 @@ A) deixar. B) alongar a neblina só nos dois últimos stops (fim em 380). C) apr
 **D3. O céu.** Hoje `ink` chapado.
 A) manter. B) faixa de brilho vermelho baixo no horizonte (+1 draw call). C) degradê `ink` → `ink-2` acima do horizonte.
 
-**D4. A estação de metrô.** Escala do modelo 1,15 contra trens de escala 5,2: cada trem tem 7,0 de largura e a estação inteira 9,0, então os trens passam por dentro dela (candidato forte; os testes de caixa mostram 120 sobreposições estação × convés e até 4,8 de penetração planar com os carros; não foi feito teste de malha).
+**D4. A estação de metrô.** Escala do modelo 1,15 contra trens de escala 5,2: cada trem tem 7,0 de largura e a estação inteira 9,0, então os trens passam por dentro dela (**confirmado em malha** com o Blender MCP, `artifacts/evidence/world-direction-016/blender-station.json`: 2.938 triângulos da estação contra os três modelos de vagão, vagão deslizado por 401 posições; faixa -3,7 sem interseção, faixa +3,7 com interseção em 83 posições e 635 a 792 pares de triângulos. A estação invade uma das duas vias; deslocá-la lateralmente não resolve, porque o vagão tem 7,0 de largura num convés de 14).
 A) remover a estação. B) escalar a estação para o tamanho dos trens (cerca de 5×: 125 de comprimento, 22 de largura; domina o stop 5). C) trocar por uma plataforma procedural baixa ao lado dos trilhos (sem licença CC-BY, sem crédito no rodapé).
 
 ## 8. Limites desta análise

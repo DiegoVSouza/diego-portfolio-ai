@@ -28,7 +28,7 @@ The first `check_fast.py` attempt failed at `flow:check` (`check-fast-first-atte
 | Id | Result |
 |---|---|
 | A1 sampling | met: 9 forward legs, 9 backward legs, 3 menu cuts, wheel down and up, arrow key, reduced motion, frame by frame |
-| A2 map and candidates | met with limits: oriented boxes for generated solids, approximate boxes for imported landmarks (11), instanced models by exact oriented bounds. Station against trains is **open** (box overlap plus scale arithmetic, no mesh-level test) |
+| A2 map and candidates | met with limits: oriented boxes for generated solids, approximate boxes for imported landmarks (11), instanced models by exact oriented bounds. Station against trains: **confirmed at mesh level** with Blender MCP (`blender-station.json`: 83 of 401 slide positions overlap on one track, 635 to 792 triangle pairs); the fix is an art choice, owner decision D4 |
 | A3 fixes with tests | met for six defects (see FINDINGS); each has a test, except the render-loop doubling whose test covers the scheduler, not the whole scene |
 | A4 cards | met: no cone on the card layer, one near card, controls reach the click, traffic canvas inert |
 | A5 plan | met: `docs/world/SURROUNDINGS-PLAN.pt-BR.md` with region map, annotated captures, models, budget, steps and decisions |
@@ -39,5 +39,5 @@ The first `check_fast.py` attempt failed at `flow:check` (`check-fast-first-atte
 
 - The world is **not** declared collision-free: sampled frames and boxes only; imported landmarks and the station are approximate.
 - No claim about devices, slow GPUs or long sessions.
-- Blender MCP was not connected (port 9876 down); no open Blender scene was used or changed.
+- Blender MCP was down during the main run. Afterwards it was used once, for the station mesh test only (the open scene was the default cube scene; imports were removed, no leftover objects). The other findings were not re-run in Blender.
 - Art acceptance: pending the owner (decisions D1 to D4 in the plan).

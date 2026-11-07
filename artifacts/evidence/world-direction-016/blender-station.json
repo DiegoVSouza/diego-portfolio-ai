@@ -1,0 +1,130 @@
+{
+ "station_local_box": {
+  "x": [
+   -0.45220330357551575,
+   24.54767417907715
+  ],
+  "y": [
+   -1.0000152587890625,
+   3.2001006603240967
+  ],
+  "z": [
+   -4.175027370452881,
+   3.612826347351074
+  ],
+  "tris": 2938
+ },
+ "station_world_box": {
+  "x": [
+   -4.154750347137451,
+   4.801281452178955
+  ],
+  "y": [
+   12.949982643127441,
+   17.780115127563477
+  ],
+  "z": [
+   -14.32003402709961,
+   14.429824829101562
+  ]
+ },
+ "cars": {
+  "train-subway-a.glb": {
+   "local_box_scaled": {
+    "x": [
+     -3.509999990463257,
+     3.509999990463257
+    ],
+    "y": [
+     0,
+     8.170217514038086
+    ],
+    "z": [
+     -6.760000228881836,
+     6.760000228881836
+    ]
+   },
+   "lanes": [
+    {
+     "lane": -3.7,
+     "overlapping_positions": 0,
+     "of": 401,
+     "first_dz": null,
+     "max_triangle_pairs": 0
+    },
+    {
+     "lane": 3.7,
+     "overlapping_positions": 83,
+     "of": 401,
+     "first_dz": -20.5,
+     "max_triangle_pairs": 792
+    }
+   ]
+  },
+  "train-subway-b.glb": {
+   "local_box_scaled": {
+    "x": [
+     -2.859999656677246,
+     2.859999656677246
+    ],
+    "y": [
+     0,
+     8.170217514038086
+    ],
+    "z": [
+     -6.760000228881836,
+     6.760000228881836
+    ]
+   },
+   "lanes": [
+    {
+     "lane": -3.7,
+     "overlapping_positions": 0,
+     "of": 401,
+     "first_dz": null,
+     "max_triangle_pairs": 0
+    },
+    {
+     "lane": 3.7,
+     "overlapping_positions": 83,
+     "of": 401,
+     "first_dz": -20.5,
+     "max_triangle_pairs": 635
+    }
+   ]
+  },
+  "train-subway-c.glb": {
+   "local_box_scaled": {
+    "x": [
+     -3.509999990463257,
+     3.509999990463257
+    ],
+    "y": [
+     0,
+     8.170217514038086
+    ],
+    "z": [
+     -6.759999752044678,
+     6.759999752044678
+    ]
+   },
+   "lanes": [
+    {
+     "lane": -3.7,
+     "overlapping_positions": 0,
+     "of": 401,
+     "first_dz": null,
+     "max_triangle_pairs": 0
+    },
+    {
+     "lane": 3.7,
+     "overlapping_positions": 83,
+     "of": 401,
+     "first_dz": -20.5,
+     "max_triangle_pairs": 727
+    }
+   ]
+  }
+ },
+ "leftover_objects": []
+}
