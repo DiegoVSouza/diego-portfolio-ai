@@ -1,7 +1,7 @@
 import type { Text } from "colagem-ui";
 
 /**
- * Career facts from the owner's CV, rewritten in English as a DRAFT until the owner reviews it.
+ * Career facts from the owner's CV (Diego_Souza_AI_Engineer_EVT_PT.docx, text approved by the owner on 2026-11-06), rewritten in English.
  * Everything here is career history, the owner's own statement. None of it is a measured result,
  * and no number elsewhere on the site may come from this file. The contact phone and WhatsApp link are published on purpose.
  */
@@ -16,8 +16,8 @@ export const profile = {
   linkedin: "https://www.linkedin.com/in/diegovsouza99",
   github: "https://github.com/DiegoVSouza",
   summary: {
-    en: "4 years of software engineering, 2+ years with generative AI, 1+ year in production. I build AI agents and integrate Claude and OpenAI models into systems through REST APIs, webhooks and tool use, with Python, RAG on pgvector, LangChain, LangGraph and MCP, on AWS.",
-    pt: "4 anos de engenharia de software, mais de 2 anos com IA generativa, mais de 1 ano em produção. Construo agentes de IA e integro modelos Claude e OpenAI a sistemas por APIs REST, webhooks e tool use, com Python, RAG em pgvector, LangChain, LangGraph e MCP, na AWS.",
+    en: "4 years of software engineering, 2+ years with generative AI, 1+ year in production. I build AI agents and integrate Claude and OpenAI models into systems through REST APIs, webhooks and tool use, with Python, RAG on pgvector, LangChain, LangGraph and MCP, on AWS. I deployed a multi-agent WhatsApp assistant that serves tens of thousands of students a month and cut manual support by 20%.",
+    pt: "4 anos de engenharia de software, mais de 2 anos com IA generativa, mais de 1 ano em produção. Construo agentes de IA e integro modelos Claude e OpenAI a sistemas por APIs REST, webhooks e tool use, com Python, RAG em pgvector, LangChain, LangGraph e MCP, na AWS. Implantei um assistente multiagente no WhatsApp que atende dezenas de milhares de alunos por mês e reduziu em 20% o suporte manual.",
   } satisfies Text,
   headline: {
     en: "4 years of software engineering, 2 in generative AI, shipping production agents.",
@@ -33,12 +33,14 @@ export const profile = {
       to: "2026-05",
       points: [
         { en: "Designed and shipped to production a multi-agent WhatsApp assistant with Python, LangGraph, LangChain and MCP (Claude and OpenAI APIs). One agent classifies intent and sentiment and routes to WhatsApp Flows, tool use or a fallback; another writes the answer.", pt: "Projetei e coloquei em produção um assistente multiagente no WhatsApp com Python, LangGraph, LangChain e MCP (APIs Claude e OpenAI). Um agente classifica intenção e sentimento e roteia para WhatsApp Flows, tool use ou fallback; outro escreve a resposta." },
-        { en: "Connected it to REST APIs, webhooks and the Kommo CRM, automating the student journey in 4 steps (sign-up, enrollment, exams, certificates) for tens of thousands of students a month, with 20% less manual support.", pt: "Integrei a APIs REST, webhooks e ao CRM Kommo, automatizando a jornada do aluno em 4 etapas (cadastro, matrícula, provas, certificados) para dezenas de milhares de alunos por mês, com 20% menos suporte manual." },
-        { en: "Built a RAG pipeline with embeddings and semantic search on PostgreSQL (pgvector) over company documents, grounding answers in official sources.", pt: "Construí um pipeline RAG com embeddings e busca semântica em PostgreSQL (pgvector) sobre documentos da empresa, ancorando as respostas em fontes oficiais." },
+        { en: "Connected it to REST APIs, webhooks and the Kommo CRM, automating 100% of the student journey in 4 steps (sign-up, enrollment, exams, certificates) for tens of thousands of students a month, with 20% less manual support.", pt: "Integrei a APIs REST, webhooks e ao CRM Kommo, automatizando 100% da jornada do aluno em 4 etapas (cadastro, matrícula, provas, certificados) para dezenas de milhares de alunos por mês, com 20% menos suporte manual." },
+        { en: "Built a RAG pipeline with embeddings and semantic search on PostgreSQL (pgvector) over company documents, grounding answers in official sources and reducing transfers to human support.", pt: "Construí um pipeline RAG com embeddings e busca semântica em PostgreSQL (pgvector) sobre documentos da empresa, ancorando as respostas em fontes oficiais e reduzindo transferências ao suporte humano." },
         { en: "Applied prompt evals, guardrails, hallucination mitigation, failure handling and human handoff, with daily CloudWatch monitoring and model cost control.", pt: "Apliquei evals de prompts, guardrails, mitigação de alucinação, tratamento de falhas e handoff humano, com monitoramento diário no CloudWatch e controle de custo dos modelos." },
+        { en: "Implemented speech-to-text (Whisper) and text-to-speech (ElevenLabs) for audio interactions, and added memory to the agent.", pt: "Implementei speech-to-text (Whisper) e text-to-speech (ElevenLabs) para interações por áudio e adicionei memória ao agente." },
+        { en: "Built in Go the full API the agent uses, with a financial module, a payments API integration and JWT and OAuth authentication; built NestJS services with an async flow (Redis queue, MongoDB) and a Redis cache that cut repeated queries and latency.", pt: "Desenvolvi em Go a API completa usada pelo agente, com módulo financeiro, integração a API de pagamentos e autenticação JWT e OAuth; construí serviços em NestJS com fluxo assíncrono (fila Redis, MongoDB) e cache Redis que reduziu consultas repetidas e latência." },
         { en: "Led architecture and backend in Python and n8n, with Docker on AWS ECS, CI/CD on GitHub Actions and TDD; documented decisions in ADRs and adopted Spec-Driven Development with human review of code generated by coding agents.", pt: "Liderei arquitetura e backend em Python e n8n, com Docker no AWS ECS, CI/CD no GitHub Actions e TDD; documentei decisões em ADRs e adotei Spec-Driven Development com revisão humana do código gerado por agentes de código." },
       ] satisfies Text[],
-      stack: "Python, LangGraph, LangChain, MCP, Claude API, OpenAI API, PostgreSQL, pgvector, Redis, MongoDB, Docker, AWS ECS, CloudWatch, GitHub Actions, NestJS, Go, n8n",
+      stack: "Python, LangGraph, LangChain, MCP, Claude API, OpenAI API, PostgreSQL, pgvector, Redis, MongoDB, Docker, AWS ECS, CloudWatch, GitHub Actions, NestJS, Go, n8n, Kommo, WhatsApp Flows, Whisper, ElevenLabs",
     },
     {
       id: "yamaha",
@@ -48,10 +50,10 @@ export const profile = {
       from: "2024-02",
       to: "2025-01",
       points: [
-        { en: "Built back-end services with NestJS, TypeScript and Python in microservices with Docker, JWT and OAuth, on Yamaha's e-commerce platform, with API caching.", pt: "Desenvolvi serviços de back-end com NestJS, TypeScript e Python em microsserviços com Docker, JWT e OAuth, na plataforma de e-commerce da Yamaha, com cache nas APIs." },
+        { en: "Built back-end services with NestJS, TypeScript and Python in microservices with Docker, JWT and OAuth, on Yamaha's e-commerce platform (an ecosystem estimated at 2 to 4 million visits a month), with API caching.", pt: "Desenvolvi serviços de back-end com NestJS, TypeScript e Python em microsserviços com Docker, JWT e OAuth, na plataforma de e-commerce da Yamaha (ecossistema estimado em 2 a 4 milhões de visitas por mês), com cache nas APIs." },
         { en: "Built Next.js and React features and contributed to Vibe, a community platform in an international project, with Scrum, code reviews and communication in English.", pt: "Construí funcionalidades em Next.js e React e contribuí para o Vibe, plataforma de comunidade em projeto internacional, com Scrum, code reviews e comunicação em inglês." },
       ] satisfies Text[],
-      stack: "NestJS, TypeScript, Python, Docker, Next.js, React, Scrum",
+      stack: "NestJS, TypeScript, Python, microservices, Docker, Next.js, React, Postman, Scrum",
     },
     {
       id: "brisa",
@@ -85,15 +87,27 @@ export const profile = {
       from: "2022-06",
       to: "2023-05",
       points: [
-        { en: "Led, in direct contact with the client, a medical appointment platform: Node.js and Express backend with TypeScript, MongoDB and PostgreSQL, JWT and OAuth, real-time chat, payments and scheduling, and a React and Redux front end on AWS.", pt: "Liderei, com contato direto com o cliente, uma plataforma de consultas médicas: backend Node.js e Express com TypeScript, MongoDB e PostgreSQL, JWT e OAuth, chat em tempo real, módulo financeiro e agendamento, e front-end React e Redux na AWS." },
+        { en: "Led, in direct contact with the client, a medical appointment platform: Node.js and Express backend with TypeScript, MongoDB and PostgreSQL, JWT and OAuth, real-time chat (Socket.IO), a financial module and scheduling, and a React and Redux front end, with Docker and AWS (EC2 and S3), in Scrum.", pt: "Liderei, com contato direto com o cliente, uma plataforma de consultas médicas: backend Node.js e Express com TypeScript, MongoDB e PostgreSQL, JWT e OAuth, chat em tempo real (Socket.IO), módulo financeiro e agendamento, e front-end React e Redux, com Docker e AWS (EC2 e S3), em Scrum." },
       ] satisfies Text[],
-      stack: "Node.js, Express, TypeScript, React, MongoDB, PostgreSQL, Docker, AWS, Socket.IO, Scrum",
+      stack: "Node.js, Express, TypeScript, React, MongoDB, PostgreSQL, Docker, AWS EC2, Amazon S3, Socket.IO, Scrum, Jira",
     },
   ],
   education: [
-    { id: "master", title: { en: "Master's (PRODER): statistical modeling, simulation and risk optimization", pt: "Mestrado (PRODER): modelagem estatística, simulação e otimização de risco" } satisfies Text, org: "UFCA", note: { en: "In progress", pt: "Em andamento" } satisfies Text },
+    { id: "master", title: { en: "Master's (PRODER): statistical modeling, simulation and risk optimization", pt: "Mestrado (PRODER): modelagem estatística, simulação e otimização de risco" } satisfies Text, org: "UFCA", note: { en: "In progress. Research on time series with ensembles and LoRA (PEFT) fine-tuning; built MCP servers and used LiteLLM as a single access layer to LLM providers; instrumented applications with Langfuse, LangSmith and OpenTelemetry.", pt: "Em andamento. Pesquisa em séries temporais com ensemble e fine-tuning com LoRA (PEFT); desenvolvi servidores MCP e usei LiteLLM como camada única de acesso a provedores de LLM; instrumentei aplicações com Langfuse, LangSmith e OpenTelemetry." } satisfies Text },
     { id: "bsc", title: { en: "BSc in Computational Mathematics", pt: "Bacharelado em Matemática Computacional" } satisfies Text, org: "UFCA", note: { en: "2023 to 2025", pt: "2023 a 2025" } satisfies Text },
     { id: "rocketseat", title: { en: "Fullstack Program (front end, back end, mobile)", pt: "Programa Fullstack (front-end, back-end, mobile)" } satisfies Text, org: "Rocketseat", note: { en: "2022 to 2023", pt: "2022 a 2023" } satisfies Text },
+  ],
+  projects: [
+    {
+      id: "newsar",
+      name: "newsAR",
+      href: "https://pypi.org/project/newsAR",
+      stack: "Python, LLM APIs (Groq, OpenAI, Anthropic)",
+      text: {
+        en: "Created and published on PyPI (MIT licence) a time-series forecasting library that uses LLM-extracted news sentiment as an exogenous variable, with a walk-forward benchmark against ARIMA, OLS-AR, Random Walk and Seasonal Naive.",
+        pt: "Criei e publiquei no PyPI (licença MIT) uma biblioteca de previsão de séries temporais que usa sentimento de notícias extraído por LLM como variável exógena, com benchmark walk-forward contra ARIMA, OLS-AR, Random Walk e Seasonal Naive.",
+      } satisfies Text,
+    },
   ],
   publications: [
     { id: "sbcas", title: "D.IAgnóstica: diagnóstico pulmonar (CADx)", venue: "SBCAS 2024", href: "https://doi.org/10.5753/sbcas.2024.2159" },

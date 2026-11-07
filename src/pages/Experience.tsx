@@ -28,6 +28,12 @@ export function ExperiencePage() {
       />
       <h2 className="section-h">{t.education}</h2>
       <ul className="plain">{profile.education.map((e) => <li key={e.id}>{e.title[lang]}, {e.org}. <span className="sub">{e.note[lang]}</span></li>)}</ul>
+      <h2 className="section-h">{t.projectsPersonal}</h2>
+      <ul className="plain">
+        {profile.projects.map((p) => (
+          <li key={p.id}><a href={p.href} rel="noopener noreferrer">{p.name}</a>. {p.text[lang]} <span className="sub">{p.stack}</span></li>
+        ))}
+      </ul>
       <h2 className="section-h">{t.publications}</h2>
       <ul className="plain">
         {profile.publications.map((p) => (

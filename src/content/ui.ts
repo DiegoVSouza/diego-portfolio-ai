@@ -181,6 +181,7 @@ export interface Strings {
   careerNote: string;
   careerTitle: string;
   education: string;
+  projectsPersonal: string;
   publications: string;
   certifications: string;
   languages: string;
@@ -389,6 +390,7 @@ const en: Strings = {
   careerNote: "Career history, not a measured result.",
   careerTitle: "Career",
   education: "Education",
+  projectsPersonal: "Open source",
   publications: "Publications",
   certifications: "Certifications",
   languages: "Languages",
@@ -597,6 +599,7 @@ const pt: Strings = {
   careerNote: "Histórico de carreira, não é resultado medido.",
   careerTitle: "Carreira",
   education: "Formação",
+  projectsPersonal: "Código aberto",
   publications: "Publicações",
   certifications: "Certificações",
   languages: "Idiomas",

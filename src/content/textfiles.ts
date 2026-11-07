@@ -55,6 +55,7 @@ export function resumeMd(): string {
     out.push(`### ${j.role}, ${j.org} (${j.from} to ${j.to}, ${j.place})`, "", ...j.points.map((p) => `- ${p.en}`), "", `Stack: ${j.stack}`, "");
   }
   out.push("## Education", "", ...profile.education.map((e) => `- ${e.title.en}, ${e.org} (${e.note.en})`), "");
+  out.push("## Open source", "", ...profile.projects.map((p) => `- ${p.name} (${p.href}): ${p.text.en} Stack: ${p.stack}`), "");
   out.push("## Publications", "", ...profile.publications.map((p) => `- ${p.title}, ${p.venue}${p.href ? ` (${p.href})` : ""}`), "");
   out.push("## Certifications", "", ...profile.certifications.map((c) => `- ${c}`), "");
   out.push("## Languages", "", ...profile.languages.map((l) => `- ${l.name.en}: ${l.level.en}`), "");
