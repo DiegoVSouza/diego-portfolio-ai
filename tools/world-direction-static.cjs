@@ -17,7 +17,7 @@ const URL = 'http://127.0.0.1:5187/';
   await page.goto(URL, { waitUntil: 'domcontentloaded' });
   await page.waitForFunction(() => document.querySelector('canvas.scene')?.getAttribute('data-scene') === '3d' && Number(document.querySelector('canvas.scene')?.getAttribute('data-vehicle-kinds')) >= 4 && document.querySelector('canvas.scene')?.getAttribute('data-train') === 'kenney' && typeof window.__worldAudit === 'function', null, { timeout: 60000 });
   const first = await page.evaluate(() => window.__worldAudit());
-  const MOVING = /^(fleet-|s64-wheels|metro-)/;
+  const MOVING = /^(fleet-|wheels-|metro-)/;
   const slim = (s) => s.objects.filter((o) => MOVING.test(o.name)).map((o) => ({ name: o.name, local: o.localBounds, matrices: o.bounds.map((b) => b.matrix) }));
   const statics = { railLength: first.railLength, poses: first.poses, path: first.path, footprints: first.footprints, boxes: first.boxes, cameraNear: first.cameraNear, cameraFar: first.cameraFar,
     other: first.objects.filter((o) => !MOVING.test(o.name)).map((o) => ({ name: o.name, geometry: o.geometry, count: o.bounds.length, local: o.localBounds, bounds: o.bounds.length <= 3 ? o.bounds.map((b) => ({ min: b.min, max: b.max })) : undefined })) };

@@ -15,9 +15,6 @@ Pairs where neither solid is approximate: 62.
 ## Moving vs moving, and moving vs static (30 snapshots, 2.1 s apart)
 
 - metro-station x viaduct-deck: 120 case(s) in 30 snapshot(s); deepest 7.60 (footprint), overlap height 1.05; e.g. metro-station#0 / viaduct-deck at snapshot 0
-- metro-station x metro-middle: 49 case(s) in 27 snapshot(s); deepest 4.17 (footprint), overlap height 3.43; e.g. metro-station#0 / metro-middle#0 at snapshot 20
-- metro-station x metro-head: 13 case(s) in 13 snapshot(s); deepest 4.81 (footprint), overlap height 3.43; e.g. metro-station#0 / metro-head#0 at snapshot 1
-- metro-station x metro-tail: 10 case(s) in 10 snapshot(s); deepest 4.80 (footprint), overlap height 3.43; e.g. metro-station#0 / metro-tail#0 at snapshot 25
 
 ## Contact with the ground / deck (lowest point of each moving kind, over all snapshots)
 
@@ -31,6 +28,7 @@ Pairs where neither solid is approximate: 62.
 | metro-middle | 14.35 | 14.35 |
 | metro-station | 12.95 | 12.95 |
 | metro-tail | 14.35 | 14.35 |
-| s64-wheels | 0.05 | 0.05 |
+| wheels-10 | 0.05 | 0.05 |
+| wheels-6 | 0.21 | 0.21 |
 
 Expected: cars near y = 0.0..0.1 (road at 0.03), trains near y = 14.35 (deck top 14.0, trains lifted 0.35 for the Kenney model).

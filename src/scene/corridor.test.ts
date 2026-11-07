@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { clearRun, obbOverlap, viaductSegments, type Obb } from "./corridor";
+import { clearRun, obbOverlap, stretchClearOf, viaductSegments, type Obb } from "./corridor";
 import { createRail } from "./rail";
 
 const box = (x: number, z: number, w: number, d: number, ry = 0): Obb => ({ x, z, w, d, ry });
@@ -35,5 +35,19 @@ describe("clearRun", () => {
     expect(run[0]).toBeGreaterThan(10);
     for (let i = run[0]; i <= run[1]; i += 1) expect(obbOverlap(segments[i]!, box(at.x, at.z, 30, 30, at.ry), 4)).toBe(false);
     expect(clearRun(segments, [box(at.x, at.z, 4000, 4000)], 4)).toBeNull();
+  });
+});
+
+describe("stretchClearOf", () => {
+  it("leaves a stretch alone when the blocker is outside it", () => {
+    expect(stretchClearOf(10, 100, 200, 20)).toEqual({ start: 10, length: 100 });
+    expect(stretchClearOf(10, 100, -50, 20)).toEqual({ start: 10, length: 100 });
+  });
+  it("keeps the longer side of a blocker inside the stretch", () => {
+    expect(stretchClearOf(0, 100, 30, 10)).toEqual({ start: 40, length: 60 });
+    expect(stretchClearOf(0, 100, 70, 10)).toEqual({ start: 0, length: 60 });
+  });
+  it("gives zero length when the blocker covers the whole stretch", () => {
+    expect(stretchClearOf(0, 20, 10, 15).length).toBe(0);
   });
 });

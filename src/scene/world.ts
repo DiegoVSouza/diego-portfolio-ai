@@ -1,6 +1,6 @@
 import * as THREE from "three";
 import { V3, bar, fit, groundLift, mergeGeometries, rng, tick, tint } from "./geometry";
-import { VIADUCT_OFFSET, clearRun, obbOverlap, viaductSegments } from "./corridor";
+import { VIADUCT_OFFSET, clearRun, obbOverlap, stretchClearOf, viaductSegments } from "./corridor";
 import { fadeMaterial } from "./fade";
 import { FAR_FADE, skylineBlocks } from "./horizon";
 import { loadModel } from "./loaders";
@@ -577,6 +577,12 @@ export async function buildWorld(c: WorldContext): Promise<World> {
     const uB = vu0 + ((v.run[1] + 1) / n) * (vu1 - vu0);
     return { start: rail.distanceAt(uA) + TRAIN_CAR_SPACING / 2, length: rail.distanceAt(uB) - rail.distanceAt(uA) - TRAIN_CAR_SPACING, uA, uB };
   });
+  // The station stands on the left viaduct and a car is wider than half the deck, so no train may run through it: the left trains use the longer
+  // stretch on one side of it, and stop short of its platform (half its length, plus half a car for the nose, plus a gap).
+  const STATION_HALF_LENGTH = 14.4;
+  const left = trackRange[0]!;
+  const stationAt = rail.distanceAt(rail.u(first[3]!, 0.5));
+  Object.assign(left, stretchClearOf(left.start, left.length, stationAt, STATION_HALF_LENGTH + TRAIN_CAR_SPACING / 2 + 1.5));
   for (const [index, v] of viaducts.entries()) {
     const side = v.side;
     v.drawn.forEach((seg, i) => {
@@ -1105,14 +1111,36 @@ export async function buildWorld(c: WorldContext): Promise<World> {
     let base = 0;
     fleet = kinds.slice(0, 4).map((k) => {
       const body = fit(k.g.clone(), k.size);
-      // The S64 source contains a body shell only. Fill its four wheel arches with dark wheels.
+      // The wheels are dark, like the road, so they vanish at street level. Each one gets a light hub, standing a little proud of the body.
+      const tyre = grey(0.2);
+      const hub = grey(0.62);
+      const wheelPart = (r: number, w: number, x: number, y: number, z: number, hubRadius: number, hubWidth: number) => {
+        const tyrePart = tint(new THREE.CylinderGeometry(r, r, w, 12).rotateZ(Math.PI / 2).translate(x, y, z), tyre);
+        const side = Math.sign(x);
+        const hubPart = tint(new THREE.CylinderGeometry(hubRadius, hubRadius, hubWidth, 12).rotateZ(Math.PI / 2).translate(x + (side * (w + hubWidth)) / 2, y, z), hub);
+        return [tyrePart, hubPart];
+      };
       let wheelGeometry: THREE.BufferGeometry | undefined;
       if (cars[1] && k.g === cars[1]) {
+        // The S64 source contains a body shell only. Fill its four wheel arches with wheels.
         const wheelParts: THREE.BufferGeometry[] = [];
-        for (const x of [-1.36, 1.36]) for (const z of [-2.47, 2.52]) {
-          wheelParts.push(new THREE.CylinderGeometry(0.53, 0.53, 0.35, 12).rotateZ(Math.PI / 2).translate(x, -0.72, z));
-        }
+        for (const x of [-1.36, 1.36]) for (const z of [-2.47, 2.52]) wheelParts.push(...wheelPart(0.53, 0.35, x, -0.72, z, 0.3, 0.06));
         wheelGeometry = mergeGeometries(wheelParts)!;
+      } else if (cars[0] && k.g === cars[0]) {
+        // The R7 source has its wheels inside the body mesh (one colour), so only the hubs are added. Centres were measured on the model
+        // (front axle at 88, rear at -114.5 along the length; 50 out; 20.5 up; source units) and mapped through the same centring and scale.
+        k.g.computeBoundingBox();
+        const bb = k.g.boundingBox!;
+        const cx = (bb.min.x + bb.max.x) / 2;
+        const cy = (bb.min.y + bb.max.y) / 2;
+        const cz = (bb.min.z + bb.max.z) / 2;
+        const scale = k.size / Math.max(bb.max.x - bb.min.x, bb.max.y - bb.min.y, bb.max.z - bb.min.z);
+        const hubParts: THREE.BufferGeometry[] = [];
+        for (const side of [-1, 1]) for (const along of [88, -114.5]) {
+          const hubGeometry = new THREE.CylinderGeometry(13 * scale, 13 * scale, 3 * scale, 12).rotateZ(Math.PI / 2);
+          hubParts.push(tint(hubGeometry.translate((side * 72 - cx) * scale, (20.5 - cy) * scale, (along - cz) * scale), hub));
+        }
+        wheelGeometry = mergeGeometries(hubParts)!;
       }
       // Each kind stands on the road by its own lowest point (body or wheels), whatever the model's origin is.
       const lift = groundLift(wheelGeometry ? [body, wheelGeometry] : [body], ROAD_TOP);
@@ -1125,8 +1153,8 @@ export async function buildWorld(c: WorldContext): Promise<World> {
       scene.add(mesh);
       let wheels: THREE.InstancedMesh | undefined;
       if (wheelGeometry) {
-        wheels = new THREE.InstancedMesh(wheelGeometry, new THREE.MeshStandardMaterial({ color: p.ink, flatShading: true, roughness: 0.9 }), k.n);
-        wheels.name = "s64-wheels";
+        wheels = new THREE.InstancedMesh(wheelGeometry, new THREE.MeshStandardMaterial({ vertexColors: true, flatShading: true, roughness: 0.9 }), k.n);
+        wheels.name = `wheels-${base}`;
         wheels.frustumCulled = false;
         wheels.layers.enable(1);
         scene.add(wheels);

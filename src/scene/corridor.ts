@@ -85,3 +85,15 @@ export function clearRun(segments: readonly ViaductSegment[], blockers: readonly
   close(segments.length - 1);
   return best;
 }
+
+/**
+ * A stretch of track [start, start + length] that a body of half-length `reach` centred at `at` blocks, cut down to the longer side of it.
+ * Returns the stretch unchanged when the blocker is not inside it.
+ */
+export function stretchClearOf(start: number, length: number, at: number, reach: number): { start: number; length: number } {
+  const end = start + length;
+  if (at + reach <= start || at - reach >= end) return { start, length };
+  const before = Math.max(0, at - reach - start);
+  const after = Math.max(0, end - (at + reach));
+  return before >= after ? { start, length: before } : { start: at + reach, length: after };
+}

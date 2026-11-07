@@ -102,7 +102,7 @@ for si, sample in enumerate(M['samples']):
         f[0] = min(f[0], a['y0']); f[1] = max(f[1], a['y0'])
     for a, b in itertools.combinations(ms, 2):
         ka, kb = a['name'].split('#')[0], b['name'].split('#')[0]
-        if ka == 's64-wheels' or kb == 's64-wheels':
+        if ka.startswith('wheels-') or kb.startswith('wheels-'):
             continue  # wheels sit inside the body box by construction
         r = overlap(a, b)
         if r: dyn.setdefault(('moving', ka, kb), []).append((si, a['name'], b['name'], *r))

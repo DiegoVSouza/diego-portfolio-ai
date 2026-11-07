@@ -1,0 +1,19 @@
+catalog: PASS
+evidence: PASS (23 records)
+flows: PASS (9 flows, paths checked at the pins)
+
+ RUN  v5.0.5 C:/estudo/Golpe/lab/projects/p07
+
+
+ Test Files  15 passed (15)
+      Tests  118 passed (118)
+   Start at  16:18:31
+   Duration  8.52s (environment 82%, setup 13%, tests 3%, import 1%)
+
+lint: exit 0
+typecheck: exit 0
+catalog:check: exit 0
+evidence:check: exit 0
+flow:check: exit 0
+test: exit 0
+check-fast: OK
