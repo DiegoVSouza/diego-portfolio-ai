@@ -11,7 +11,6 @@ export function ExperiencePage() {
     <>
       <Headline>{t.experienceTitle}</Headline>
       <Lead>{t.experienceLead}</Lead>
-      <p className="sub">{t.draftNote}</p>
       <h2 className="section-h">{t.careerTitle}</h2>
       <Timeline
         items={profile.career.map((j) => ({

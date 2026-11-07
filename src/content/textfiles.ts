@@ -42,7 +42,7 @@ export function resumeMd(): string {
     "",
     `[${profile.email}](mailto:${profile.email}) · ${profile.phone} · [WhatsApp](${profile.whatsapp}) · [LinkedIn](${profile.linkedin}) · [GitHub](${profile.github})`,
     "",
-    "_English draft, pending the owner's review. Career history, not measured results._",
+    "_Career history reviewed and approved by the owner. Not measured results._",
     "",
     "## Summary",
     "",

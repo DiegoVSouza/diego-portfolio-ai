@@ -186,7 +186,6 @@ export interface Strings {
   certifications: string;
   languages: string;
   skills: string;
-  draftNote: string;
   resume: string;
   dsTitle: string;
   dsLead: string;
@@ -395,7 +394,6 @@ const en: Strings = {
   certifications: "Certifications",
   languages: "Languages",
   skills: "Skills",
-  draftNote: "English draft of the CV, pending the owner's review.",
   resume: "Plain-text résumé",
   dsTitle: "Design system",
   dsLead: "colagem-ui is the design system this site is built on. Its tokens, components and a machine-checked contrast table live in their own repository.",
@@ -604,7 +602,6 @@ const pt: Strings = {
   certifications: "Certificações",
   languages: "Idiomas",
   skills: "Habilidades",
-  draftNote: "Rascunho do CV em inglês, pendente de revisão do dono.",
   resume: "Currículo em texto puro",
   dsTitle: "Design system",
   dsLead: "O colagem-ui é o design system sobre o qual este site é construído. Tokens, componentes e uma tabela de contraste verificada por máquina vivem em um repositório próprio.",
