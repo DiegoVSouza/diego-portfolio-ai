@@ -51,6 +51,11 @@ export const BILLBOARD_WIDTH = BOARD_WIDTH;
 /** Height over width: the card is 640 by 460 px (src/styles/site.css), so the board has the same proportions. */
 const BILLBOARD_RATIO = 460 / 640;
 const BOARD_MAX_HEIGHT = 30;
+/** Roof the building keeps in front of a rooftop billboard, so it stands on the roof and not on its edge. */
+const ROOF_APRON = 12;
+/** Boards with a frame, lamps and a catwalk: the card covers the inner part only, so the frame stays visible around it. */
+const CARD_INSET = 0.9;
+const framed = (kind: string): boolean => kind === "post" || kind === "roof" || kind === "under";
 
 type Part = THREE.BufferGeometry;
 
@@ -108,9 +113,10 @@ export async function buildWorld(c: WorldContext): Promise<World> {
     const boardH = Math.min(BOARD_MAX_HEIGHT, boardW * BILLBOARD_RATIO);
     const roof = shot.kind === "roof";
     const width = boardW + (roof ? 14 : 12);
-    const depth = roof ? 36 : 34;
+    // A roof billboard stands well back from the roof's edge: the roof goes on for ROOF_APRON in front of it.
+    const depth = roof ? 36 + ROOF_APRON : 34;
     const height = roof ? shot.board.bottom : shot.board.bottom + boardH + 16;
-    const back = 1 + depth / 2;
+    const back = roof ? depth / 2 - ROOF_APRON : 1 + depth / 2;
     const block = { x: at.x - Math.sin(ry) * back, z: at.z - Math.cos(ry) * back, ry, width, depth, height, bottom: shot.board.bottom, roof, boardH };
     footprints.push({ x: block.x, z: block.z, r: Math.max(width, depth) * 0.62 + 3 });
     return block;
@@ -878,7 +884,7 @@ export async function buildWorld(c: WorldContext): Promise<World> {
     group.add(panel, ...posts, ...beams);
     scene.add(group);
     const board: Board = { group, panel, posts, beams, repaint: painted.paint, width: 1, height: 1 };
-    fitBoard(board, BILLBOARD_WIDTH * shot.scale, BILLBOARD_RATIO, shot.board.bottom, shot.kind);
+    fitBoard(board, (BILLBOARD_WIDTH * shot.scale) / (framed(shot.kind) ? CARD_INSET : 1), BILLBOARD_RATIO, shot.board.bottom, shot.kind);
     // A board on a building: the whole building stands behind it (see `blocks`), with a setback on top and a beacon.
     const block = blocks[k];
     if (block) {
@@ -1109,7 +1115,8 @@ export async function buildWorld(c: WorldContext): Promise<World> {
     repaintText: () => painters.forEach((paint) => paint()),
     boardCorners(k, out) {
       const b = board(k);
-      CORNERS.forEach(([cx, cy], i) => out[i]!.copy(corner.set(cx, cy, 0)).applyMatrix4(b.panel.matrixWorld));
+      const inset = framed(shotOf(k).kind) ? CARD_INSET : 1;
+      CORNERS.forEach(([cx, cy], i) => out[i]!.copy(corner.set(cx * inset, cy * inset, 0)).applyMatrix4(b.panel.matrixWorld));
     },
   };
 }
