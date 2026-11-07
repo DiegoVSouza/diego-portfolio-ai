@@ -342,6 +342,7 @@ a:not(.btn):hover { color: var(--paper); text-decoration-thickness: 3px; }
   html[data-stage="3d"] [data-page="home"].wrap > section.stop { min-height: 100vh; margin: 0; }
   html[data-stage="3d"] .stop-card { position: fixed; left: 0; top: 0; z-index: 5; width: 640px; height: 460px; max-width: none; margin: 0; overflow: hidden; transform: var(--m, scale(0)); transform-origin: 0 0; opacity: var(--o, 0); will-change: transform, opacity; pointer-events: none; }
   html[data-stage="3d"] .stop-card[data-near] { pointer-events: auto; }
+  html[data-stage="3d"] .stop-card::after { content: ""; position: absolute; inset: 0; z-index: 10; pointer-events: none; opacity: .07; background: radial-gradient(ellipse 20% 70% at 12% 0%, var(--paper), transparent 75%), radial-gradient(ellipse 20% 70% at 38% 0%, var(--paper), transparent 75%), radial-gradient(ellipse 20% 70% at 62% 0%, var(--paper), transparent 75%), radial-gradient(ellipse 20% 70% at 88% 0%, var(--paper), transparent 75%); }
   html[data-stage="3d"] .flow-only { display: none; }
   html[data-stage="3d"] .sc-sum { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 3; overflow: hidden; }
   html[data-stage="3d"] .sc-title { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden; }
