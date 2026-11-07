@@ -220,6 +220,39 @@ export async function start(canvas: HTMLCanvasElement, options: SceneOptions): P
       return { railLength: rail.length, roadStart: rail.frameAt(0).p.toArray(), roadEnd: rail.frameAt(1).p.toArray(), camera: camera.position.toArray(), cameraNear: camera.near, cameraFar: camera.far, poses, path, footprints: world.auditFootprints(), boxes: world.auditBoxes(), objects };
     };
   }
+  // Development-only: every mesh's triangles in world space (instanced meshes expanded), for the mesh-level audit in tools/world-direction-*.
+  if (import.meta.env.DEV) {
+    (window as unknown as Record<string, unknown>).__worldTriangles = (skipInstanced: boolean) => {
+      scene.updateMatrixWorld(true);
+      const out: { id: number; name: string; parent: string; instance: number; visible: boolean; positions: number[]; index: number[] | null }[] = [];
+      const instance = new THREE.Matrix4();
+      const matrix = new THREE.Matrix4();
+      const point = V3(0, 0, 0);
+      let id = 0;
+      scene.traverse((object) => {
+        const mesh = object as THREE.Mesh;
+        if (!mesh.isMesh || !mesh.geometry) return;
+        const instanced = mesh as THREE.InstancedMesh;
+        if (instanced.isInstancedMesh && skipInstanced) return;
+        const position = mesh.geometry.getAttribute("position");
+        const index = mesh.geometry.getIndex();
+        const count = instanced.isInstancedMesh ? instanced.count : 1;
+        for (let i = 0; i < count; i += 1) {
+          if (instanced.isInstancedMesh) {
+            instanced.getMatrixAt(i, instance);
+            matrix.multiplyMatrices(mesh.matrixWorld, instance);
+          } else matrix.copy(mesh.matrixWorld);
+          const positions: number[] = [];
+          for (let v = 0; v < position.count; v += 1) {
+            point.fromBufferAttribute(position, v).applyMatrix4(matrix);
+            positions.push(Math.round(point.x * 1000) / 1000, Math.round(point.y * 1000) / 1000, Math.round(point.z * 1000) / 1000);
+          }
+          out.push({ id: id++, name: mesh.name || "unnamed", parent: mesh.parent?.name ?? "", instance: i, visible: mesh.visible, positions, index: index ? Array.from(index.array) : null });
+        }
+      });
+      return out;
+    };
+  }
   // Development-only frame probe: what the camera and the cards did in the frame just drawn (read by tools/world-direction-*).
   if (import.meta.env.DEV) {
     const raycaster = new THREE.Raycaster();

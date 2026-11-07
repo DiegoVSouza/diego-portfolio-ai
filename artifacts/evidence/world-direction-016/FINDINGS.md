@@ -39,6 +39,18 @@ The tools need dev-only hooks in `scene.ts` (`__worldProbe`, `__worldInside`, `_
 
 | Wheels invisible | the fleet's wheels were ink on an ink road, and R7's own wheels share the body tint: at street level every car read as wheelless (`vehicles-mid/`) | light hubs (`grey 0.62`) on R7 and S64, S64 tyres `grey 0.2`; `vehicles-after/` shows them |
 
+## Mesh-level audit of the whole scene (follow-up)
+
+`tools/world-direction-triangles.cjs` dumps every non-instanced mesh's world triangles (162 meshes, about 51,000 triangles, `__worldTriangles` dev hook); `tools/world-direction-blender-audit.py` builds one BVH per mesh in Blender (MCP) and lists every pair that intersects; `tools/world-direction-overlaps.py` groups them (`triangles/OVERLAPS.txt`). Instanced meshes (fleet, trains, station) were audited before with oriented boxes and the station mesh test. Overlaps inside one merged district mesh are not visible to this audit.
+
+| Found | Fix | After |
+|---|---|---|
+| The viaduct deck went through the post board of stop 5 (frame and posts), and boards 1, 2, 4, 7, 9 touched their own building's front (frame reached 1.05 behind the panel, the wall stood 1 behind) | post boards are blockers for the viaduct run; the wall stands 2.5 behind the panel | board 5 and boards 1, 2, 4, 7, 9 no longer in the list |
+| The "under" board (stop 6) rose above the viaduct deck's underside | its height is capped below the deck | gone from the list |
+| Surroundings were black: the far ring was 16-26% and the sky flat ink | sky glow band (`sky.ts`, follows the camera, fog off, no depth write), near ring grey 0.20-0.32, far ring 40-60% | silhouettes against a red horizon in `sky1/horizon-left.png` |
+
+Left in the list and judged intended contact, not crossings: roof boards 3 and 8 stand with their posts in the roof (their footing); ribbons and lamp bases touching boards 0 and 5 at ground level (y 0.0 to 0.1); crowns and signs flush with towers; props on the harbour quay. These are readings of positions and one screenshot, not a guarantee.
+
 ## Checks that came out clean
 
 - Cards: `cards-check.json` (all ten stops): no light cone on the card layer, exactly one near card, every control inside the viewport and reaching the click (hit test), traffic canvas `pointer-events: none`, painted face hidden under the card.

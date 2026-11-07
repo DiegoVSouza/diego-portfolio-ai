@@ -4,6 +4,7 @@ import { VIADUCT_OFFSET, clearRun, obbOverlap, stretchClearOf, viaductSegments }
 import { fadeMaterial } from "./fade";
 import { FAR_FADE, skylineBlocks } from "./horizon";
 import { loadModel } from "./loaders";
+import { createSky } from "./sky";
 import { BOARD_BEAM_DEPTH, BOARD_BEAM_Z, BOARD_POST_DEPTH, BOARD_POST_Z, BOARD_WIDTH, ROAD_EXTRA, SURROUNDINGS, TRAIN_CAR_SPACING, shotOf, trafficAt, trainLead } from "./layout";
 import { cardSide, type Frame, type Rail } from "./rail";
 import { truckFallback } from "./symbols";
@@ -124,6 +125,7 @@ export async function buildWorld(c: WorldContext): Promise<World> {
     roof: boolean;
     boardH: number;
   }
+  const frameBlockers: { x: number; z: number; w: number; d: number; ry: number }[] = [];
   const blocks: (Block | null)[] = stops.map((_, k) => {
     const shot = shotOf(k);
     const at = rail.cardAnchor(k, V3(0, 0, 0));
@@ -131,6 +133,9 @@ export async function buildWorld(c: WorldContext): Promise<World> {
     // The board faces the camera of its shot, turned a little toward the avenue.
     const ry = Math.atan2(cam.x - at.x, cam.z - at.z) + 0.1 * cardSide(k);
     shotYaw[k] = ry;
+    // A post board has no building, but its frame is as tall as a building's lower half: the viaduct keeps clear of it (an "under" board
+    // is meant to stand below the deck, and fitBoard keeps it there).
+    if (shot.kind === "post") frameBlockers.push({ x: at.x, z: at.z, w: BOARD_WIDTH * shot.scale + 6, d: 5, ry });
     if (shot.kind === "post" || shot.kind === "under") return null;
     const boardW = BOARD_WIDTH * shot.scale;
     const boardH = Math.min(BOARD_MAX_HEIGHT, boardW * BILLBOARD_RATIO);
@@ -139,7 +144,8 @@ export async function buildWorld(c: WorldContext): Promise<World> {
     // A roof billboard stands well back from the roof's edge: the roof goes on for ROOF_APRON in front of it.
     const depth = roof ? 36 + ROOF_APRON : 34;
     const height = roof ? shot.board.bottom : shot.board.bottom + boardH + 16;
-    const back = roof ? depth / 2 - ROOF_APRON : 1 + depth / 2;
+    // The wall stands clear of the frame: the posts and beam reach 1.05 behind the panel, the spot lights a little more.
+    const back = roof ? depth / 2 - ROOF_APRON : 2.5 + depth / 2;
     const block = { x: at.x - Math.sin(ry) * back, z: at.z - Math.cos(ry) * back, ry, width, depth, height, bottom: shot.board.bottom, roof, boardH };
     footprints.push({ x: block.x, z: block.z, r: Math.hypot(width, depth) / 2 + 3, kind: "board-building", district: stops[k]!.district, height });
     auditBoxes.push({ kind: `board-building-${k}`, x: block.x, z: block.z, w: width, d: depth, ry, y0: 0, y1: height });
@@ -153,7 +159,7 @@ export async function buildWorld(c: WorldContext): Promise<World> {
    */
   const VIADUCT_CLEARANCE = 4;
   const [vu0, vu1] = [rail.u(first[3]!, -1.2), rail.u(last[3]!, 1.2)];
-  const boardBlockers = blocks.flatMap((b) => (b ? [{ x: b.x, z: b.z, w: b.width, d: b.depth, ry: b.ry }] : []));
+  const boardBlockers = [...blocks.flatMap((b) => (b ? [{ x: b.x, z: b.z, w: b.width, d: b.depth, ry: b.ry }] : [])), ...frameBlockers];
   const viaducts = ([-1, 1] as const).map((side) => {
     const segments = viaductSegments(rail, vu0, vu1, side);
     const run = clearRun(segments, boardBlockers, VIADUCT_CLEARANCE) ?? ([0, segments.length - 1] as [number, number]);
@@ -790,13 +796,15 @@ export async function buildWorld(c: WorldContext): Promise<World> {
       });
     // The near ring is inside the fog and fades with it. The far ring stands near the camera's far plane, where the fog has long since
     // turned everything to the background: it is drawn without fog and fades to the background by distance instead.
-    const nearMesh = new THREE.Mesh(mergeGeometries(boxes("near", () => grey(0.1 + rnd() * 0.08), true))!, windowMat);
+    const nearMesh = new THREE.Mesh(mergeGeometries(boxes("near", () => grey(0.2 + rnd() * 0.12), true))!, windowMat);
     nearMesh.name = "skyline-near";
     const farMaterial = fadeMaterial(p.ink, FAR_FADE.start, FAR_FADE.end);
-    const farMesh = new THREE.Mesh(mergeGeometries(boxes("far", () => p.mix(p.ink, p.dred, 0.16 + rnd() * 0.1), false))!, farMaterial);
+    const farMesh = new THREE.Mesh(mergeGeometries(boxes("far", () => p.mix(p.ink, p.dred, 0.4 + rnd() * 0.2), false))!, farMaterial);
     farMesh.name = "skyline-far";
     scene.add(nearMesh, farMesh);
   }
+  // The sky comes with the surroundings: a glow band at the horizon for the silhouettes to stand against.
+  if (SURROUNDINGS) scene.add(createSky(p.ink, p.mix(p.ink, p.red, 0.55)));
 
   /* ---------- one billboard per stop: the card's place in the city ---------- */
   const signPairs: [THREE.Color, THREE.Color][] = [[p.red, p.paper], [p.paper, p.ink2], [p.ink2, p.red], [p.red, p.ink2], [p.paper, p.red], [p.ink2, p.paper]];
@@ -1015,7 +1023,9 @@ export async function buildWorld(c: WorldContext): Promise<World> {
   });
   function fitBoard(b: Board, baseWidth: number, ratio: number, bottom: number, kind: string) {
     // Keep the card's proportions; a tall card makes a narrower board so it never grows past the screen.
-    const h = Math.min(BOARD_MAX_HEIGHT, baseWidth * ratio);
+    // A board under the viaduct stays below its deck (whose underside is VIADUCT_Y - 1.4), beam included.
+    const cap = kind === "under" ? VIADUCT_Y - 1.4 - 1 - bottom : BOARD_MAX_HEIGHT;
+    const h = Math.min(cap, baseWidth * ratio);
     const w = h / ratio;
     b.width = w;
     b.height = h;
