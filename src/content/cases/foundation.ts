@@ -51,7 +51,7 @@ export const detail: CaseDetail = {
   measured: ["p00-final-trials", "p00-final-wilson", "p00-final-cases", "p00-final-actions", "p00-dev-alone", "p00-dev-director", "p00-dev-feature", "p00-holdout-old"],
   notMeasured: [
     t("The bare model without the director on the final split. The model outputs before the director were not stored.", "O modelo sozinho, sem o diretor, na rodada final. As saídas do modelo antes do diretor não foram guardadas."),
-    t("Independent review of the dataset. The owner waived it, so the cases carry the assistant's labels under one written rule; human review and promotion are pending.", "Revisão independente do dataset. O dono a dispensou, então os casos levam rótulos do assistente sob uma regra escrita; a revisão humana e a promoção estão pendentes."),
+    t("Independent review of the dataset. I reviewed the cases and labels myself under one written rule and waived a second reviewer, so no outside person has checked them. Promotion is still pending.", "Revisão independente do dataset. Eu mesmo revisei os casos e os rótulos sob uma regra escrita e dispensei um segundo revisor, então nenhuma pessoa de fora os conferiu. A promoção segue pendente."),
     t("Provider latency under load and billed cost. The keys are on a free plan and the cost figures in the repository are economic estimates.", "Latência do provedor sob carga e custo faturado. As chaves são de um plano gratuito e os valores de custo no repositório são estimativas econômicas."),
     t("Real customer tickets. Every case is synthetic.", "Tickets reais de clientes. Todos os casos são sintéticos."),
   ],
