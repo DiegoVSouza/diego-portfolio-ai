@@ -1,0 +1,209 @@
+[
+ {
+  "stop": 0,
+  "blocked": []
+ },
+ {
+  "stop": 1,
+  "blocked": []
+ },
+ {
+  "stop": 2,
+  "blocked": [
+   {
+    "point": "grid6,6",
+    "by": "unnamed",
+    "at": 38.1,
+    "of": 57.8
+   }
+  ]
+ },
+ {
+  "stop": 3,
+  "blocked": [
+   {
+    "point": "grid-1,6",
+    "by": "district-2-generated",
+    "at": 34,
+    "of": 48.7
+   },
+   {
+    "point": "grid0,6",
+    "by": "district-2-generated",
+    "at": 31.7,
+    "of": 45.3
+   },
+   {
+    "point": "grid1,6",
+    "by": "district-2-generated",
+    "at": 29.9,
+    "of": 42.8
+   },
+   {
+    "point": "grid2,6",
+    "by": "district-2-generated",
+    "at": 28.7,
+    "of": 41.1
+   },
+   {
+    "point": "grid3,6",
+    "by": "district-2-generated",
+    "at": 28.2,
+    "of": 40.5
+   },
+   {
+    "point": "grid4,6",
+    "by": "district-2-generated",
+    "at": 28.5,
+    "of": 40.9
+   },
+   {
+    "point": "grid5,6",
+    "by": "district-2-generated",
+    "at": 29.6,
+    "of": 42.3
+   },
+   {
+    "point": "grid6,6",
+    "by": "district-2-generated",
+    "at": 31.2,
+    "of": 44.7
+   }
+  ]
+ },
+ {
+  "stop": 4,
+  "blocked": []
+ },
+ {
+  "stop": 5,
+  "blocked": []
+ },
+ {
+  "stop": 6,
+  "blocked": [
+   {
+    "point": "grid-1,-1",
+    "by": "district-3-generated",
+    "at": 18.7,
+    "of": 19.8
+   },
+   {
+    "point": "grid0,-1",
+    "by": "district-3-generated",
+    "at": 17.9,
+    "of": 19
+   },
+   {
+    "point": "grid1,-1",
+    "by": "district-3-generated",
+    "at": 17.4,
+    "of": 18.4
+   },
+   {
+    "point": "grid2,-1",
+    "by": "district-3-generated",
+    "at": 17.3,
+    "of": 18.3
+   },
+   {
+    "point": "grid3,-1",
+    "by": "district-3-generated",
+    "at": 17.5,
+    "of": 18.5
+   },
+   {
+    "point": "grid4,-1",
+    "by": "district-3-generated",
+    "at": 18.1,
+    "of": 19.2
+   },
+   {
+    "point": "grid5,-1",
+    "by": "district-3-generated",
+    "at": 19,
+    "of": 20.1
+   },
+   {
+    "point": "grid6,-1",
+    "by": "district-3-generated",
+    "at": 20.2,
+    "of": 21.3
+   }
+  ]
+ },
+ {
+  "stop": 7,
+  "blocked": [
+   {
+    "point": "grid-1,6",
+    "by": "unnamed",
+    "at": 36.7,
+    "of": 55.6
+   },
+   {
+    "point": "grid0,6",
+    "by": "unnamed",
+    "at": 34.1,
+    "of": 51.8
+   }
+  ]
+ },
+ {
+  "stop": 8,
+  "blocked": [
+   {
+    "point": "grid-1,6",
+    "by": "district-4-generated",
+    "at": 31.7,
+    "of": 45.2
+   },
+   {
+    "point": "grid0,6",
+    "by": "district-4-generated",
+    "at": 30,
+    "of": 42.8
+   },
+   {
+    "point": "grid1,6",
+    "by": "district-4-generated",
+    "at": 29,
+    "of": 41.4
+   },
+   {
+    "point": "grid2,6",
+    "by": "district-4-generated",
+    "at": 28.7,
+    "of": 41
+   },
+   {
+    "point": "grid3,6",
+    "by": "district-4-generated",
+    "at": 29.2,
+    "of": 41.6
+   },
+   {
+    "point": "grid4,6",
+    "by": "district-4-generated",
+    "at": 30.4,
+    "of": 43.3
+   },
+   {
+    "point": "grid5,6",
+    "by": "district-4-generated",
+    "at": 32.2,
+    "of": 45.8
+   },
+   {
+    "point": "grid6,6",
+    "by": "district-4-generated",
+    "at": 34.5,
+    "of": 49.1
+   }
+  ]
+ },
+ {
+  "stop": 9,
+  "blocked": []
+ }
+]

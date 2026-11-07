@@ -100,7 +100,7 @@ function baseShot(k: number): Shot {
       // A board under the viaduct deck (its underside is 12.6 high; the board tops out at 11.8) between the camera and the trains.
       return { kind: "under", cam: { ahead: 0.2, lat: 24 * s, h: 6 }, board: { ahead: 0.2, lat: 41 * s, bottom: 1 }, scale: 0.5 };
     default:
-      return { kind: "post", cam: { ahead: 0, lat: 9 * s, h: 12 }, board: { ahead: 0.27, lat: 20 * s, bottom: 2.5 }, scale: 1 };
+      return { kind: "post", cam: { ahead: 0, lat: 9 * s, h: 12 }, board: { ahead: 0.27, lat: 32 * s, bottom: 2.5 }, scale: 1 };
   }
 }
 /**

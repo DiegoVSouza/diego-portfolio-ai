@@ -253,6 +253,63 @@ export async function start(canvas: HTMLCanvasElement, options: SceneOptions): P
       return out;
     };
   }
+  // Development-only: from each stop's camera, rays to nine points of its board; a hit before the board means something stands in front of the card.
+  if (import.meta.env.DEV) {
+    (window as unknown as Record<string, unknown>).__worldSight = () => {
+      scene.updateMatrixWorld(true);
+      const ray = new THREE.Raycaster();
+      const origin = V3(0, 0, 0);
+      const look = V3(0, 0, 0);
+      const corners = Array.from({ length: 4 }, () => V3(0, 0, 0));
+      const report: { stop: number; blocked: { point: string; by: string; at: number; of: number }[] }[] = [];
+      for (let k = 0; k < count; k += 1) {
+        rail.pose(k, origin, look);
+        world.boardCorners(k, corners);
+        const centre = corners[0]!.clone().add(corners[2]!).multiplyScalar(0.5);
+        const targets: [string, THREE.Vector3][] = [["centre", centre]];
+        corners.forEach((c, i) => targets.push([`corner${i}`, c.clone().lerp(centre, 0.05)]));
+        corners.forEach((c, i) => targets.push([`edge${i}`, c.clone().add(corners[(i + 1) % 4]!).multiplyScalar(0.5).lerp(centre, 0.05)]));
+        // A grid over the card and a margin of a fifth around it: anything nearer than the board there is drawn under the card, or beside it.
+        const across = corners[1]!.clone().sub(corners[0]!);
+        const up = corners[3]!.clone().sub(corners[0]!);
+        for (let i = -1; i <= 6; i += 1) for (let j = -1; j <= 6; j += 1) targets.push([`grid${i},${j}`, corners[0]!.clone().addScaledVector(across, i / 5).addScaledVector(up, j / 5)]);
+        const meshes: THREE.Object3D[] = [];
+        scene.traverse((o) => {
+          const m = o as THREE.Mesh;
+          if (!m.isMesh || m.name === "sky" || m.name === "ground-grid") return;
+          for (let p: THREE.Object3D | null = m; p; p = p.parent) if (p.name === `board-${k}`) return;
+          if (m.name === `board-face-${k}`) return;
+          meshes.push(m);
+        });
+        const blocked: { point: string; by: string; at: number; of: number }[] = [];
+        for (const [label, target] of targets) {
+          const direction = target.clone().sub(origin);
+          const distance = direction.length();
+          ray.set(origin, direction.normalize());
+          ray.far = distance - 0.3;
+          const hit = ray.intersectObjects(meshes, false)[0];
+          if (hit) blocked.push({ point: label, by: hit.object.name || hit.object.parent?.name || "unnamed", at: Math.round(hit.distance * 10) / 10, of: Math.round(distance * 10) / 10 });
+        }
+        report.push({ stop: k, blocked });
+      }
+      return report;
+    };
+  }
+  // Development-only: what does the camera see at a pixel (CSS pixels of the canvas)? Name, parent, world point, and the mesh's own bounds.
+  if (import.meta.env.DEV) {
+    (window as unknown as Record<string, unknown>).__worldPick = (px: number, py: number) => {
+      scene.updateMatrixWorld(true);
+      const rect = canvas.getBoundingClientRect();
+      const ray = new THREE.Raycaster();
+      ray.setFromCamera(new THREE.Vector2(((px - rect.left) / rect.width) * 2 - 1, -(((py - rect.top) / rect.height) * 2 - 1)), camera);
+      const hits = ray.intersectObjects(scene.children, true).filter((h) => h.object.name !== "sky");
+      return hits.slice(0, 3).map((h) => {
+        const mesh = h.object as THREE.Mesh;
+        mesh.geometry.computeBoundingBox();
+        return { name: mesh.name || "unnamed", parent: mesh.parent?.name ?? "", distance: h.distance, point: h.point.toArray(), instance: h.instanceId ?? null, tris: (mesh.geometry.getIndex()?.count ?? mesh.geometry.getAttribute("position").count) / 3 };
+      });
+    };
+  }
   // Development-only frame probe: what the camera and the cards did in the frame just drawn (read by tools/world-direction-*).
   if (import.meta.env.DEV) {
     const raycaster = new THREE.Raycaster();

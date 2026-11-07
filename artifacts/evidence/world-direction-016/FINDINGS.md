@@ -51,6 +51,17 @@ The tools need dev-only hooks in `scene.ts` (`__worldProbe`, `__worldInside`, `_
 
 Left in the list and judged intended contact, not crossings: roof boards 3 and 8 stand with their posts in the roof (their footing); ribbons and lamp bases touching boards 0 and 5 at ground level (y 0.0 to 0.1); crowns and signs flush with towers; props on the harbour quay. These are readings of positions and one screenshot, not a guarantee.
 
+## Owner review round (card numbers 1, 3, 4, 6, 8, 9 = stops 0, 2, 3, 5, 7, 8)
+
+| Report | Cause found | Change | Evidence |
+|---|---|---|---|
+| Boards 1 and 6 enter the street | post boards (stops 0 and 5) hung at 20 from the avenue's middle with a frame 33 wide: the frame's near end was 3.6 from the middle line | board at 32, test `boards.test.ts` (every frame end at least 13 from the middle; fails on the old values with 3.6) | `now5/stop-0.png`, unit test |
+| Building in front of 3 and 8, card over the building | towers and imported buildings stood on the camera-to-board line; the card is a DOM layer drawn over everything | a chain of keep-clear circles along each camera-to-board line (`sight`) | `tools/world-direction-sight.cjs` (rays from each camera to 64+ points over the card and a fifth around it): with the circles disabled stops 0 and 2 were blocked (negative control); with them nothing is nearer than the board inside the card area at any stop. Stop 7 was not flagged even in the negative control, so what was seen there is not explained |
+| Light beams behind the card (4 and 9) | board light cones | removed for every board (floodlight lamps stay) | `now5/stop-3.png` |
+| Road sign flying right of 4 | the sky bridges of district 2: a 54 wide slab at 36 to 46 high on two thin struts touching no building (`__worldPick` at that pixel returned `district-2-generated` at y 42) | removed; also the roof signs on struts | `now5/stop-3.png` |
+
+"Too close" was read as the post boards sitting near the camera and the road; the other camera distances were not changed.
+
 ## Checks that came out clean
 
 - Cards: `cards-check.json` (all ten stops): no light cone on the card layer, exactly one near card, every control inside the viewport and reaching the click (hit test), traffic canvas `pointer-events: none`, painted face hidden under the card.

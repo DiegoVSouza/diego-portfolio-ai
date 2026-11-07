@@ -152,6 +152,21 @@ export async function buildWorld(c: WorldContext): Promise<World> {
     return block;
   });
   const last = Array.from({ length: D }, (_, d) => stops.map((s) => s.district).lastIndexOf(d));
+  /**
+   * The line of sight from each stop's camera to its board stays clear: the card is drawn over the scene, so a tower standing between the
+   * camera and the board would show the card on top of it. A chain of circles along that line, widening toward the board, keeps towers and
+   * imported buildings out of it (the board's own building stands behind the board, past the last circle).
+   */
+  stops.forEach((stop, k) => {
+    const from = rail.cameraAt(k, V3(0, 0, 0));
+    const to = rail.cardAnchor(k, V3(0, 0, 0));
+    const boardW = BOARD_WIDTH * shotOf(k).scale;
+    const length = Math.hypot(to.x - from.x, to.z - from.z);
+    for (let along = 0; along < length - 2; along += 4) {
+      const t = along / length;
+      footprints.push({ x: from.x + (to.x - from.x) * t, z: from.z + (to.z - from.z) * t, r: 6 + (boardW / 2 + 2 - 6) * t, kind: "sight", district: stop.district, height: 0 });
+    }
+  });
 
   /**
    * The metro viaduct runs on each side of the avenue, past the boards. It cannot go through a building: each side keeps the longest
@@ -520,18 +535,8 @@ export async function buildWorld(c: WorldContext): Promise<World> {
 
   /* ---------- district 0, ARRIVAL: the avenue into town, with a gate ---------- */
   await tick();
-  const roofSigns: { x: number; y: number; z: number; ry: number }[] = [];
-  /** A frame on a roof that carries a horizontal sign, turned a little toward the avenue. */
-  const roofFrame = (d: number, b: { x: number; z: number; h: number; ry: number; s: number }, i: number) => {
-    const frame = (dx: number, dy: number) => V3(b.x + Math.cos(b.ry) * dx, b.h + dy, b.z - Math.sin(b.ry) * dx);
-    for (const dx of [-5, 5]) strut(d, frame(dx, 0), frame(dx, 6.5), 0.35, grey(0.5));
-    strut(d, frame(-5, 6.5), frame(5, 6.5), 0.35, p.red);
-    roofSigns.push({ x: b.x, y: b.h + 3.4, z: b.z, ry: face(-b.s, 0) + (i % 2 ? 0.2 : -0.2) });
-  };
-  const roofsOf = (d: number, list: { x: number; z: number; h: number; ry: number; s: number; w: number }[], minH: number, count: number) =>
-    list.filter((b) => b.h > minH && b.w >= 6).slice(0, count).forEach((b, i) => roofFrame(d, b, i));
-  const l0 = lane(0, { count: 20, latMin: 17, latMax: 50, hMin: 16, hMax: 58, wMin: 4, wMax: 9, realEvery: 3, signs: 4, walls: 8 });
-  roofsOf(0, l0, 20, 3);
+  // Roof signs (a hovering sign on thin struts) are gone: under the halftone the struts vanish and the sign reads as floating.
+  lane(0, { count: 20, latMin: 17, latMax: 50, hMin: 16, hMax: 58, wMin: 4, wMax: 9, realEvery: 3, signs: 4, walls: 8 });
   {
     rail.frameAt(rail.u(0, 0.5), f);
     const ry = yaw(f.T);
@@ -546,22 +551,14 @@ export async function buildWorld(c: WorldContext): Promise<World> {
 
   /* ---------- district 1, OPS: a control tower with setbacks and a beacon ---------- */
   await tick();
-  const l1 = lane(1, { count: 14, latMin: 18, latMax: 48, hMin: 14, hMax: 36, wMin: 5, wMax: 9, realEvery: 3, signs: 2, walls: 6 });
-  roofsOf(1, l1, 18, 3);
+  lane(1, { count: 14, latMin: 18, latMax: 48, hMin: 14, hMax: 36, wMin: 5, wMax: 9, realEvery: 3, signs: 2, walls: 6 });
   // (A stepped landmark tower stood here, 32 to the side of the avenue: right where the facade board of stop 2 hangs. It showed through the card.)
 
-  /* ---------- district 2, CORE: a dense glass core joined by sky bridges ---------- */
+  /* ---------- district 2, CORE: a dense glass core ---------- */
   await tick();
-  const l2 = lane(2, { count: 46, latMin: 15, latMax: 62, hMin: 44, hMax: 98, wMin: 5, wMax: 11, realEvery: 4, signs: 5, walls: 10 });
-  roofsOf(2, l2, 60, 4);
-  for (let k = first[2]!; k <= last[2]!; k += 1) {
-    rail.frameAt(rail.u(k, -0.3), f);
-    const ry = yaw(f.T);
-    const y = 36 + (k % 3) * 5;
-    solid(2, 54, 2.6, 4.2, f.p.x, y, f.p.z, ry, grey(0.32));
-    solid(2, 54, 0.5, 0.5, f.p.x, y - 0.4, f.p.z, ry, p.red, false);
-    for (const s of [-1, 1]) strut(2, V3(f.p.x + f.R.x * s * 27, y, f.p.z + f.R.z * s * 27), V3(f.p.x + f.R.x * s * 27, y - 12, f.p.z + f.R.z * s * 27), 0.5, grey(0.4));
-  }
+  lane(2, { count: 46, latMin: 15, latMax: 62, hMin: 44, hMax: 98, wMin: 5, wMax: 11, realEvery: 4, signs: 5, walls: 10 });
+  // (The sky bridges are gone: each was a 54 wide slab across the avenue at 36 to 46 high on two thin struts, touching no building. From the roof stop it
+  // read as a road sign flying beside the card.)
 
   /* ---------- district 3, PLATFORM: an elevated viaduct beside the avenue, a metro station and trains ---------- */
   await tick();
@@ -668,7 +665,6 @@ export async function buildWorld(c: WorldContext): Promise<World> {
   /* ---------- district 4, CRAFT: low rooftops with billboards, scaffolding and a crane ---------- */
   await tick();
   const low = lane(4, { count: 40, latMin: 14, latMax: 58, hMin: 7, hMax: 22, wMin: 6, wMax: 14, signs: 0, walls: 8 });
-  roofsOf(4, low, 12, 6);
   low.filter((b) => b.h > 9).slice(6, 9).forEach((b) => {
     for (let level = 0; level < 4; level += 1) {
       const y = b.h + level * 3;
@@ -692,8 +688,7 @@ export async function buildWorld(c: WorldContext): Promise<World> {
 
   /* ---------- district 5, TERMINAL: the avenue goes on past the last stop, towers on both sides, and the harbour waits at its far end ---------- */
   await tick();
-  const l5 = lane(5, { count: 64, latMin: 17, latMax: 62, hMin: 14, hMax: 64, wMin: 5, wMax: 11, realEvery: 4, signs: 3, walls: 8, until: rail.u(endStop, -0.7) });
-  roofsOf(5, l5, 24, 5);
+  lane(5, { count: 64, latMin: 17, latMax: 62, hMin: 14, hMax: 64, wMin: 5, wMax: 11, realEvery: 4, signs: 3, walls: 8, until: rail.u(endStop, -0.7) });
   const water = new THREE.Mesh(new THREE.PlaneGeometry(1000, 480), new THREE.MeshBasicMaterial({ color: p.mix(p.ink, p.dred, 0.5) }));
   water.name = "harbour-water";
   water.rotation.x = -Math.PI / 2;
@@ -927,21 +922,19 @@ export async function buildWorld(c: WorldContext): Promise<World> {
   const frameMat = new THREE.MeshBasicMaterial({ color: p.red });
   const unitBox = new THREE.BoxGeometry(1, 1, 1);
   /**
-   * What makes a board a billboard: a row of floodlights on arms over its top edge, each with a cone of light on the face, a row of bulbs
+   * What makes a board a billboard: a row of floodlights on arms over its top edge (no light cones: they drew behind the HTML card), a row of bulbs
    * along the top and bottom beams, a catwalk with a rail under it, and a steel brace behind. The metro-viaduct board has the bulbs only
    * (the deck is right over it).
    */
   const lampMat = new THREE.MeshBasicMaterial({ color: p.paper });
-  const glowMat = new THREE.MeshBasicMaterial({ color: p.paper, transparent: true, opacity: 0.04, blending: THREE.AdditiveBlending, depthWrite: false, side: THREE.DoubleSide });
   const steelMat = new THREE.MeshBasicMaterial({ color: grey(0.32) });
   const dress = (b: Board, kind: string, bottom: number) => {
     const g = b.group;
     const w = b.width;
     const top = bottom + b.height;
-    // Everything is merged: three meshes per billboard (steel, lamps and bulbs, light cones), so the draw-call budget holds.
+    // Everything is merged: two meshes per billboard (steel, lamps and bulbs), so the draw-call budget holds.
     const steel: Part[] = [];
     const lit: Part[] = [];
-    const glow: Part[] = [];
     const place = (geo: Part, x: number, y: number, z: number, sx = 1, sy = 1, sz = 1, quat?: THREE.Quaternion): Part => {
       dummy.position.set(x, y, z);
       dummy.scale.set(sx, sy, sz);
@@ -959,19 +952,10 @@ export async function buildWorld(c: WorldContext): Promise<World> {
     if (kind !== "under") {
       // Floodlights over the top edge, lighting the face.
       const lamps = Math.max(3, Math.round(w / 6));
-      const coneH = Math.min(11, b.height * 0.7);
-      const tilt = new THREE.Quaternion().setFromAxisAngle(V3(1, 0, 0), Math.atan(2.4 / coneH));
       for (let i = 0; i < lamps; i += 1) {
         const x = -w / 2 + ((i + 0.5) / lamps) * w;
         steel.push(place(cube, x, top + 0.7, 1.2, 0.22, 0.22, 2.4));
         lit.push(place(cube, x, top + 0.55, 2.4, 0.9, 0.5, 0.9));
-        // The cone's apex is at the lamp: tilt it about the lamp, then lay it down toward the face.
-        const cone = new THREE.ConeGeometry(Math.min(3.4, w / lamps / 2 + 0.6), coneH, 14, 1, true).translate(0, -coneH / 2, 0);
-        dummy.position.set(x, top + 0.4, 2.4);
-        dummy.scale.set(1, 1, 1);
-        dummy.quaternion.copy(tilt);
-        dummy.updateMatrix();
-        glow.push(cone.applyMatrix4(dummy.matrix));
       }
       // Catwalk under the face, with a rail.
       steel.push(place(cube, 0, bottom - 0.55, 1, w + 2, 0.25, 1.9));
@@ -989,11 +973,6 @@ export async function buildWorld(c: WorldContext): Promise<World> {
     }
     if (steel.length) g.add(new THREE.Mesh(mergeGeometries(steel)!, steelMat));
     g.add(new THREE.Mesh(mergeGeometries(lit)!, lampMat));
-    if (glow.length) {
-      const beams = new THREE.Mesh(mergeGeometries(glow)!, glowMat);
-      beams.name = `${g.name}-light-cones`;
-      g.add(beams);
-    }
   };
   const boards: Board[] = stops.map((_, k) => {
     rail.cardAnchor(k, anchor);
@@ -1095,13 +1074,6 @@ export async function buildWorld(c: WorldContext): Promise<World> {
     m.translateZ(1.9);
     scene.add(m);
   }
-  roofSigns.forEach((s, i) => {
-    const [bg, fg] = signPairs[(i + 1) % signPairs.length]!;
-    const m = makeSign(words[(i + 2) % words.length]!, 11, 5.4, bg, fg, false);
-    m.position.set(s.x, s.y, s.z);
-    m.rotation.y = s.ry;
-    scene.add(m);
-  });
 
   /* ---------- the fleet and the station: models that load after the first frame ---------- */
   type Fleet = { mesh: THREE.InstancedMesh; wheels?: THREE.InstancedMesh; n: number; base: number; lift: number };
