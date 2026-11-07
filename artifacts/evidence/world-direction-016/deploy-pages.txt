@@ -1,0 +1,20 @@
+
+ ⛅️ wrangler 4.105.0
+────────────────────
+[33m▲ [43;33m[[43;30mWARNING[43;33m][0m [1mWarning: Your working directory is a git repo and has uncommitted changes[0m
+
+  To silence this warning, pass in --commit-dirty=true
+
+
+✨ Compiled Worker successfully
+Uploading... (73/118)
+Uploading... (88/118)
+Uploading... (103/118)
+Uploading... (118/118)
+✨ Success! Uploaded 45 files (73 already uploaded) (2.29 sec)
+
+✨ Uploading _headers
+✨ Uploading Functions bundle
+✨ Uploading _routes.json
+🌎 Deploying...
+✨ Deployment complete! Take a peek over at https://445e4249.diego-portfolio-ai.pages.dev
