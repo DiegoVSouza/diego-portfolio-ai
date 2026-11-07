@@ -288,7 +288,17 @@ export async function buildWorld(c: WorldContext): Promise<World> {
         placed.push({ x, z, w, dd, h, ry, s });
         continue;
       }
-      solid(d, w, h, dd, x, 0, z, ry, toneTower());
+      const towerTone = toneTower();
+      // A street-level plinth and a recessed crown give the generated skyline a readable silhouette.
+      const crown = h > 28 ? Math.min(7, h * 0.14) : 0;
+      solid(d, w, h - crown, dd, x, 0, z, ry, towerTone);
+      if (crown) {
+        solid(d, w * 0.72, crown, dd * 0.76, x, h - crown, z, ry, towerTone);
+        solid(d, w * 0.76, 0.35, dd * 0.8, x, h - crown, z, ry, grey(0.4), false);
+      }
+      solid(d, w + 0.45, 0.55, dd + 0.45, x, 0, z, ry, grey(0.24), false);
+      // Roof plant is deliberately large enough to read from the distant camera.
+      if (n % 3 === 0) solid(d, w * 0.28, 1.2, dd * 0.4, x, h, z, ry, grey(0.36), false);
       footprints.push({ x, z, r: Math.max(w, dd) * 0.62 });
       if (rnd() < 0.5) beacon(x + (rnd() - 0.5) * w * 0.6, h + 0.3, z);
       if (signsLeft > 0 && h > 24) {
@@ -413,9 +423,11 @@ export async function buildWorld(c: WorldContext): Promise<World> {
   scene.add(marks);
 
   const lampGeo = mergeGeometries([
-    new THREE.BoxGeometry(0.3, 7, 0.3).translate(0, 3.5, 0),
-    new THREE.BoxGeometry(2.6, 0.25, 0.25).translate(1.2, 6.9, 0),
-    new THREE.BoxGeometry(0.8, 0.4, 0.8).translate(2.5, 6.7, 0),
+    new THREE.CylinderGeometry(0.13, 0.23, 6.6, 6).translate(0, 3.6, 0),
+    new THREE.CylinderGeometry(0.35, 0.42, 0.6, 6).translate(0, 0.3, 0),
+    new THREE.BoxGeometry(2.6, 0.22, 0.26).translate(1.2, 6.9, 0),
+    new THREE.BoxGeometry(1.35, 0.28, 0.7).translate(2.25, 6.65, 0),
+    bar(V3(0, 5.8, 0), V3(1.7, 6.8, 0), 0.12),
   ])!;
   const lampSlots = Math.floor(rail.length / 22) * 2;
   /**

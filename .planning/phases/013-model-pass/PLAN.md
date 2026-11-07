@@ -20,3 +20,7 @@ allowed_write_paths:
 5. Review staged diff and make atomic local commits with Co-Authored-By trailers.
 
 Preserve unrelated dirty files and prior evidence. If asset CLI lacks a safe promotion route, extend and verify it before promotion.
+
+## Follow-up: world pass
+
+Owner requested improvements to the remaining generated models and the world overall. Refine procedural tower silhouettes with setbacks, plinths and roof service volumes; refine street lamps with tapered shafts and broad luminaires. Keep merged district geometry and instancing so these details do not introduce additional draw calls. Preserve board clearances and seeded placement. Validate with the existing scene suite and new phase-specific screenshots.

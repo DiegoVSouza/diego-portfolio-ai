@@ -2,7 +2,7 @@ import { expect, test } from "@playwright/test";
 import { mkdirSync } from "node:fs";
 
 /** Phase 011: the menu names what the camera shows, and a far jump cuts instead of flying past every stop. */
-const evidence = "artifacts/evidence/city-fixes-011";
+const evidence = "artifacts/evidence/model-pass-013/city";
 mkdirSync(evidence, { recursive: true });
 
 test("the menu follows the camera, and a jump of several stops cuts instead of passing the stops in between", async ({ page }) => {
