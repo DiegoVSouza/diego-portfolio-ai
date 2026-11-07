@@ -33,6 +33,8 @@ export interface Rail {
   uAtDistance(distance: number): number;
   /** u of stop k plus `ahead` stops. */
   u(k: number, ahead?: number): number;
+  /** Length of the camera's path for each leg, from stop k to stop k + 1, in world units. */
+  legLengths: readonly number[];
 }
 
 /** Spacing between stops, and the sway of the avenue (a long gentle S). */
@@ -128,14 +130,44 @@ export function createRail(count: number): Rail {
     const span = knots[i + 1]!.c - knots[i]!.c;
     return (i + (cc - knots[i]!.c) / span) / (knots.length - 1);
   };
+  // Along one leg the camera moves at a steady rate per unit of c: the spline's own parameter speeds up and slows down with the knot
+  // spacing (a leg that ends in a side street was measured 1.5 times faster at its peak than its mean). Within each leg, c is remapped so
+  // the distance flown grows in step with it; the leg's ends are untouched, so every stop is still exactly a knot.
+  const LEG_SAMPLES = 256;
+  const probe = V3(0, 0, 0);
+  const previous = V3(0, 0, 0);
+  const legs = Array.from({ length: n - 1 }, (_, k) => {
+    const along = [0];
+    for (let i = 0; i <= LEG_SAMPLES; i += 1) {
+      camera.getPoint(tOf(k + i / LEG_SAMPLES), probe);
+      if (i) along.push(along[i - 1]! + probe.distanceTo(previous));
+      previous.copy(probe);
+    }
+    return { along, length: along[LEG_SAMPLES]! };
+  });
+  /** The spline's own c for the fraction `f` of the distance of leg `k`. */
+  const flown = (k: number, f: number): number => {
+    const { along, length } = legs[k]!;
+    const target = f * length;
+    let i = 0;
+    while (i < LEG_SAMPLES - 1 && along[i + 1]! < target) i += 1;
+    const span = along[i + 1]! - along[i]!;
+    return k + (i + (span > 0 ? (target - along[i]!) / span : 0)) / LEG_SAMPLES;
+  };
+  const even = (c: number): number => {
+    const cc = Math.min(n - 1, Math.max(0, c));
+    const k = Math.min(n - 2, Math.floor(cc));
+    return flown(k, cc - k);
+  };
   return {
     count: n,
     length: ground.getLength(),
     distanceAt,
     uAtDistance: (distance) => ground.getUtoTmapping(0, Math.max(0, Math.min(ground.getLength(), distance))),
     u: (k, ahead = 0) => Math.min(1, Math.max(0, (k + ahead) / total)),
+    legLengths: legs.map((leg) => leg.length),
     pose(c, pos, lookAt) {
-      const t = tOf(c);
+      const t = tOf(even(c));
       camera.getPoint(t, pos);
       look.getPoint(t, lookAt);
     },

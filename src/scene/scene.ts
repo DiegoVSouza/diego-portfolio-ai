@@ -7,7 +7,10 @@ import * as THREE from "three";
 import { V3, rng } from "./geometry";
 import { createPost } from "./post";
 import { createQuality, type Quality } from "./quality";
+import { createFrameScheduler } from "./loop";
+import { flightMs } from "./layout";
 import { createRail } from "./rail";
+import { MAX_TURN_RATE, turnToward } from "./turn";
 import { readPalette } from "./tokens";
 import { buildWorld } from "./world";
 
@@ -76,6 +79,8 @@ export async function start(canvas: HTMLCanvasElement, options: SceneOptions): P
   const trafficPlane = new THREE.Plane();
   trafficRenderer.clippingPlanes = [trafficPlane];
   const rail = createRail(count);
+  // The menu flies each leg for as long as the leg is long (src/site/DistrictMenu.tsx reads this).
+  document.documentElement.dataset.legMs = rail.legLengths.map(flightMs).join(",");
 
   // Three lights at most: a flat fill, one key, and a red point that travels with the camera.
   const ambient = new THREE.AmbientLight(new THREE.Color().setScalar(1), 0.4);
@@ -116,7 +121,6 @@ export async function start(canvas: HTMLCanvasElement, options: SceneOptions): P
   let height = 0;
   let centers: number[] = [];
   let last = performance.now();
-  let raf = 0;
   let settleTimer = 0;
   let glitch = 0;
   let shake = 0;
@@ -213,7 +217,39 @@ export async function start(canvas: HTMLCanvasElement, options: SceneOptions): P
         rail.pose(c, position, look);
         return { c, position: position.toArray(), look: look.toArray() };
       });
-      return { railLength: rail.length, roadStart: rail.frameAt(0).p.toArray(), roadEnd: rail.frameAt(1).p.toArray(), camera: camera.position.toArray(), cameraNear: camera.near, cameraFar: camera.far, poses, path, footprints: world.auditFootprints(), objects };
+      return { railLength: rail.length, roadStart: rail.frameAt(0).p.toArray(), roadEnd: rail.frameAt(1).p.toArray(), camera: camera.position.toArray(), cameraNear: camera.near, cameraFar: camera.far, poses, path, footprints: world.auditFootprints(), boxes: world.auditBoxes(), objects };
+    };
+  }
+  // Development-only frame probe: what the camera and the cards did in the frame just drawn (read by tools/world-direction-*).
+  if (import.meta.env.DEV) {
+    const raycaster = new THREE.Raycaster();
+    const dirs = [V3(0, 1, 0), V3(0, -1, 0), V3(1, 0, 0), V3(-1, 0, 0), V3(0, 0, 1), V3(0, 0, -1)];
+    const solids: THREE.Mesh[] = [];
+    (window as unknown as Record<string, unknown>).__worldProbe = () => ({
+      t: performance.now(), time, cCur, vel, fov: camera.fov, shown: canvas.dataset.shown, flight: document.documentElement.dataset.flight ?? "",
+      scrollY: window.scrollY, snap: snapTurn, frames: drawn, pos: camera.position.toArray(), quat: camera.quaternion.toArray(), cards: canvas.dataset.cards,
+    });
+    /** For each point: the distance to the nearest solid face, and whether the point is inside a solid (the first face a ray meets points away). */
+    (window as unknown as Record<string, unknown>).__worldInside = (points: number[][]) => {
+      if (!solids.length) scene.traverse((o) => { const m = o as THREE.Mesh; if (m.isMesh && !(m as THREE.InstancedMesh).isInstancedMesh && /^district-/.test(m.name)) solids.push(m); });
+      const sides = solids.map((m) => (m.material as THREE.Material).side);
+      solids.forEach((m) => { (m.material as THREE.Material).side = THREE.DoubleSide; });
+      const out = points.map(([x, y, z]) => {
+        let nearest = Infinity;
+        let inside = false;
+        let by = "";
+        for (const d of dirs) {
+          raycaster.set(V3(x!, y!, z!), d);
+          raycaster.far = 400;
+          const hit = raycaster.intersectObjects(solids, false)[0];
+          if (!hit) continue;
+          nearest = Math.min(nearest, hit.distance);
+          if (hit.face && hit.face.normal.clone().transformDirection(hit.object.matrixWorld).dot(d) > 0.01) { inside = true; by = hit.object.name; }
+        }
+        return { inside, nearest, by };
+      });
+      solids.forEach((m, i) => { (m.material as THREE.Material).side = sides[i]!; });
+      return out;
     };
   }
   if (document.fonts?.load) {
@@ -308,9 +344,10 @@ export async function start(canvas: HTMLCanvasElement, options: SceneOptions): P
     return best;
   };
 
+  /** One request at a time: see loop.ts. `frameLoop` is a function declaration below, so it is available here. */
+  const loop = createFrameScheduler((now) => frameLoop(now), () => !dead && !document.hidden && (motion || dirty));
   const schedule = () => {
-    if (dead || raf || document.hidden) return;
-    if (motion || dirty) raf = requestAnimationFrame(frameLoop);
+    loop.schedule();
   };
 
   const select = (index: number) => {
@@ -352,6 +389,7 @@ export async function start(canvas: HTMLCanvasElement, options: SceneOptions): P
     if (fixed) return;
     select(rawIndex());
     cCur = motion ? flightC() : Math.max(0, active);
+    snapTurn = true;
     vel = 0;
     if (motion) {
       glitch = 1;
@@ -362,6 +400,11 @@ export async function start(canvas: HTMLCanvasElement, options: SceneOptions): P
   };
 
   let lastTravel = 1;
+  /** The camera's orientation as flown (rate limited); `snapTurn` makes the next frame take the target at once (a cut, or no motion). */
+  const flownTurn = new THREE.Quaternion();
+  let snapTurn = true;
+  /** Frames drawn so far: the development probe reports it, so a doubled loop shows as twice the display rate. */
+  let drawn = 0;
   const camPos = V3(0, 0, 0);
   const camLook = V3(0, 0, 0);
   const view = V3(0, 0, 0);
@@ -371,7 +414,7 @@ export async function start(canvas: HTMLCanvasElement, options: SceneOptions): P
    * turn; faster scrolling banks more and widens the lens. All of it is zero at a stop, so a project is always seen head-on.
    * Under reduced motion `motion` is false: no swing, no bank, no lens change.
    */
-  const poseCamera = () => {
+  const poseCamera = (dt: number) => {
     rail.pose(cCur, camPos, camLook);
     const leg = Math.floor(cCur);
     const dir = ((leg % 2) + 2) % 2 === 0 ? 1 : -1;
@@ -393,6 +436,11 @@ export async function start(canvas: HTMLCanvasElement, options: SceneOptions): P
     const roll = swing * dir * BANK + speedRoll;
     camera.up.set(-Math.sin(roll), Math.cos(roll), 0);
     camera.lookAt(camera.position.x + vx, camLook.y, camera.position.z + vz);
+    if (motion && !snapTurn && dt > 0) {
+      turnToward(flownTurn, camera.quaternion, MAX_TURN_RATE * dt);
+      camera.quaternion.copy(flownTurn);
+    } else flownTurn.copy(camera.quaternion);
+    snapTurn = false;
     const wide = 58 + (motion ? Math.min(9, Math.abs(vel) * 5) : 0);
     fov += (wide - fov) * 0.2;
     if (Math.abs(camera.fov - fov) > 0.05) {
@@ -400,6 +448,19 @@ export async function start(canvas: HTMLCanvasElement, options: SceneOptions): P
       camera.updateProjectionMatrix();
     }
     redLight.position.set(camera.position.x + 4, camera.position.y + 3, camera.position.z - 6);
+    // Development-only free camera for the audit and the surroundings plan: `window.__freeCam = { pos, look, fov }` replaces the rail pose.
+    if (import.meta.env.DEV) {
+      const free = (window as unknown as { __freeCam?: { pos: number[]; look: number[]; fov?: number } }).__freeCam;
+      if (free) {
+        camera.up.set(0, 1, 0);
+        camera.position.set(free.pos[0]!, free.pos[1]!, free.pos[2]!);
+        camera.lookAt(free.look[0]!, free.look[1]!, free.look[2]!);
+        if (free.fov && camera.fov !== free.fov) {
+          camera.fov = free.fov;
+          camera.updateProjectionMatrix();
+        }
+      }
+    }
     // The page's panels lean with the camera (src/pages/Home.tsx listens); the attribute is what the e2e suite reads.
     if (Math.abs(pan - lastTravel) > 0.004 || pan === 0) {
       lastTravel = pan;
@@ -496,7 +557,7 @@ export async function start(canvas: HTMLCanvasElement, options: SceneOptions): P
   let cpuSum = 0;
   let cpuFrames = 0;
   function frameLoop(now: number) {
-    raf = 0;
+    loop.enter();
     if (dead) return;
     const started = performance.now();
     const rawDt = (now - last) / 1000;
@@ -521,7 +582,8 @@ export async function start(canvas: HTMLCanvasElement, options: SceneOptions): P
     post.finish.uniforms.uVel!.value = motion ? glitch * 2.5 + Math.min(0.6, Math.abs(vel) * 0.08) : 0;
     post.finish.uniforms.uTime!.value = motion ? time : 0;
     if (glitch > 0.05 && canvas.dataset.splitSeen !== "1") canvas.dataset.splitSeen = "1";
-    poseCamera();
+    drawn += 1;
+    poseCamera(motion ? dt : 0);
     announceShown();
     updateCards();
     renderer.info.reset();
@@ -553,8 +615,7 @@ export async function start(canvas: HTMLCanvasElement, options: SceneOptions): P
 
   const onVisibility = () => {
     if (document.hidden) {
-      if (raf) cancelAnimationFrame(raf);
-      raf = 0;
+      loop.cancel();
     } else {
       last = performance.now();
       dirty = true;
@@ -603,7 +664,7 @@ export async function start(canvas: HTMLCanvasElement, options: SceneOptions): P
     if (dead) return;
     dead = true;
     if (import.meta.env.DEV) delete (window as unknown as { __worldAudit?: () => unknown }).__worldAudit;
-    if (raf) cancelAnimationFrame(raf);
+    loop.cancel();
     window.clearTimeout(settleTimer);
     observer.disconnect();
     window.removeEventListener("scroll", onScroll);
@@ -611,6 +672,7 @@ export async function start(canvas: HTMLCanvasElement, options: SceneOptions): P
     window.removeEventListener("scene-cut", onCut);
     document.removeEventListener("visibilitychange", onVisibility);
     canvas.removeEventListener("webglcontextlost", onLost);
+    delete document.documentElement.dataset.legMs;
     scene.traverse((o) => {
       const mesh = o as THREE.Mesh;
       mesh.geometry?.dispose();
@@ -638,6 +700,7 @@ export async function start(canvas: HTMLCanvasElement, options: SceneOptions): P
     setMotion(on) {
       if (options.mode === "3d-static" || fixed) return;
       motion = on;
+      snapTurn = true;
       if (!on) {
         cCur = Math.max(0, active);
         time = 0;

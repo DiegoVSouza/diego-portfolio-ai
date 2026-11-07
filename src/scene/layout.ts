@@ -133,3 +133,12 @@ export const boardMid = (k: number): number => {
   const shot = shotOf(k);
   return shot.board.bottom + (BOARD_HEIGHT * shot.scale) / 2;
 };
+
+/**
+ * How long the flight over a leg of `length` world units lasts, in milliseconds. A fixed time made the short legs crawl and the long ones
+ * race (peak speeds from 90 to 255 units per second); this holds the peak of the cubic ease-out (three times the mean) near 110 units per
+ * second, within limits that keep a short hop from being abrupt and a long leg from dragging.
+ */
+export const FLIGHT_MIN_MS = 1800;
+export const FLIGHT_MAX_MS = 3400;
+export const flightMs = (length: number): number => Math.round(Math.min(FLIGHT_MAX_MS, Math.max(FLIGHT_MIN_MS, ((3 * length) / 110) * 1000)));

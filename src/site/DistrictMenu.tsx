@@ -3,8 +3,13 @@ import { caseCards } from "../content/caseIndex";
 import { districts, stops } from "../content/districts";
 import { useLang } from "./Shell";
 
-/** One move from stop to stop takes this long: the camera flies the whole way, so the visitor can enjoy the ride. */
+/** One move from stop to stop takes this long when the scene gives no leg time: the camera flies the whole way, so the visitor can enjoy the ride. */
 const FLIGHT_MS = 2200;
+/** The scene writes the flight time of each leg (longer legs take longer, so the speed stays even); the leg is the one between two adjacent stops. */
+const legMs = (from: number, to: number): number => {
+  const value = Number(document.documentElement.dataset.legMs?.split(",")[Math.min(from, to)]);
+  return Number.isFinite(value) && value > 0 ? value : FLIGHT_MS;
+};
 /** Starts at once (a wheel turn must not wait) and glides to a stop: the long part of the trip is the arrival, not the take-off. */
 const ease = (x: number) => 1 - Math.pow(1 - x, 3);
 const setFlight = (on: boolean) => {
@@ -116,8 +121,9 @@ export function DistrictMenu() {
       // The scene reads this: during a flight the scroll position already carries the easing, so the camera follows it one to one.
       setFlight(true);
       const started = performance.now();
+      const duration = legMs(here, i);
       const step = (now: number) => {
-        const x = Math.min(1, (now - started) / FLIGHT_MS);
+        const x = Math.min(1, (now - started) / duration);
         window.scrollTo(0, from + (top - from) * ease(x));
         if (x < 1) frame.current = requestAnimationFrame(step);
         else {
