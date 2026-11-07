@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import * as THREE from "three";
-import { BOARD_PANEL_Z, BOARD_WIDTH, ROAD_EXTRA, boardMid, frameFront, shotKind, shotOf, trainLead } from "./layout";
+import { BOARD_PANEL_Z, BOARD_WIDTH, ROAD_EXTRA, boardMid, frameFront, patchShot, shotKind, shotOf, trainLead } from "./layout";
 import { createRail } from "./rail";
 
 describe("shuttle train", () => {
@@ -78,5 +78,24 @@ describe("shots", () => {
       expect(look.y).toBeCloseTo(shotOf(k).aim ?? boardMid(k), 5);
       expect(pos.y).toBeCloseTo(shotOf(k).cam.h, 5);
     }
+  });
+});
+
+describe("shot patches (the atelier's camera tuner)", () => {
+  it("changes only what the patch names, and mirrors lateral values to the stop's side", () => {
+    const base = shotOf(1); // stop 1 is on the left (side -1)
+    const patched = patchShot(base, { cam: { h: 20, lat: 15 }, scale: 2 }, -1);
+    expect(patched.cam.h).toBe(20);
+    expect(patched.cam.lat).toBe(-15);
+    expect(patched.cam.ahead).toBe(base.cam.ahead);
+    expect(patched.board).toEqual(base.board);
+    expect(patched.scale).toBe(2);
+  });
+
+  it("removes the aim with null and leaves a shot alone without a patch", () => {
+    const curb = shotOf(4);
+    expect(curb.aim).toBeDefined();
+    expect(patchShot(curb, { aim: null }, 1).aim).toBeUndefined();
+    expect(patchShot(curb, undefined, 1)).toBe(curb);
   });
 });

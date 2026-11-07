@@ -1,0 +1,64 @@
+{
+  "in": "Prop_Planter_Single.gltf",
+  "out": "Prop_Planter_Single.glb",
+  "before": {
+    "triangles": 118,
+    "size": [
+      2,
+      2,
+      0.6
+    ]
+  },
+  "after": {
+    "triangles": 118,
+    "size": [
+      2,
+      2,
+      0.6
+    ]
+  },
+  "blender": "5.2.1 LTS",
+  "inspect": {
+    "file": "C:\\estudo\\Golpe\\lab\\projects\\p07\\.cache\\atelier-out\\Prop_Planter_Single.glb",
+    "bytes": 11672,
+    "triangles": 118,
+    "vertices": 218,
+    "meshes": 1,
+    "nodes": 1,
+    "materials": 2,
+    "textures": 0,
+    "images": 0,
+    "animations": [],
+    "skins": 0,
+    "attributes": [
+      "NORMAL",
+      "POSITION",
+      "TEXCOORD_0",
+      "TEXCOORD_1"
+    ],
+    "extensionsUsed": [],
+    "bounds": {
+      "min": [
+        -1,
+        0,
+        -1
+      ],
+      "max": [
+        1,
+        0.6000000238418579,
+        1
+      ],
+      "size": [
+        2,
+        0.6000000238418579,
+        2
+      ]
+    },
+    "originOffset": {
+      "x": 0,
+      "y": 0,
+      "z": 0
+    }
+  },
+  "problems": []
+}

@@ -9,7 +9,7 @@
 - **Run it.** `npm ci && python scripts/check_fast.py` (then `python scripts/check_full.py` with Chrome installed).
 - **Live.** https://diego-portfolio-ai.pages.dev (Cloudflare Pages). The same Playwright suite passes against it: `artifacts/evidence/portfolio-w7/public-e2e.txt`.
 - **Limits.** The 3D scene is deployed, but frame rate on a physical phone is not measured. The live run log has one run; the Turnstile start flow remains pending. Screen-reader and owner visual review remain pending.
-- **Docs.** [Architecture](docs/architecture.md), [phase 003](.planning/phases/003-real-portfolio/SPEC.md).
+- **Docs.** [Atelier: models and camera workbench](docs/atelier/PLAYBOOK.md) ([pt-BR](docs/atelier/GUIA.pt-BR.md)), [Architecture](docs/architecture.md), [phase 003](.planning/phases/003-real-portfolio/SPEC.md).
 <!-- case:end -->
 
 <!-- flow:start -->

@@ -60,7 +60,7 @@ const KINDS: readonly ShotKind[] = ["post", "facade", "side", "roof", "curb", "p
 export const shotKind = (k: number): ShotKind => KINDS[k % KINDS.length]!;
 /** Where a side street crosses the avenue, in stops past the stop (see crossUs in world.ts). */
 export const SIDE_JUNCTION = 0.62;
-export function shotOf(k: number): Shot {
+function baseShot(k: number): Shot {
   const s = sideOf(k);
   switch (shotKind(k)) {
     case "facade":
@@ -79,6 +79,45 @@ export function shotOf(k: number): Shot {
       return { kind: "post", cam: { ahead: 0, lat: 9 * s, h: 12 }, board: { ahead: 0.27, lat: 20 * s, bottom: 2.5 }, scale: 1 };
   }
 }
+/**
+ * A change to one stop's numbers, written for a stop on the right of the avenue (side +1): `lat` values are multiplied by the stop's side.
+ * `aim: null` removes the aim. This is what the atelier's camera tuner edits; see docs/atelier/PLAYBOOK.md.
+ */
+export interface ShotPatch {
+  cam?: Partial<Shot["cam"]>;
+  board?: Partial<Shot["board"]>;
+  scale?: number;
+  aim?: number | null;
+}
+let patches: Record<string, ShotPatch> = {};
+export const setShotPatches = (next: Record<string, ShotPatch>): void => {
+  patches = next;
+};
+/** Apply a patch to a shot, as the shot of a stop on `side`. Pure. */
+export function patchShot(shot: Shot, patch: ShotPatch | undefined, side: 1 | -1): Shot {
+  if (!patch) return shot;
+  const lat = (own: number, change: number | undefined) => (change === undefined ? own : change * side);
+  const out: Shot = {
+    ...shot,
+    cam: { ...shot.cam, ...patch.cam, lat: lat(shot.cam.lat, patch.cam?.lat) },
+    board: { ...shot.board, ...patch.board, lat: lat(shot.board.lat, patch.board?.lat) },
+    scale: patch.scale ?? shot.scale,
+  };
+  if (patch.aim === null) delete out.aim;
+  else if (patch.aim !== undefined) out.aim = patch.aim;
+  return out;
+}
+// Dev only: the atelier page saves patches in localStorage and the scene picks them up when it starts. Production builds drop this.
+if (import.meta.env.DEV && typeof localStorage !== "undefined") {
+  try {
+    setShotPatches(JSON.parse(localStorage.getItem("atelier-shots") ?? "{}") as Record<string, ShotPatch>);
+  } catch {
+    // no storage or a bad value: the shipped shots stay
+  }
+}
+/** The shot as shipped, before any dev patch (the atelier shows patches against it). */
+export { baseShot as shippedShot };
+export const shotOf = (k: number): Shot => patchShot(baseShot(k), patches[String(k)], sideOf(k));
 export const boardMid = (k: number): number => {
   const shot = shotOf(k);
   return shot.board.bottom + (BOARD_HEIGHT * shot.scale) / 2;

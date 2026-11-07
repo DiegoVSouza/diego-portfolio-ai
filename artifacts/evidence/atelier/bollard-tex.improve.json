@@ -1,0 +1,66 @@
+{
+  "in": "Prop_Bollard.gltf",
+  "out": "bollard-tex.glb",
+  "before": {
+    "triangles": 190,
+    "size": [
+      0.2163,
+      0.2274,
+      0.8918
+    ]
+  },
+  "after": {
+    "triangles": 190,
+    "size": [
+      0.2668,
+      0.2805,
+      1.1
+    ]
+  },
+  "blender": "5.2.1 LTS",
+  "inspect": {
+    "file": "C:\\estudo\\Golpe\\lab\\projects\\p07\\.cache\\atelier-out\\bollard-tex.glb",
+    "bytes": 8173464,
+    "triangles": 190,
+    "vertices": 216,
+    "meshes": 1,
+    "nodes": 1,
+    "materials": 1,
+    "textures": 3,
+    "images": 3,
+    "animations": [],
+    "skins": 0,
+    "attributes": [
+      "NORMAL",
+      "POSITION",
+      "TEXCOORD_0",
+      "TEXCOORD_1"
+    ],
+    "extensionsUsed": [],
+    "bounds": {
+      "min": [
+        -0.13338229060173035,
+        0,
+        -0.1402464210987091
+      ],
+      "max": [
+        0.13338229060173035,
+        1.100000023841858,
+        0.1402464210987091
+      ],
+      "size": [
+        0.2667645812034607,
+        1.100000023841858,
+        0.2804928421974182
+      ]
+    },
+    "originOffset": {
+      "x": 0,
+      "y": 0,
+      "z": 0
+    }
+  },
+  "problems": [
+    "carries textures: the CSP has no blob: img-src, bake a palette (scripts/glb_bake_palette.py) or strip them"
+  ]
+}

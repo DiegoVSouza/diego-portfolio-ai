@@ -1,0 +1,63 @@
+{
+  "in": "Prop_ManholeCover.gltf",
+  "out": "Prop_ManholeCover.glb",
+  "before": {
+    "triangles": 118,
+    "size": [
+      0.9251,
+      0.9251,
+      0.033
+    ]
+  },
+  "after": {
+    "triangles": 118,
+    "size": [
+      0.9251,
+      0.9251,
+      0.033
+    ]
+  },
+  "blender": "5.2.1 LTS",
+  "inspect": {
+    "file": "C:\\estudo\\Golpe\\lab\\projects\\p07\\.cache\\atelier-out\\Prop_ManholeCover.glb",
+    "bytes": 5724,
+    "triangles": 118,
+    "vertices": 120,
+    "meshes": 1,
+    "nodes": 1,
+    "materials": 1,
+    "textures": 0,
+    "images": 0,
+    "animations": [],
+    "skins": 0,
+    "attributes": [
+      "NORMAL",
+      "POSITION",
+      "TEXCOORD_0"
+    ],
+    "extensionsUsed": [],
+    "bounds": {
+      "min": [
+        -0.4625564217567444,
+        0,
+        -0.4625564217567444
+      ],
+      "max": [
+        0.4625564217567444,
+        0.03297102451324463,
+        0.4625564217567444
+      ],
+      "size": [
+        0.9251128435134888,
+        0.03297102451324463,
+        0.9251128435134888
+      ]
+    },
+    "originOffset": {
+      "x": 0,
+      "y": 0,
+      "z": 0
+    }
+  },
+  "problems": []
+}

@@ -1,0 +1,63 @@
+{
+  "in": "Prop_Drain.gltf",
+  "out": "Prop_Drain.glb",
+  "before": {
+    "triangles": 10,
+    "size": [
+      0.5852,
+      0.5852,
+      0.0404
+    ]
+  },
+  "after": {
+    "triangles": 10,
+    "size": [
+      0.5852,
+      0.5852,
+      0.0404
+    ]
+  },
+  "blender": "5.2.1 LTS",
+  "inspect": {
+    "file": "C:\\estudo\\Golpe\\lab\\projects\\p07\\.cache\\atelier-out\\Prop_Drain.glb",
+    "bytes": 1856,
+    "triangles": 10,
+    "vertices": 20,
+    "meshes": 1,
+    "nodes": 1,
+    "materials": 1,
+    "textures": 0,
+    "images": 0,
+    "animations": [],
+    "skins": 0,
+    "attributes": [
+      "NORMAL",
+      "POSITION",
+      "TEXCOORD_0"
+    ],
+    "extensionsUsed": [],
+    "bounds": {
+      "min": [
+        -0.2925943434238434,
+        0,
+        -0.2925943434238434
+      ],
+      "max": [
+        0.2925943434238434,
+        0.040405962616205215,
+        0.2925943434238434
+      ],
+      "size": [
+        0.5851886868476868,
+        0.040405962616205215,
+        0.5851886868476868
+      ]
+    },
+    "originOffset": {
+      "x": 0,
+      "y": 0,
+      "z": 0
+    }
+  },
+  "problems": []
+}

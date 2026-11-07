@@ -1,0 +1,64 @@
+{
+  "in": "Prop_ACUnit.gltf",
+  "out": "Prop_ACUnit.glb",
+  "before": {
+    "triangles": 136,
+    "size": [
+      0.8932,
+      0.3471,
+      0.6
+    ]
+  },
+  "after": {
+    "triangles": 136,
+    "size": [
+      0.8932,
+      0.3471,
+      0.6
+    ]
+  },
+  "blender": "5.2.1 LTS",
+  "inspect": {
+    "file": "C:\\estudo\\Golpe\\lab\\projects\\p07\\.cache\\atelier-out\\Prop_ACUnit.glb",
+    "bytes": 7568,
+    "triangles": 136,
+    "vertices": 136,
+    "meshes": 1,
+    "nodes": 1,
+    "materials": 1,
+    "textures": 0,
+    "images": 0,
+    "animations": [],
+    "skins": 0,
+    "attributes": [
+      "NORMAL",
+      "POSITION",
+      "TEXCOORD_0",
+      "TEXCOORD_1"
+    ],
+    "extensionsUsed": [],
+    "bounds": {
+      "min": [
+        -0.4465842843055725,
+        0,
+        -0.17353558540344238
+      ],
+      "max": [
+        0.4465842843055725,
+        0.6000000238418579,
+        0.17353560030460358
+      ],
+      "size": [
+        0.893168568611145,
+        0.6000000238418579,
+        0.34707118570804596
+      ]
+    },
+    "originOffset": {
+      "x": 0,
+      "y": 0,
+      "z": 7.450580596923828e-9
+    }
+  },
+  "problems": []
+}

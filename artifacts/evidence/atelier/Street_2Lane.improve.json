@@ -1,0 +1,66 @@
+{
+  "in": "Street_2Lane.gltf",
+  "out": "Street_2Lane.glb",
+  "before": {
+    "triangles": 220,
+    "size": [
+      6,
+      12,
+      0.15
+    ]
+  },
+  "after": {
+    "triangles": 220,
+    "size": [
+      6,
+      12,
+      0.15
+    ]
+  },
+  "blender": "5.2.1 LTS",
+  "inspect": {
+    "file": "C:\\estudo\\Golpe\\lab\\projects\\p07\\.cache\\atelier-out\\Street_2Lane.glb",
+    "bytes": 21480,
+    "triangles": 220,
+    "vertices": 304,
+    "meshes": 1,
+    "nodes": 1,
+    "materials": 3,
+    "textures": 0,
+    "images": 0,
+    "animations": [],
+    "skins": 0,
+    "attributes": [
+      "COLOR_0",
+      "COLOR_1",
+      "NORMAL",
+      "POSITION",
+      "TEXCOORD_0",
+      "TEXCOORD_1"
+    ],
+    "extensionsUsed": [],
+    "bounds": {
+      "min": [
+        -3.0000014305114746,
+        0,
+        -6.000000476837158
+      ],
+      "max": [
+        3.0000014305114746,
+        0.15000051259994507,
+        6.000000476837158
+      ],
+      "size": [
+        6.000002861022949,
+        0.15000051259994507,
+        12.000000953674316
+      ]
+    },
+    "originOffset": {
+      "x": 0,
+      "y": 0,
+      "z": 0
+    }
+  },
+  "problems": []
+}
