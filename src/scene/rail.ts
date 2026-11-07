@@ -89,7 +89,7 @@ export function createRail(count: number): Rail {
     if (k >= n) return b.clone();
     const dir = V3(b.x - camPts[k]!.x, 0, b.z - camPts[k]!.z).normalize();
     right.crossVectors(dir, up);
-    return V3(b.x - right.x * LOOK_SHIFT, b.y, b.z - right.z * LOOK_SHIFT);
+    return V3(b.x - right.x * LOOK_SHIFT, shotAt(k)?.aim ?? b.y, b.z - right.z * LOOK_SHIFT);
   });
   // The camera's path is a spline through knots. Each stop is a knot at its own integer c. A stop in a side street gets two more, on the
   // avenue just before and just after the junction, so the camera follows the street to the turn instead of cutting across the blocks.

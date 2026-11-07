@@ -52,6 +52,8 @@ export interface Shot {
   board: { ahead: number; lat: number; bottom: number };
   /** Board size, as a multiple of BOARD_WIDTH: far shots get a bigger board so the card still fills the screen. */
   scale: number;
+  /** Height the camera looks at, when it is not the board's middle (the kerb shot tilts down so the street shows under the card). */
+  aim?: number;
 }
 /** The shot of each of the ten stops, in order (the ninth and tenth are the last two). */
 const KINDS: readonly ShotKind[] = ["post", "facade", "side", "roof", "curb", "post", "under", "side", "roof", "curb"];
@@ -69,7 +71,7 @@ export function shotOf(k: number): Shot {
     case "roof":
       return { kind: "roof", cam: { ahead: 0.05, lat: 2 * s, h: 30 }, board: { ahead: 0.3, lat: 36 * s, bottom: 26 }, scale: 1.1 };
     case "curb":
-      return { kind: "curb", cam: { ahead: 0.3, lat: 6.5 * s, h: 1.7 }, board: { ahead: 0.3, lat: -36 * s, bottom: 3 }, scale: 1.3 };
+      return { kind: "curb", cam: { ahead: 0.3, lat: 6.5 * s, h: 1.7 }, board: { ahead: 0.3, lat: -32 * s, bottom: 6 }, scale: 1, aim: 9.7 };
     case "under":
       // A board under the viaduct deck (its underside is 12.6 high; the board tops out at 11.8) between the camera and the trains.
       return { kind: "under", cam: { ahead: 0.2, lat: 24 * s, h: 6 }, board: { ahead: 0.2, lat: 41 * s, bottom: 1 }, scale: 0.5 };

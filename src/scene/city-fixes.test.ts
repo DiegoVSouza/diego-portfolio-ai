@@ -75,7 +75,7 @@ describe("shots", () => {
     const pos = new THREE.Vector3();
     for (let k = 0; k < 10; k += 1) {
       rail.pose(k, pos, look);
-      expect(look.y).toBeCloseTo(boardMid(k), 5);
+      expect(look.y).toBeCloseTo(shotOf(k).aim ?? boardMid(k), 5);
       expect(pos.y).toBeCloseTo(shotOf(k).cam.h, 5);
     }
   });

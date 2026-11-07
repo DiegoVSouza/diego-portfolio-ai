@@ -476,20 +476,7 @@ export async function buildWorld(c: WorldContext): Promise<World> {
   await tick();
   const l1 = lane(1, { count: 14, latMin: 18, latMax: 48, hMin: 14, hMax: 36, wMin: 5, wMax: 9, realEvery: 3, signs: 2, walls: 6 });
   roofsOf(1, l1, 18, 3);
-  {
-    rail.frameAt(rail.u(first[1]!, 0.4), f);
-    const ry = yaw(f.T);
-    const cx = f.p.x - f.R.x * 32;
-    const cz = f.p.z - f.R.z * 32;
-    solid(1, 16, 30, 16, cx, 0, cz, ry, grey(0.2));
-    solid(1, 11, 18, 11, cx, 30, cz, ry, grey(0.26));
-    solid(1, 6, 12, 6, cx, 48, cz, ry, p.dred);
-    solid(1, 17, 1, 17, cx, 29.6, cz, ry, p.red, false);
-    solid(1, 12, 0.8, 12, cx, 47.6, cz, ry, p.red, false);
-    strut(1, V3(cx, 60, cz), V3(cx, 76, cz), 0.4, grey(0.4));
-    strut(1, V3(cx - 3, 66, cz), V3(cx + 3, 66, cz), 0.3, grey(0.4));
-    beacon(cx, 76.5, cz, 1.2);
-  }
+  // (A stepped landmark tower stood here, 32 to the side of the avenue: right where the facade board of stop 2 hangs. It showed through the card.)
 
   /* ---------- district 2, CORE: a dense glass core joined by sky bridges ---------- */
   await tick();
@@ -979,7 +966,13 @@ export async function buildWorld(c: WorldContext): Promise<World> {
   let fleet: Fleet[] | null = null;
   let kindsLoaded = 0;
   const VEHICLES = 13;
-  const vehicleData = Array.from({ length: VEHICLES }, (_, i) => ({ u: rnd(), sp: (0.01 + rnd() * 0.012) * (i % 2 ? 1 : -1), off: (i % 2 ? 1 : -1) * (3 + (i % 3) * 1.8) }));
+  const KERB_CARS = 3;
+  const KERB_TRAFFIC = stops.map((_, k) => k).filter((k) => shotOf(k).kind === "curb");
+  const vehicleData = Array.from({ length: VEHICLES }, (_, i) => ({
+    u: i < KERB_TRAFFIC.length * KERB_CARS ? (i % KERB_CARS) / KERB_CARS + 0.1 * (i % 2) : rnd(),
+    sp: (0.01 + rnd() * 0.012) * (i % 2 ? 1 : -1),
+    off: (i % 2 ? 1 : -1) * (3 + (i % 3) * 1.8) * (i < KERB_TRAFFIC.length * KERB_CARS ? 0.8 : 1),
+  }));
   const carFront = (g: THREE.BufferGeometry | null) => g?.rotateY(-Math.PI / 2) ?? null; // the cars' front is +X; vehicles drive along +Z
   void Promise.all([loadModel(c.models.truck), loadModel(c.models.moto), ...(c.models.cars ?? []).map((url) => loadModel(url).then(carFront))]).then(([truck, moto, ...cars]) => {
     // Sizes are the longest side in world units: a car reads as a car next to towers forty units tall.
@@ -1055,7 +1048,14 @@ export async function buildWorld(c: WorldContext): Promise<World> {
         for (let i = 0; i < k.n; i += 1) {
           const v = vehicleData[k.base + i]!;
           const dir = v.sp > 0 ? 1 : -1;
-          const u = (((v.u + (reduce ? 0 : time * v.sp)) % 1) + 1) % 1;
+          const index = k.base + i;
+          let u: number;
+          if (index < KERB_TRAFFIC.length * KERB_CARS) {
+            // The kerb stops get their own cars, looping up and down the avenue in front of the camera so some always cross the board.
+            const stop = KERB_TRAFFIC[Math.floor(index / KERB_CARS)]!;
+            const frac = (((v.u + (reduce ? 0 : (time * dir) / 7)) % 1) + 1) % 1;
+            u = rail.u(stop, -0.5 + frac * 1.4);
+          } else u = (((v.u + (reduce ? 0 : time * v.sp)) % 1) + 1) % 1;
           rail.frameAt(u, f);
           dummy.position.set(f.p.x + f.R.x * v.off, k.lift, f.p.z + f.R.z * v.off);
           dummy.lookAt(dummy.position.x + f.T.x * dir, dummy.position.y, dummy.position.z + f.T.z * dir);
