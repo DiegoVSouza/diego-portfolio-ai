@@ -63,13 +63,22 @@ export const SIDE_JUNCTION = 0.62;
 /** Centre-to-centre distance between metro cars, including clearance on curved tracks. */
 export const TRAIN_CAR_SPACING = 17;
 
+/** Each traffic lane runs this far from the avenue's middle (a vehicle's centre line). */
+export const TRAFFIC_LANE = 4;
+/** The widest vehicle on the road, in world units: the truck, measured from its bounds in the scene (4.82). */
+export const MAX_VEHICLE_WIDTH = 4.9;
+/** The tallest vehicle (the truck, 4.18). A camera lower than this plus a margin shares the road's height with traffic. */
+export const MAX_VEHICLE_HEIGHT = 4.3;
+/** How far a camera low enough to meet traffic must keep from the side of the widest vehicle. */
+export const CAMERA_CLEARANCE = 1;
+
 /** Evenly spaced vehicles share a lane speed, so they cannot catch one another. */
 export function trafficAt(index: number, count: number, time: number, reduced: boolean): { u: number; lateral: number; direction: 1 | -1 } {
   const direction = index % 2 === 0 ? 1 : -1;
   const laneCount = direction === 1 ? Math.ceil(count / 2) : Math.floor(count / 2);
   const slot = Math.floor(index / 2);
   const phase = slot / Math.max(1, laneCount) + (reduced ? 0 : time * 0.012 * direction);
-  return { u: ((phase % 1) + 1) % 1, lateral: direction * 4, direction };
+  return { u: ((phase % 1) + 1) % 1, lateral: direction * TRAFFIC_LANE, direction };
 }
 function baseShot(k: number): Shot {
   const s = sideOf(k);
@@ -82,7 +91,8 @@ function baseShot(k: number): Shot {
     case "roof":
       return { kind: "roof", cam: { ahead: 0.05, lat: 2 * s, h: 30 }, board: { ahead: 0.3, lat: 36 * s, bottom: 26 }, scale: 1.1 };
     case "curb":
-      return { kind: "curb", cam: { ahead: 0.3, lat: 6.5 * s, h: 1.7 }, board: { ahead: 0.3, lat: -32 * s, bottom: 6 }, scale: 1, aim: 9.7 };
+      // The camera stands at the kerb, past the side of the widest vehicle (the truck is 4.82 wide on a lane at 4, so its side is at 6.41).
+      return { kind: "curb", cam: { ahead: 0.3, lat: 7.8 * s, h: 1.7 }, board: { ahead: 0.3, lat: -32 * s, bottom: 6 }, scale: 1, aim: 9.7 };
     case "under":
       // A board under the viaduct deck (its underside is 12.6 high; the board tops out at 11.8) between the camera and the trains.
       return { kind: "under", cam: { ahead: 0.2, lat: 24 * s, h: 6 }, board: { ahead: 0.2, lat: 41 * s, bottom: 1 }, scale: 0.5 };

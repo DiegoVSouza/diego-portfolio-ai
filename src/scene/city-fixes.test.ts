@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import * as THREE from "three";
 import { OBB } from "three/examples/jsm/math/OBB.js";
-import { BOARD_PANEL_Z, BOARD_WIDTH, ROAD_EXTRA, TRAIN_CAR_SPACING, boardMid, frameFront, patchShot, shotKind, shotOf, trafficAt, trainLead } from "./layout";
+import { BOARD_PANEL_Z, BOARD_WIDTH, CAMERA_CLEARANCE, MAX_VEHICLE_HEIGHT, MAX_VEHICLE_WIDTH, ROAD_EXTRA, TRAIN_CAR_SPACING, boardMid, frameFront, patchShot, shotKind, shotOf, trafficAt, trainLead } from "./layout";
 import { fit, groundLift } from "./geometry";
 import { createRail } from "./rail";
 
@@ -157,5 +157,20 @@ describe("vehicle ground contact", () => {
     const wheels = new THREE.CylinderGeometry(0.5, 0.5, 0.3, 8).translate(0, -1.2, 0);
     // Wheels hang lower than the body: they set the lift.
     expect(groundLift([body, wheels], 0.05)).toBeCloseTo(0.05 + 1.2 + 0.15, 5);
+  });
+});
+
+describe("camera against traffic", () => {
+  it("keeps every low camera clear of the side of the widest vehicle in both lanes", () => {
+    const lanes = [trafficAt(0, 2, 0, true).lateral, trafficAt(1, 2, 0, true).lateral];
+    expect(lanes.map(Math.abs)).toEqual([4, 4]);
+    for (let k = 0; k < 10; k += 1) {
+      const cam = shotOf(k).cam;
+      if (cam.h > MAX_VEHICLE_HEIGHT + 1) continue;
+      for (const lane of lanes) {
+        const gap = Math.abs(cam.lat - lane) - MAX_VEHICLE_WIDTH / 2;
+        expect(gap, `stop ${k}, lane ${lane}`).toBeGreaterThanOrEqual(CAMERA_CLEARANCE);
+      }
+    }
   });
 });
