@@ -1,0 +1,10 @@
+
+ RUN  v5.0.5 C:/estudo/Golpe/lab/projects/p07
+
+
+ Test Files  15 passed (15)
+      Tests  115 passed (115)
+   Start at  13:08:36
+   Duration  59.36s (environment 94%, setup 4%, tests 1%)
+
+test exit code: 0

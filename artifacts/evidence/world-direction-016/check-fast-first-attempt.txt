@@ -1,0 +1,10 @@
+catalog: PASS
+evidence: PASS (23 records)
+FLOW-002: foundation/verdict code p00:artifacts/evals/live/free-final-c1/report.md does not exist at bff2acf5
+lint: exit 0
+typecheck: exit 0
+catalog:check: exit 0
+evidence:check: exit 0
+flow:check: exit 1
+check-fast: FAIL, run npm run flow:check and fix the first error
+exit code: 1

@@ -1,0 +1,237 @@
+[
+ {
+  "stop": 0,
+  "conesOnCardLayer": 0,
+  "cones": 4,
+  "paintedFaceVisible": false,
+  "nearCards": 1,
+  "controls": [
+   {
+    "text": "Start the tour →",
+    "inside": true,
+    "reaches": true
+   },
+   {
+    "text": "Live demo",
+    "inside": true,
+    "reaches": true
+   }
+  ],
+  "trafficPointerEvents": "none",
+  "trafficVisibility": "visible"
+ },
+ {
+  "stop": 1,
+  "conesOnCardLayer": 0,
+  "cones": 4,
+  "paintedFaceVisible": false,
+  "nearCards": 1,
+  "controls": [
+   {
+    "text": "SupportOps",
+    "inside": true,
+    "reaches": true
+   },
+   {
+    "text": "Live demo →",
+    "inside": true,
+    "reaches": true
+   },
+   {
+    "text": "View project",
+    "inside": true,
+    "reaches": true
+   }
+  ],
+  "trafficPointerEvents": "none",
+  "trafficVisibility": "visible"
+ },
+ {
+  "stop": 2,
+  "conesOnCardLayer": 0,
+  "cones": 4,
+  "paintedFaceVisible": false,
+  "nearCards": 1,
+  "controls": [
+   {
+    "text": "Foundation and live eval",
+    "inside": true,
+    "reaches": true
+   },
+   {
+    "text": "View project →",
+    "inside": true,
+    "reaches": true
+   }
+  ],
+  "trafficPointerEvents": "none",
+  "trafficVisibility": "visible"
+ },
+ {
+  "stop": 3,
+  "conesOnCardLayer": 0,
+  "cones": 4,
+  "paintedFaceVisible": false,
+  "nearCards": 1,
+  "controls": [
+   {
+    "text": "Multi-agent orchestratio",
+    "inside": true,
+    "reaches": true
+   },
+   {
+    "text": "View project →",
+    "inside": true,
+    "reaches": true
+   }
+  ],
+  "trafficPointerEvents": "none",
+  "trafficVisibility": "visible"
+ },
+ {
+  "stop": 4,
+  "conesOnCardLayer": 0,
+  "cones": 4,
+  "paintedFaceVisible": false,
+  "nearCards": 1,
+  "controls": [
+   {
+    "text": "Production AI toolkit",
+    "inside": true,
+    "reaches": true
+   },
+   {
+    "text": "View project →",
+    "inside": true,
+    "reaches": true
+   }
+  ],
+  "trafficPointerEvents": "none",
+  "trafficVisibility": "visible"
+ },
+ {
+  "stop": 5,
+  "conesOnCardLayer": 0,
+  "cones": 4,
+  "paintedFaceVisible": false,
+  "nearCards": 1,
+  "controls": [
+   {
+    "text": "Agent observability",
+    "inside": true,
+    "reaches": true
+   },
+   {
+    "text": "View project →",
+    "inside": true,
+    "reaches": true
+   }
+  ],
+  "trafficPointerEvents": "none",
+  "trafficVisibility": "visible"
+ },
+ {
+  "stop": 6,
+  "conesOnCardLayer": 0,
+  "cones": 4,
+  "paintedFaceVisible": false,
+  "nearCards": 1,
+  "controls": [
+   {
+    "text": "Durable async workflows",
+    "inside": true,
+    "reaches": true
+   },
+   {
+    "text": "View project →",
+    "inside": true,
+    "reaches": true
+   }
+  ],
+  "trafficPointerEvents": "none",
+  "trafficVisibility": "visible"
+ },
+ {
+  "stop": 7,
+  "conesOnCardLayer": 0,
+  "cones": 4,
+  "paintedFaceVisible": false,
+  "nearCards": 1,
+  "controls": [
+   {
+    "text": "This site and its design",
+    "inside": true,
+    "reaches": true
+   },
+   {
+    "text": "View project →",
+    "inside": true,
+    "reaches": true
+   }
+  ],
+  "trafficPointerEvents": "none",
+  "trafficVisibility": "visible"
+ },
+ {
+  "stop": 8,
+  "conesOnCardLayer": 0,
+  "cones": 4,
+  "paintedFaceVisible": false,
+  "nearCards": 1,
+  "controls": [
+   {
+    "text": "The engineering harness",
+    "inside": true,
+    "reaches": true
+   },
+   {
+    "text": "View project →",
+    "inside": true,
+    "reaches": true
+   }
+  ],
+  "trafficPointerEvents": "none",
+  "trafficVisibility": "visible"
+ },
+ {
+  "stop": 9,
+  "conesOnCardLayer": 0,
+  "cones": 4,
+  "paintedFaceVisible": false,
+  "nearCards": 1,
+  "controls": [
+   {
+    "text": "+55 88 99797-4229",
+    "inside": true,
+    "reaches": true
+   },
+   {
+    "text": "dvsdiegovieira@gmail.com",
+    "inside": true,
+    "reaches": true
+   },
+   {
+    "text": "LinkedIn",
+    "inside": true,
+    "reaches": true
+   },
+   {
+    "text": "GitHub",
+    "inside": true,
+    "reaches": true
+   },
+   {
+    "text": "Experience",
+    "inside": true,
+    "reaches": true
+   },
+   {
+    "text": "Message me on WhatsApp",
+    "inside": true,
+    "reaches": true
+   }
+  ],
+  "trafficPointerEvents": "none",
+  "trafficVisibility": "visible"
+ }
+]

@@ -1,0 +1,2 @@
+budget: PASS (worst route /projects/foundation/index.html: 66.3 KB gzip of 100 KB; scene chunk 171.4 KB of 500 KB)
+budget exit code: 0

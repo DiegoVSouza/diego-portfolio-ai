@@ -1,0 +1,4 @@
+Phase 016 render loop rate (dev server, headless Chrome, 100 Hz rAF)
+before fix: starts=1 loops/s=202 canvases=1 (two request chains; second call has dt=0)
+after fix:  scene frames/s=100.2 (one request chain)
+method: window.__worldProbe().frames counter (scene.ts, dev only) sampled 2 s apart

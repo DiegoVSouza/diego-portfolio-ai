@@ -1,0 +1,52 @@
+# Phase 016 findings
+
+Everything here comes from runs in this phase on the current state (dev server, headless Chrome 1280 x 800, 100 Hz display). Phase 015 results were not reused as proof. Three separate levels: **technical** (numbers and tests), **agent visual review** (screenshots the agent opened and read, listed), **human approval** (none yet).
+
+## Reproduce
+
+`npm run dev -- --host 127.0.0.1 --port 5187 --strictPort`, then:
+
+| Tool | Output |
+|---|---|
+| `node tools/world-direction-motion.cjs` then `python tools/world-direction-analyze.py` | `motion-frames.json`, `MOTION.md` |
+| `node tools/world-direction-static.cjs` then `python tools/world-direction-collide.py` | `world-static.json`, `world-moving.json`, `COLLISIONS.md` |
+| `node tools/world-direction-cards.cjs` | `cards-check.json` |
+| `node tools/world-direction-shots.cjs <tag>` / `node tools/world-direction-view.cjs <tag> <views.json>` | screenshots under `<tag>/` |
+| `python tools/world-direction-annotate.py` | `docs/world/img/*` |
+
+The tools need dev-only hooks in `scene.ts` (`__worldProbe`, `__worldInside`, `__worldAudit`, `__freeCam`); production builds drop them.
+
+## Confirmed defects and fixes
+
+| # | Defect | Evidence (before, after) | Fix and test | Commit |
+|---|---|---|---|---|
+| 1 | Towers and one board building stood on the metro viaduct (deck and pillars); trains ran through those buildings | `COLLISIONS-before.md`: 94 static pairs and 12 train/building classes from exact oriented boxes; `COLLISIONS.md`: none between exact solids | viaduct keeps the longest clear stretch per side, towers skip the corridor, trains use the drawn stretch, buffer stops at the ends; `corridor.test.ts` | `6ea65af` |
+| 2 | Cars hovered over the road: lowest point 0.41 (S64) and 0.57 (R7) above it | `COLLISIONS-before.md` (contact table) vs `COLLISIONS.md`: 0.05 | `groundLift` by lowest point of body and wheels; test in `city-fixes.test.ts` | `6ea65af` |
+| 3 | The render loop ran twice per frame (two request chains from start-up); the second call had dt = 0 | `loop-rate.txt`: 202 calls/s before, 100.2 after | `loop.ts` scheduler; `loop.test.ts` | `d8161a5` |
+| 4 | Camera whip: up to 11.9 rad/s leaving roof and side stops | `MOTION-limiter-only.md` (100 ms windows, taken while the doubled loop still defeated the limiter, so it equals the unlimited camera): fwd-6-7 10.69, back-8-7 10.66, back-3-2 11.91 rad/s; after (final run): at most 5.12 in every flight (`MOTION.md`; the limit is 5, a 100 ms window can read a little above it). `MOTION-before.md` holds the first, noisier per-frame metrics and is not used for rates | rate limit 5 rad/s (`turn.ts`); `turn.test.ts` | `d8161a5` |
+| 5 | Uneven speed: legs of 65 to 171 units all took 2.2 s, and the spline ran up to 1.56 times faster than its mean inside a leg. Peak speed 80 to 302 u/s | `MOTION-limiter-only.md` (before): peak speed 80 to 302 u/s, acceleration mostly 150 to 660 u/s2 over 100 ms windows. `MOTION.md` (final run): peak speed 90 to 138 u/s; acceleration 64 to 178 u/s2 in all but three runs: `fwd-0-1` 656 (the first leg from rest; cause not isolated), `wheel-down` 256 and `wheel-up` 218 | arc-length remap per leg and a flight time proportional to the leg; `flow.test.ts` | `d8161a5` |
+| 6 | Curb-stop cameras (stops 4 and 9) sat 0.09 from the side of a passing truck (truck 4.82 wide on a lane at 4; camera at 6.5), inside the 0.5 near plane | geometry from `world-moving.json` bounds | camera to 7.8; test requires 1 unit of clearance for every low camera | `b5460c5` |
+
+## Candidates not settled
+
+| Candidate | What the evidence says | Status |
+|---|---|---|
+| Station against trains | `COLLISIONS.md`: station box overlaps the cars (up to 4.8 planar). Scale arithmetic: trains are 7.0 wide, the whole station 9.0 wide. `views-1/station-close.png` shows the cars running behind the platform rail and posts | very likely a real clipping, **no mesh-level test was run**; owner decision D4 in `docs/world/SURROUNDINGS-PLAN.pt-BR.md` |
+| Viaduct decks overlapping each other (62 pairs, up to 1.83) | adjacent segments are 7.6 long on a 7.0 step, same colour and same top height | not changed; flicker cannot be judged from still images |
+| Camera "inside" flags | 403 flags on 9,507 samples, all on imported landmark meshes with the nearest face at least 12.1 away; the smallest distance from any sample to any solid was 7.35 | false positives (open GLB shells); the camera did not touch a solid in the sampled frames (final run, after every fix: 9,507 samples, smallest distance 7.35) |
+| Cars wrapping at the ends of the road | analytical: the start is behind the stop 0 view; the far end is 315 from stop 9, past the fog | not sampled in frames |
+| Harbour never visible | stop 9 is 327 from the water's edge, fog ends at 300 | decision D2 |
+
+## Checks that came out clean
+
+- Cards: `cards-check.json` (all ten stops): no light cone on the card layer, exactly one near card, every control inside the viewport and reaching the click (hit test), traffic canvas `pointer-events: none`, painted face hidden under the card.
+- Navigation sampled: 9 forward legs, 9 backward legs, 3 menu cuts, 160-step wheel down and up, arrow key, and reduced motion (four steps: each press goes straight to the stop, no flight, no page error). No direction reversals in flight, no frame step above 30 units outside the cuts.
+- First-frame draw calls: 80 before the surroundings, 82 after (limit 100).
+
+## Screenshots actually opened and read
+
+`after-fixes-1/stop-4, stop-5, stop-6`; `views-1/station-close, viaduct-start-left, avenue-overview`; `views-2/end-of-avenue, harbour-from-above, skyline-wide-aerial, ground-edge-high, behind-start, avenue-end-ground`; `views-3/skyline-wide-aerial, end-of-avenue, horizon-left, harbour-from-above`; `after-final/flight-6-7, stop-3, stop-9`; `after-curb/stop-9, stop-4`; `docs/world/img/region-map.png`. Not opened: the other stops and flight frames, `station-side`, `station-along`, and the remaining free views.
+
+## Not verified
+
+Blender MCP was not connected (port 9876 down), so no open scene was touched. Real devices, frame time on slow GPUs and long sessions were not tested. Colour and composition are an agent reading, not approval.
