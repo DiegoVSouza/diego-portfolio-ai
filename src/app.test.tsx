@@ -28,7 +28,7 @@ describe("prerendered HTML (SEO-001, SEC-001)", () => {
       const text = main.replace(/<[^>]+>/g, "");
       expect(text.includes("`"), `${path} shows a literal backtick`).toBe(false);
     }
-    expect(await renderToHtml("/projects/foundation/")).toContain("<code>FAIL_PROVISIONAL</code>");
+    expect(await renderToHtml("/projects/foundation/")).toContain("54 of 60");
   });
 
   it("the contact section has a WhatsApp button and a phone link, in both languages", async () => {

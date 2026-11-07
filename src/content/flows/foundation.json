@@ -99,11 +99,11 @@
         "pt": "Veredito"
       },
       "detail": {
-        "en": "The report states the pass rate, the interval and the failing families.",
-        "pt": "O relatório traz a taxa, o intervalo e as famílias que falharam."
+        "en": "The report states the pass rate, the interval and the failing cases.",
+        "pt": "O relatório traz a taxa, o intervalo e os casos que falharam."
       },
       "project": "P00",
-      "code": "artifacts/evals/live/free-dev-c2r1/report.md",
+      "code": "artifacts/evals/live/free-final-c1/report.md",
       "repo": "p00"
     }
   ],

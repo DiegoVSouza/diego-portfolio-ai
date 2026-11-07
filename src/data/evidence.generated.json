@@ -41,99 +41,163 @@
       }
     },
     {
-      "id": "p00-cases",
+      "id": "p00-dev-alone",
       "project": "foundation",
       "label": {
-        "en": "Unique cases that passed all three trials",
-        "pt": "Casos únicos aprovados nos três trials"
+        "en": "Development-set trials passed by the prompt alone",
+        "pt": "Trials do conjunto de desenvolvimento aprovados só com o prompt"
       },
-      "value": "9 of 12",
+      "value": "157 of 192",
       "mode": "live",
-      "command": "run_live_campaign.py, campaign free-dev-c2r1, as recorded in the campaign report",
-      "exitCode": 1,
-      "commit": "09d8c1ec6c0efc9a57d65ca86e8c7c5fe4396d6a",
-      "path": "artifacts/evals/live/free-dev-c2r1/report.json",
-      "repo": "https://github.com/DiegoVSouza/supportops-foundation",
-      "recordedAt": "2026-10-28",
-      "caveat": {
-        "en": "Same campaign, same status.",
-        "pt": "Mesma campanha, mesmo status."
-      }
-    },
-    {
-      "id": "p00-errors",
-      "project": "foundation",
-      "label": {
-        "en": "Failures by family in the development campaign",
-        "pt": "Falhas por família na campanha de desenvolvimento"
-      },
-      "value": "classification 3, routing 6, tool selection 3",
-      "mode": "live",
-      "command": "run_live_campaign.py, campaign free-dev-c2r1, as recorded in the campaign report",
-      "exitCode": 1,
-      "commit": "09d8c1ec6c0efc9a57d65ca86e8c7c5fe4396d6a",
-      "path": "artifacts/evals/live/free-dev-c2r1/report.json",
-      "repo": "https://github.com/DiegoVSouza/supportops-foundation",
-      "recordedAt": "2026-10-28",
-      "caveat": {
-        "en": "Counts of errors, not of failed trials; one trial can carry more than one.",
-        "pt": "Contagem de erros, não de trials reprovados; um trial pode ter mais de um."
-      }
-    },
-    {
-      "id": "p00-protected",
-      "project": "foundation",
-      "label": {
-        "en": "Protected evaluation budget",
-        "pt": "Orçamento de avaliação protegido"
-      },
-      "value": "84 held-out calls and 60 confirmation calls stayed reserved",
-      "mode": "live",
-      "command": "recorded in the P00 progress log",
+      "command": "python evals/candidates/summarize_campaign.py free-dev-c6 (computed from the recorded trials)",
       "exitCode": 0,
-      "commit": "438d19f1e8a9d745727475f2a7ded271c5a38f45",
-      "path": "docs/harness/progress.md",
+      "commit": "44880f5582f0e67bab8e19169fb692b22035fae4",
+      "path": "artifacts/evidence/summaries/free-dev-c6.json",
       "repo": "https://github.com/DiegoVSouza/supportops-foundation",
-      "recordedAt": "2026-11-04"
-    },
-    {
-      "id": "p00-trials",
-      "project": "foundation",
-      "label": {
-        "en": "Real-model trials passed (development set)",
-        "pt": "Trials com modelo real aprovados (conjunto de desenvolvimento)"
-      },
-      "value": "27 of 36",
-      "mode": "live",
-      "command": "run_live_campaign.py, campaign free-dev-c2r1, as recorded in the campaign report",
-      "exitCode": 1,
-      "commit": "09d8c1ec6c0efc9a57d65ca86e8c7c5fe4396d6a",
-      "path": "artifacts/evals/live/free-dev-c2r1/report.json",
-      "repo": "https://github.com/DiegoVSouza/supportops-foundation",
-      "recordedAt": "2026-10-28",
+      "recordedAt": "2026-11-07",
       "caveat": {
-        "en": "Development set, not held out. Status FAIL_PROVISIONAL; the exit code follows that status, as the P00 README defines it.",
-        "pt": "Conjunto de desenvolvimento, não holdout. Status FAIL_PROVISIONAL; o exit code segue esse status, como o README do P00 define."
+        "en": "64 development cases x 3 trials. Development data, used to choose the prompt.",
+        "pt": "64 casos de desenvolvimento x 3 trials. Dados de desenvolvimento, usados para escolher o prompt."
       }
     },
     {
-      "id": "p00-wilson",
+      "id": "p00-dev-director",
       "project": "foundation",
       "label": {
-        "en": "Wilson 95% interval for the all-three pass rate",
-        "pt": "Intervalo de Wilson 95% da taxa de aprovação nos três trials"
+        "en": "Same development trials replayed through the deterministic director",
+        "pt": "Mesmos trials de desenvolvimento reproduzidos pelo diretor determinístico"
       },
-      "value": "0.47 to 0.91 (Wilson, 95%)",
+      "value": "182 of 192",
       "mode": "live",
-      "command": "run_live_campaign.py, campaign free-dev-c2r1, as recorded in the campaign report",
-      "exitCode": 1,
-      "commit": "09d8c1ec6c0efc9a57d65ca86e8c7c5fe4396d6a",
-      "path": "artifacts/evals/live/free-dev-c2r1/report.json",
+      "command": "python evals/candidates/summarize_campaign.py free-dev-c6 (computed from the recorded trials)",
+      "exitCode": 0,
+      "commit": "44880f5582f0e67bab8e19169fb692b22035fae4",
+      "path": "artifacts/evidence/summaries/free-dev-c6.json",
       "repo": "https://github.com/DiegoVSouza/supportops-foundation",
-      "recordedAt": "2026-10-28",
+      "recordedAt": "2026-11-07",
       "caveat": {
-        "en": "Rounded to two decimals from the report.",
-        "pt": "Arredondado para duas casas a partir do relatório."
+        "en": "In-sample: the director's rules were written after reading these tickets. The replay is exact because the director only post-processes the recorded outputs.",
+        "pt": "Dentro da amostra: as regras do diretor foram escritas depois de ler estes tickets. A reprodução é exata porque o diretor só pós-processa as saídas gravadas."
+      }
+    },
+    {
+      "id": "p00-dev-feature",
+      "project": "foundation",
+      "label": {
+        "en": "Development-set trials passed by the feature-report prompt",
+        "pt": "Trials de desenvolvimento aprovados pelo prompt de relatório de fatos"
+      },
+      "value": "150 of 192",
+      "mode": "live",
+      "command": "python evals/candidates/summarize_campaign.py free-dev-c8 (computed from the recorded trials)",
+      "exitCode": 0,
+      "commit": "44880f5582f0e67bab8e19169fb692b22035fae4",
+      "path": "artifacts/evidence/summaries/free-dev-c8.json",
+      "repo": "https://github.com/DiegoVSouza/supportops-foundation",
+      "recordedAt": "2026-11-07",
+      "caveat": {
+        "en": "The candidate a free-tier proxy preferred; on the real stack it scored lower than the prompt it was meant to beat.",
+        "pt": "O candidato que um proxy gratuito preferiu; na stack real ele ficou abaixo do prompt que devia superar."
+      }
+    },
+    {
+      "id": "p00-final-actions",
+      "project": "foundation",
+      "label": {
+        "en": "Final-split trials passed by the expected action",
+        "pt": "Trials aprovados na rodada final por ação esperada"
+      },
+      "value": "answers 36/36, asks for detail 12/12, escalations 6/12",
+      "mode": "live",
+      "command": "python evals/candidates/summarize_campaign.py free-final-c1 (computed from the recorded trials)",
+      "exitCode": 0,
+      "commit": "44880f5582f0e67bab8e19169fb692b22035fae4",
+      "path": "artifacts/evidence/summaries/free-final-c1.json",
+      "repo": "https://github.com/DiegoVSouza/supportops-foundation",
+      "recordedAt": "2026-11-07",
+      "caveat": {
+        "en": "Escalations are the weak part: the two failing cases were both expected escalations.",
+        "pt": "As escalações são a parte fraca: os dois casos que falharam esperavam escalação."
+      }
+    },
+    {
+      "id": "p00-final-cases",
+      "project": "foundation",
+      "label": {
+        "en": "Final-split cases that passed all three trials",
+        "pt": "Casos da rodada final aprovados nos três trials"
+      },
+      "value": "18 of 20",
+      "mode": "live",
+      "command": "python evals/candidates/summarize_campaign.py free-final-c1 (computed from the recorded trials)",
+      "exitCode": 0,
+      "commit": "44880f5582f0e67bab8e19169fb692b22035fae4",
+      "path": "artifacts/evidence/summaries/free-final-c1.json",
+      "repo": "https://github.com/DiegoVSouza/supportops-foundation",
+      "recordedAt": "2026-11-07",
+      "caveat": {
+        "en": "Same run.",
+        "pt": "Mesma rodada."
+      }
+    },
+    {
+      "id": "p00-final-trials",
+      "project": "foundation",
+      "label": {
+        "en": "Trials passed on the unseen final split (single use)",
+        "pt": "Trials aprovados na rodada final com casos não vistos (uso único)"
+      },
+      "value": "54 of 60",
+      "mode": "live",
+      "command": "python evals/candidates/summarize_campaign.py free-final-c1 (computed from the recorded trials)",
+      "exitCode": 0,
+      "commit": "44880f5582f0e67bab8e19169fb692b22035fae4",
+      "path": "artifacts/evidence/summaries/free-final-c1.json",
+      "repo": "https://github.com/DiegoVSouza/supportops-foundation",
+      "recordedAt": "2026-11-07",
+      "caveat": {
+        "en": "20 synthetic cases written once under a documented rule and never used to design the prompt. The number measures the whole system, model plus code, not the bare model.",
+        "pt": "20 casos sintéticos escritos uma vez sob uma regra documentada e nunca usados para desenhar o prompt. O número mede o sistema inteiro, modelo mais código, não o modelo sozinho."
+      }
+    },
+    {
+      "id": "p00-final-wilson",
+      "project": "foundation",
+      "label": {
+        "en": "Wilson 95% interval for the final-split pass rate",
+        "pt": "Intervalo de Wilson 95% da taxa de aprovação na rodada final"
+      },
+      "value": "0.799 to 0.953 (Wilson, 95%)",
+      "mode": "live",
+      "command": "python evals/candidates/summarize_campaign.py free-final-c1 (computed from the recorded trials)",
+      "exitCode": 0,
+      "commit": "44880f5582f0e67bab8e19169fb692b22035fae4",
+      "path": "artifacts/evidence/summaries/free-final-c1.json",
+      "repo": "https://github.com/DiegoVSouza/supportops-foundation",
+      "recordedAt": "2026-11-07",
+      "caveat": {
+        "en": "Rounded to three decimals. With 60 trials the interval is wide.",
+        "pt": "Arredondado para três casas. Com 60 trials o intervalo é largo."
+      }
+    },
+    {
+      "id": "p00-holdout-old",
+      "project": "foundation",
+      "label": {
+        "en": "Trials passed on the first sealed holdout (older 28-case dataset)",
+        "pt": "Trials aprovados no primeiro holdout selado (dataset antigo de 28 casos)"
+      },
+      "value": "29 of 84",
+      "mode": "live",
+      "command": "python evals/candidates/summarize_campaign.py free-holdout-c1 (computed from the recorded trials)",
+      "exitCode": 0,
+      "commit": "44880f5582f0e67bab8e19169fb692b22035fae4",
+      "path": "artifacts/evidence/summaries/free-holdout-c1.json",
+      "repo": "https://github.com/DiegoVSouza/supportops-foundation",
+      "recordedAt": "2026-11-07",
+      "caveat": {
+        "en": "Older dataset and prompt; it had no account-access or technical cases in development. Kept because it is what the first design scored.",
+        "pt": "Dataset e prompt antigos; não havia casos de acesso à conta nem técnicos no desenvolvimento. Mantido porque é o que o primeiro desenho fez."
       }
     },
     {
