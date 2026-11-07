@@ -28,6 +28,9 @@ export interface Rail {
   cameraAt(k: number, out: THREE.Vector3): THREE.Vector3;
   /** Ground path length in world units. */
   length: number;
+  /** Convert between the spline parameter and distance along the ground path. */
+  distanceAt(u: number): number;
+  uAtDistance(distance: number): number;
   /** u of stop k plus `ahead` stops. */
   u(k: number, ahead?: number): number;
 }
@@ -58,6 +61,13 @@ export function createRail(count: number): Rail {
   // The camera sits 26 units in front of the stop's centre (the city is ahead of it, -z).
   const centres = Array.from({ length: total + 1 }, (_, k) => V3(SWAY * Math.sin(k * 0.85), 0, -SPACING * k + 26));
   const ground = new THREE.CatmullRomCurve3(centres, false, "catmullrom", 0.5);
+  ground.arcLengthDivisions = 2000;
+  const arcLengths = ground.getLengths();
+  const distanceAt = (u: number) => {
+    const p = Math.min(1, Math.max(0, u)) * ground.arcLengthDivisions;
+    const i = Math.min(ground.arcLengthDivisions - 1, Math.floor(p));
+    return THREE.MathUtils.lerp(arcLengths[i]!, arcLengths[i + 1]!, p - i);
+  };
   const up = V3(0, 1, 0);
   const right = V3(0, 0, 0);
   const frameOf = (u: number, out: { p: THREE.Vector3; T: THREE.Vector3; R: THREE.Vector3 }) => {
@@ -121,6 +131,8 @@ export function createRail(count: number): Rail {
   return {
     count: n,
     length: ground.getLength(),
+    distanceAt,
+    uAtDistance: (distance) => ground.getUtoTmapping(0, Math.max(0, Math.min(ground.getLength(), distance))),
     u: (k, ahead = 0) => Math.min(1, Math.max(0, (k + ahead) / total)),
     pose(c, pos, lookAt) {
       const t = tOf(c);

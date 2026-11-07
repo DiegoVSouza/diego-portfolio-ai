@@ -49,7 +49,7 @@ const SETTLE_MS = 140;
 /** Fraction of a leg the camera rests at each end: the stop is a place, not a point. */
 const DWELL = 0.12;
 /** Swing between stops: sideways shift on the avenue (units), pan (radians) and bank (radians). All are zero at a stop. */
-const SWING_SHIFT = 5;
+const SWING_SHIFT = 2;
 const SWING_PAN = 0.4;
 const BANK = 0.28;
 const smooth = (x: number) => x * x * (3 - 2 * x);
@@ -173,6 +173,49 @@ export async function start(canvas: HTMLCanvasElement, options: SceneOptions): P
     },
   });
   canvas.dataset.landmarks = String(world.landmarks);
+  // Development-only inventory: the audit records actual world-space instance bounds, not guessed layout values.
+  if (import.meta.env.DEV) {
+    (window as unknown as { __worldAudit?: () => unknown }).__worldAudit = () => {
+      scene.updateMatrixWorld(true);
+      const objects: unknown[] = [];
+      const instance = new THREE.Matrix4();
+      const worldMatrix = new THREE.Matrix4();
+      scene.traverse((object) => {
+        const mesh = object as THREE.Mesh;
+        if (!mesh.isMesh || !mesh.geometry) return;
+        mesh.geometry.computeBoundingBox();
+        const box = mesh.geometry.boundingBox;
+        if (!box) return;
+        const instanced = mesh as THREE.InstancedMesh;
+        const bounds = [];
+        for (let i = 0; i < (instanced.isInstancedMesh ? instanced.count : 1); i += 1) {
+          if (instanced.isInstancedMesh) {
+            instanced.getMatrixAt(i, instance);
+            worldMatrix.multiplyMatrices(mesh.matrixWorld, instance);
+          } else worldMatrix.copy(mesh.matrixWorld);
+          const b = box.clone().applyMatrix4(worldMatrix);
+          bounds.push({ min: b.min.toArray(), max: b.max.toArray(), matrix: worldMatrix.toArray() });
+        }
+        objects.push({ name: mesh.name || mesh.parent?.name || "unnamed", geometry: mesh.geometry.type, visible: mesh.visible, layers: mesh.layers.mask, localBounds: { min: box.min.toArray(), max: box.max.toArray() }, bounds });
+      });
+      const poses = Array.from({ length: count }, (_, k) => {
+        const position = V3(0, 0, 0);
+        const look = V3(0, 0, 0);
+        const board = Array.from({ length: 4 }, () => V3(0, 0, 0));
+        rail.pose(k, position, look);
+        world.boardCorners(k, board);
+        return { stop: k, position: position.toArray(), look: look.toArray(), board: board.map((v) => v.toArray()) };
+      });
+      const path = Array.from({ length: (count - 1) * 20 + 1 }, (_, i) => {
+        const c = i / 20;
+        const position = V3(0, 0, 0);
+        const look = V3(0, 0, 0);
+        rail.pose(c, position, look);
+        return { c, position: position.toArray(), look: look.toArray() };
+      });
+      return { railLength: rail.length, roadStart: rail.frameAt(0).p.toArray(), roadEnd: rail.frameAt(1).p.toArray(), camera: camera.position.toArray(), cameraNear: camera.near, cameraFar: camera.far, poses, path, footprints: world.auditFootprints(), objects };
+    };
+  }
   if (document.fonts?.load) {
     void document.fonts
       .load('400 84px "Anton"')
@@ -401,6 +444,7 @@ export async function start(canvas: HTMLCanvasElement, options: SceneOptions): P
       const ad = Math.abs(d);
       const visible = d > -1.15 && d < 0.55;
       const hide = () => {
+        world.setCardOverlay(k, false);
         if (el.dataset.shown !== "0") {
           el.dataset.shown = "0";
           delete el.dataset.near;
@@ -434,6 +478,7 @@ export async function start(canvas: HTMLCanvasElement, options: SceneOptions): P
       }
       // Previews fade in from the distance; the card at its stop is fully there.
       const o = near ? 1 : Math.max(0, 0.9 * (1 - (ad - 0.22) / 0.9));
+      world.setCardOverlay(k, o > 0);
       put(el, "--m", homography(cardWidth[k]!, cardHeight[k]!));
       put(el, "--o", o.toFixed(2));
       if (el.dataset.shown !== "1" || el.inert === near) {
@@ -461,7 +506,9 @@ export async function start(canvas: HTMLCanvasElement, options: SceneOptions): P
       quality.sample(rawDt, now);
       time += dt;
       const before = cCur;
-      cCur += (flightC() - cCur) * (1 - Math.exp(-7 * dt));
+      const target = flightC();
+      // Programmatic navigation already eases the scroll; do not ease it a second time.
+      cCur = document.documentElement.dataset.flight === "1" ? target : cCur + (target - cCur) * (1 - Math.exp(-7 * dt));
       if (dt > 0) vel += ((cCur - before) / dt - vel) * (1 - Math.exp(-10 * dt));
       px += (pxT - px) * (1 - Math.exp(-4 * dt));
       py += (pyT - py) * (1 - Math.exp(-4 * dt));
@@ -555,6 +602,7 @@ export async function start(canvas: HTMLCanvasElement, options: SceneOptions): P
   function dispose() {
     if (dead) return;
     dead = true;
+    if (import.meta.env.DEV) delete (window as unknown as { __worldAudit?: () => unknown }).__worldAudit;
     if (raf) cancelAnimationFrame(raf);
     window.clearTimeout(settleTimer);
     observer.disconnect();

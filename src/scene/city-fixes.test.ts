@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import * as THREE from "three";
-import { BOARD_PANEL_Z, BOARD_WIDTH, ROAD_EXTRA, boardMid, frameFront, patchShot, shotKind, shotOf, trainLead } from "./layout";
+import { OBB } from "three/examples/jsm/math/OBB.js";
+import { BOARD_PANEL_Z, BOARD_WIDTH, ROAD_EXTRA, TRAIN_CAR_SPACING, boardMid, frameFront, patchShot, shotKind, shotOf, trafficAt, trainLead } from "./layout";
 import { createRail } from "./rail";
 
 describe("shuttle train", () => {
@@ -27,6 +28,30 @@ describe("shuttle train", () => {
     const start = body(0);
     expect(start[0]).toBeCloseTo(end[0]!, 6);
   });
+  it("keeps adjacent cars clear on the curved inner and outer tracks", () => {
+    const rail = createRail(10);
+    const start = rail.distanceAt(rail.u(5, -1.2));
+    const trackLength = rail.distanceAt(rail.u(6, 1.2)) - start;
+    const spacing = TRAIN_CAR_SPACING;
+    const room = (4 * spacing) / trackLength;
+    const dummy = new THREE.Object3D();
+    // The widest downloaded carriage is 1.35 x 1.57 x 2.6 at scale 5.2.
+    const box = new OBB(new THREE.Vector3(0, 4, 0), new THREE.Vector3(1.35 * 5.2 / 2, 1.57 * 5.2 / 2, 2.6 * 5.2 / 2));
+    for (const lateral of [-45.7, -38.3, 38.3, 45.7]) for (let step = 0; step < 100; step += 1) {
+      const { lead, forward } = trainLead(step / 100, room);
+      const dir = forward ? 1 : -1;
+      let previous: OBB | undefined;
+      for (let slot = 0; slot < 5; slot += 1) {
+        const frame = rail.frameAt(rail.uAtDistance(start + lead * trackLength - dir * slot * spacing));
+        dummy.position.set(frame.p.x + frame.R.x * lateral, 14, frame.p.z + frame.R.z * lateral);
+        dummy.rotation.set(0, Math.atan2(frame.T.x, frame.T.z) + (forward ? 0 : Math.PI), 0);
+        dummy.updateMatrix();
+        const next = box.clone().applyMatrix4(dummy.matrix);
+        if (previous) expect(previous.intersectsOBB(next)).toBe(false);
+        previous = next;
+      }
+    }
+  });
 });
 
 describe("board frame", () => {
@@ -35,7 +60,30 @@ describe("board frame", () => {
   });
 });
 
+describe("traffic spacing", () => {
+  it("keeps vehicles in separate lanes with consistent separation through the loop", () => {
+    for (let t = 0; t < 100; t += 0.5) {
+      const cars = Array.from({ length: 13 }, (_, i) => trafficAt(i, 13, t, false));
+      for (let i = 0; i < cars.length; i += 1) for (let j = i + 1; j < cars.length; j += 1) {
+        if (cars[i]!.lateral !== cars[j]!.lateral) continue;
+        const gap = Math.abs(cars[i]!.u - cars[j]!.u);
+        expect(Math.min(gap, 1 - gap)).toBeGreaterThan(0.14);
+      }
+    }
+  });
+  it("keeps positions still with reduced motion", () => {
+    expect(trafficAt(4, 13, 0, true)).toEqual(trafficAt(4, 13, 999, true));
+  });
+});
+
 describe("rail", () => {
+  it("converts the spline parameter to distance and back, including the ends", () => {
+    const rail = createRail(10);
+    for (let i = 0; i <= 100; i += 1) {
+      const u = i / 100;
+      expect(rail.uAtDistance(rail.distanceAt(u))).toBeCloseTo(u, 5);
+    }
+  });
   it("keeps stops where they were and adds road after the last one", () => {
     const rail = createRail(10);
     expect(rail.count).toBe(10);

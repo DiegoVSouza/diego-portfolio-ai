@@ -1,7 +1,7 @@
 import * as THREE from "three";
 import { V3, bar, fit, mergeGeometries, tick, tint } from "./geometry";
 import { loadModel } from "./loaders";
-import { BOARD_BEAM_DEPTH, BOARD_BEAM_Z, BOARD_POST_DEPTH, BOARD_POST_Z, BOARD_WIDTH, ROAD_EXTRA, shotOf, trainLead } from "./layout";
+import { BOARD_BEAM_DEPTH, BOARD_BEAM_Z, BOARD_POST_DEPTH, BOARD_POST_Z, BOARD_WIDTH, ROAD_EXTRA, TRAIN_CAR_SPACING, shotOf, trafficAt, trainLead } from "./layout";
 import { cardSide, type Frame, type Rail } from "./rail";
 import { truckFallback } from "./symbols";
 import type { Palette } from "./tokens";
@@ -44,6 +44,10 @@ export interface World {
   repaintText(): void;
   /** The four corners of stop k's board in the world: top left, top right, bottom right, bottom left, as seen from the front. */
   boardCorners(k: number, out: THREE.Vector3[]): void;
+  /** Hide the painted fallback face whenever its HTML card is visible. */
+  setCardOverlay(k: number, visible: boolean): void;
+  /** Placement reservations for the development-only spatial audit. */
+  auditFootprints(): readonly { x: number; z: number; r: number; kind: string; district: number; height: number }[];
 }
 
 /** World width of a board, in units, before it is fitted to its card; the board is never taller than BOARD_MAX_HEIGHT. */
@@ -84,7 +88,7 @@ export async function buildWorld(c: WorldContext): Promise<World> {
   const crossUs: number[] = [];
   const shotYaw: number[] = [];
   /** Where something already stands (a circle on the ground): a tower is not placed on top of another, or on a board's building. */
-  const footprints: { x: number; z: number; r: number }[] = [];
+  const footprints: { x: number; z: number; r: number; kind: string; district: number; height: number }[] = [];
   const collides = (x: number, z: number, r: number): boolean => footprints.some((q) => Math.hypot(q.x - x, q.z - z) < q.r + r);
   /**
    * The building a board hangs on (none for a post board). It is a whole building, not a slab: as wide as the board plus a margin,
@@ -118,7 +122,7 @@ export async function buildWorld(c: WorldContext): Promise<World> {
     const height = roof ? shot.board.bottom : shot.board.bottom + boardH + 16;
     const back = roof ? depth / 2 - ROOF_APRON : 1 + depth / 2;
     const block = { x: at.x - Math.sin(ry) * back, z: at.z - Math.cos(ry) * back, ry, width, depth, height, bottom: shot.board.bottom, roof, boardH };
-    footprints.push({ x: block.x, z: block.z, r: Math.max(width, depth) * 0.62 + 3 });
+    footprints.push({ x: block.x, z: block.z, r: Math.hypot(width, depth) / 2 + 3, kind: "board-building", district: stops[k]!.district, height });
     return block;
   });
   const last = Array.from({ length: D }, (_, d) => stops.map((s) => s.district).lastIndexOf(d));
@@ -205,21 +209,22 @@ export async function buildWorld(c: WorldContext): Promise<World> {
       g.computeBoundingBox();
       const bb = g.boundingBox!;
       g.translate(-(bb.min.x + bb.max.x) / 2, -bb.min.y, -(bb.min.z + bb.max.z) / 2);
-      return { g, height: bb.max.y - bb.min.y, span: Math.max(bb.max.x - bb.min.x, bb.max.z - bb.min.z) };
+      return { g, height: bb.max.y - bb.min.y, span: Math.hypot(bb.max.x - bb.min.x, bb.max.z - bb.min.z) };
     });
   let landmarkCount = 0;
   let heavyUsed = 0;
   /** A real building (its front is +Z) facing `towards`, scaled to `height`. Returns false when no model is available. */
-  const landmark = (d: number, x: number, z: number, towardsX: number, towardsZ: number, height: number): boolean => {
+  const landmark = (d: number, x: number, z: number, towardsX: number, towardsZ: number, height: number, maxRadius: number): boolean => {
     if (!protos.length) return false;
     const i = landmarkCount % protos.length;
     // Keep the sample landmark at most twice to preserve the skyline composition.
     if (i === protos.length - 1 && protos.length > 3 && heavyUsed >= 2) return false;
     const proto = protos[i]!;
-    const s = height / proto.height;
+    // Fit the imported footprint within the same reserved area as the generated tower.
+    const s = Math.min(height / proto.height, (maxRadius * 2) / proto.span);
     if (collides(x, z, (s * proto.span) / 2)) return false;
     if (i === protos.length - 1 && protos.length > 3) heavyUsed += 1;
-    footprints.push({ x, z, r: (s * proto.span) / 2 });
+    footprints.push({ x, z, r: (s * proto.span) / 2, kind: `landmark-${i}`, district: d, height: s * proto.height });
     const g = proto.g.clone().scale(s, s, s);
     g.rotateY(face(towardsX, towardsZ));
     g.translate(x, 0, z);
@@ -280,11 +285,12 @@ export async function buildWorld(c: WorldContext): Promise<World> {
       const z = f.p.z + f.R.z * s * lat + (rnd() - 0.5) * 5;
       const ry = yaw(f.T);
       // Nothing stands on top of another tower or on the building a board hangs on: overlapping boxes flicker where their faces meet.
-      if (collides(x, z, Math.max(w, dd) * 0.62)) continue;
+      if (collides(x, z, Math.hypot(w + 0.45, dd + 0.45) / 2 + 1)) continue;
       if (o.clear !== false && crossUs.some((cu) => Math.abs(uPick - cu) * rail.length < CROSS_HALF + SIDEWALK + Math.max(dd, 9) / 2 + 3)) continue;
       n += 1;
-      if (o.realEvery && (n - 1) % o.realEvery === 0 && landmark(d, x, z, -f.R.x * s, -f.R.z * s, h)) {
-        if (rnd() < 0.5) beacon(x, h + 0.3, z);
+      const reservation = Math.hypot(w + 0.45, dd + 0.45) / 2 + 1;
+      if (o.realEvery && (n - 1) % o.realEvery === 0 && landmark(d, x, z, -f.R.x * s, -f.R.z * s, h, reservation)) {
+        if (rnd() < 0.5) beacon(x, footprints.at(-1)!.height + 0.3, z);
         placed.push({ x, z, w, dd, h, ry, s });
         continue;
       }
@@ -299,7 +305,7 @@ export async function buildWorld(c: WorldContext): Promise<World> {
       solid(d, w + 0.45, 0.55, dd + 0.45, x, 0, z, ry, grey(0.24), false);
       // Roof plant is deliberately large enough to read from the distant camera.
       if (n % 3 === 0) solid(d, w * 0.28, 1.2, dd * 0.4, x, h, z, ry, grey(0.36), false);
-      footprints.push({ x, z, r: Math.max(w, dd) * 0.62 });
+      footprints.push({ x, z, r: Math.hypot(w + 0.45, dd + 0.45) / 2 + 1, kind: "generated-building", district: d, height: h });
       if (rnd() < 0.5) beacon(x + (rnd() - 0.5) * w * 0.6, h + 0.3, z);
       if (signsLeft > 0 && h > 24) {
         signSpots.push({ x: f.p.x + f.R.x * s * (lat - w / 2 - 0.12), y: h * (0.4 + rnd() * 0.3), z: f.p.z + f.R.z * s * (lat - w / 2 - 0.12), ry: face(-f.R.x * s, -f.R.z * s) });
@@ -318,7 +324,8 @@ export async function buildWorld(c: WorldContext): Promise<World> {
   /* ---------- the street: ground, avenue, sidewalks, lane marks, lamps ---------- */
   rail.frameAt(1, f2);
   rail.frameAt(rail.u(endStop, 0.55), f);
-  const shoreZ = f.p.z;
+  // Keep the ground beyond the full road ribbon, including the avenue's sideways width at its end.
+  const shoreZ = f2.p.z - 12;
   const groundDepth = 160 - shoreZ;
   const ground = (() => {
     const cv = document.createElement("canvas");
@@ -335,6 +342,7 @@ export async function buildWorld(c: WorldContext): Promise<World> {
     t.magFilter = THREE.NearestFilter;
     t.colorSpace = THREE.SRGBColorSpace;
     const m = new THREE.Mesh(new THREE.PlaneGeometry(1000, groundDepth), new THREE.MeshBasicMaterial({ map: t }));
+    m.name = "ground-grid";
     m.rotation.x = -Math.PI / 2;
     m.position.set(0, -0.06, (160 + shoreZ) / 2);
     return m;
@@ -454,6 +462,7 @@ export async function buildWorld(c: WorldContext): Promise<World> {
     if (!blocksBoard(u, s)) lampList.push({ u, s, i });
   }
   const lamps = new THREE.InstancedMesh(lampGeo, new THREE.MeshStandardMaterial({ flatShading: true, roughness: 0.7, metalness: 0.2 }), lampList.length);
+  lamps.name = "avenue-lamps";
   lamps.frustumCulled = false;
   lampList.forEach(({ u, s, i }, n) => {
     rail.frameAt(u, f);
@@ -525,7 +534,8 @@ export async function buildWorld(c: WorldContext): Promise<World> {
   const LANE = 3.7;
   // The viaduct runs a stop and a bit beyond each end of the district, so a train is nearly always in view ahead of the camera there.
   const [vu0, vu1] = [rail.u(first[3]!, -1.2), rail.u(last[3]!, 1.2)];
-  const viaductLength = (vu1 - vu0) * rail.length;
+  const viaductStartDistance = rail.distanceAt(vu0);
+  const viaductLength = rail.distanceAt(vu1) - viaductStartDistance;
   for (const side of [-1, 1]) {
     const segments = Math.ceil(viaductLength / 7);
     for (let i = 0; i < segments; i += 1) {
@@ -586,6 +596,8 @@ export async function buildWorld(c: WorldContext): Promise<World> {
   // The procedural train is the fallback; the Kenney metro cars replace it when they load.
   let heads = new THREE.InstancedMesh(trainCar(true), flatMat(), TRAINS * 2);
   let mids = new THREE.InstancedMesh(trainCar(false), flatMat(), TRAINS * MIDS);
+  heads.name = "metro-head-fallback";
+  mids.name = "metro-middle-fallback";
   let tails: THREE.InstancedMesh | null = null;
   heads.frustumCulled = false;
   mids.frustumCulled = false;
@@ -622,12 +634,14 @@ export async function buildWorld(c: WorldContext): Promise<World> {
   const l5 = lane(5, { count: 64, latMin: 17, latMax: 62, hMin: 14, hMax: 64, wMin: 5, wMax: 11, realEvery: 4, signs: 3, walls: 8, until: rail.u(endStop, -0.7) });
   roofsOf(5, l5, 24, 5);
   const water = new THREE.Mesh(new THREE.PlaneGeometry(1000, 480), new THREE.MeshBasicMaterial({ color: p.mix(p.ink, p.dred, 0.5) }));
+  water.name = "harbour-water";
   water.rotation.x = -Math.PI / 2;
   water.position.set(0, -0.4, shoreZ - 240);
   scene.add(water);
   {
     rail.frameAt(rail.u(endStop, 0.55), f);
     const quay = new THREE.Mesh(new THREE.BoxGeometry(46, 0.7, 170), new THREE.MeshBasicMaterial({ color: grey(0.12) }));
+    quay.name = "harbour-quay";
     quay.position.set(f.p.x, -0.1, shoreZ - 65);
     scene.add(quay);
     const streaks = new THREE.InstancedMesh(new THREE.BoxGeometry(0.3, 0.05, 6), new THREE.MeshBasicMaterial({ color: p.paper }), 46);
@@ -643,6 +657,7 @@ export async function buildWorld(c: WorldContext): Promise<World> {
     // Container stacks beside the avenue, in a few colours; the left-hand side stays clear for the last billboard.
     const stackCount = 48;
     const stacks = new THREE.InstancedMesh(new THREE.BoxGeometry(2.8, 2.8, 6.4), new THREE.MeshStandardMaterial({ flatShading: true, roughness: 0.8, metalness: 0.1 }), stackCount);
+    stacks.name = "harbour-containers";
     stacks.frustumCulled = false;
     const tones = [p.red, p.paper, grey(0.32), p.dred, grey(0.18)];
     const lastStop = endStop;
@@ -885,7 +900,7 @@ export async function buildWorld(c: WorldContext): Promise<World> {
     g.add(new THREE.Mesh(mergeGeometries(lit)!, lampMat));
     if (glow.length) {
       const beams = new THREE.Mesh(mergeGeometries(glow)!, glowMat);
-      beams.layers.enable(1);
+      beams.name = `${g.name}-light-cones`;
       g.add(beams);
     }
   };
@@ -893,10 +908,12 @@ export async function buildWorld(c: WorldContext): Promise<World> {
     rail.cardAnchor(k, anchor);
     const shot = shotOf(k);
     const group = new THREE.Group();
+    group.name = `board-${k}`;
     group.position.set(anchor.x, 0, anchor.z);
     group.rotation.y = shotYaw[k]!;
     const painted = makeBillboardMap(k);
     const panel = new THREE.Mesh(new THREE.PlaneGeometry(1, 1), new THREE.MeshBasicMaterial({ map: painted.map, polygonOffset: true, polygonOffsetFactor: -2, polygonOffsetUnits: -2 }));
+    panel.name = `board-face-${k}`;
     const posts = [0, 1].map(() => new THREE.Mesh(unitBox, frameMat));
     const beams = [0, 1].map(() => new THREE.Mesh(unitBox, frameMat));
     group.add(panel, ...posts, ...beams);
@@ -944,8 +961,16 @@ export async function buildWorld(c: WorldContext): Promise<World> {
   /* ---------- merge every district ---------- */
   await tick();
   for (let d = 0; d < D; d += 1) {
-    if (parts[d]!.length) scene.add(new THREE.Mesh(mergeGeometries(parts[d]!)!, windowMat));
-    if (realParts[d]!.length) scene.add(new THREE.Mesh(mergeGeometries(realParts[d]!)!, windowMat));
+    if (parts[d]!.length) {
+      const m = new THREE.Mesh(mergeGeometries(parts[d]!)!, windowMat);
+      m.name = `district-${d}-generated`;
+      scene.add(m);
+    }
+    if (realParts[d]!.length) {
+      const m = new THREE.Mesh(mergeGeometries(realParts[d]!)!, windowMat);
+      m.name = `district-${d}-landmarks`;
+      scene.add(m);
+    }
   }
   const beaconMesh = new THREE.Mesh(mergeGeometries(beacons)!, new THREE.MeshBasicMaterial({ color: p.red }));
   beaconMesh.frustumCulled = false;
@@ -990,13 +1015,6 @@ export async function buildWorld(c: WorldContext): Promise<World> {
   let fleet: Fleet[] | null = null;
   let kindsLoaded = 0;
   const VEHICLES = 13;
-  const KERB_CARS = 3;
-  const KERB_TRAFFIC = stops.map((_, k) => k).filter((k) => shotOf(k).kind === "curb");
-  const vehicleData = Array.from({ length: VEHICLES }, (_, i) => ({
-    u: i < KERB_TRAFFIC.length * KERB_CARS ? (i % KERB_CARS) / KERB_CARS + 0.1 * (i % 2) : rnd(),
-    sp: (0.01 + rnd() * 0.012) * (i % 2 ? 1 : -1),
-    off: (i % 2 ? 1 : -1) * (3 + (i % 3) * 1.8) * (i < KERB_TRAFFIC.length * KERB_CARS ? 0.8 : 1),
-  }));
   const carFront = (g: THREE.BufferGeometry | null) => g?.rotateY(-Math.PI / 2) ?? null; // the cars' front is +X; vehicles drive along +Z
   void Promise.all([loadModel(c.models.truck), loadModel(c.models.moto), ...(c.models.cars ?? []).map((url) => loadModel(url).then(carFront))]).then(([truck, moto, ...cars]) => {
     // Sizes are the longest side in world units: a car reads as a car next to towers forty units tall.
@@ -1008,6 +1026,7 @@ export async function buildWorld(c: WorldContext): Promise<World> {
     let base = 0;
     fleet = kinds.slice(0, 4).map((k) => {
       const mesh = new THREE.InstancedMesh(fit(k.g.clone(), k.size), new THREE.MeshStandardMaterial({ flatShading: true, roughness: 0.6, metalness: 0.2 }), k.n);
+      mesh.name = `fleet-${base}`;
       mesh.layers.enable(1);
       mesh.frustumCulled = false;
       const tones = [p.red, p.paper, grey(0.17), p.red];
@@ -1021,6 +1040,7 @@ export async function buildWorld(c: WorldContext): Promise<World> {
           wheelParts.push(new THREE.CylinderGeometry(0.53, 0.53, 0.35, 12).rotateZ(Math.PI / 2).translate(x, -0.72, z));
         }
         wheels = new THREE.InstancedMesh(mergeGeometries(wheelParts)!, new THREE.MeshStandardMaterial({ color: p.ink, flatShading: true, roughness: 0.9 }), k.n);
+        wheels.name = "s64-wheels";
         wheels.frustumCulled = false;
         wheels.layers.enable(1);
         scene.add(wheels);
@@ -1037,6 +1057,7 @@ export async function buildWorld(c: WorldContext): Promise<World> {
       if (!g) return;
       g.translate(-12, 0, 0); // centre the 24 m platform on its own origin
       const mesh = new THREE.InstancedMesh(g, new THREE.MeshStandardMaterial({ flatShading: true, roughness: 0.8, metalness: 0.1 }), 1);
+      mesh.name = "metro-station";
       mesh.frustumCulled = false;
       rail.frameAt(rail.u(first[3]!, 0.5), f);
       dummy.position.set(f.p.x + f.R.x * VIADUCT_LAT, VIADUCT_Y + 0.1, f.p.z + f.R.z * VIADUCT_LAT);
@@ -1072,6 +1093,9 @@ export async function buildWorld(c: WorldContext): Promise<World> {
       heads = make(head, TRAINS);
       mids = make(mid, TRAINS * MIDS);
       tails = make(tail, TRAINS);
+      heads.name = "metro-head";
+      mids.name = "metro-middle";
+      tails.name = "metro-tail";
       scene.add(heads, mids, tails);
       realTrain = true;
       c.onModels();
@@ -1083,19 +1107,11 @@ export async function buildWorld(c: WorldContext): Promise<World> {
     if (fleet) {
       for (const k of fleet) {
         for (let i = 0; i < k.n; i += 1) {
-          const v = vehicleData[k.base + i]!;
-          const dir = v.sp > 0 ? 1 : -1;
           const index = k.base + i;
-          let u: number;
-          if (index < KERB_TRAFFIC.length * KERB_CARS) {
-            // The kerb stops get their own cars, looping up and down the avenue in front of the camera so some always cross the board.
-            const stop = KERB_TRAFFIC[Math.floor(index / KERB_CARS)]!;
-            const frac = (((v.u + (reduce ? 0 : (time * dir) / 7)) % 1) + 1) % 1;
-            u = rail.u(stop, -0.5 + frac * 1.4);
-          } else u = (((v.u + (reduce ? 0 : time * v.sp)) % 1) + 1) % 1;
-          rail.frameAt(u, f);
-          dummy.position.set(f.p.x + f.R.x * v.off, k.lift, f.p.z + f.R.z * v.off);
-          dummy.lookAt(dummy.position.x + f.T.x * dir, dummy.position.y, dummy.position.z + f.T.z * dir);
+          const v = trafficAt(index, VEHICLES, time, reduce);
+          rail.frameAt(v.u, f);
+          dummy.position.set(f.p.x + f.R.x * v.lateral, k.lift, f.p.z + f.R.z * v.lateral);
+          dummy.lookAt(dummy.position.x + f.T.x * v.direction, dummy.position.y, dummy.position.z + f.T.z * v.direction);
           dummy.scale.setScalar(1);
           dummy.updateMatrix();
           k.mesh.setMatrixAt(i, dummy.matrix);
@@ -1107,7 +1123,8 @@ export async function buildWorld(c: WorldContext): Promise<World> {
     }
     // Two trains, one on each track, shuttle along the viaduct: each eases to a stop at an end, waits, and comes back with the other
     // end leading. Nothing wraps and nothing pops: a train is always on the viaduct and always whole.
-    const length = 14;
+    // Give the 13.52-unit cars clearance on both the inside and outside of curved tracks.
+    const length = TRAIN_CAR_SPACING;
     const cars = MIDS + 2;
     const room = ((cars - 1) * length) / viaductLength;
     for (let t = 0; t < TRAINS; t += 1) {
@@ -1116,7 +1133,8 @@ export async function buildWorld(c: WorldContext): Promise<World> {
       const { lead, forward } = trainLead(q, room);
       const dir = forward ? 1 : -1;
       for (let slot = 0; slot < cars; slot += 1) {
-        rail.frameAt(vu0 + (lead - dir * ((slot * length) / viaductLength)) * (vu1 - vu0), f);
+        const distance = viaductStartDistance + lead * viaductLength - dir * slot * length;
+        rail.frameAt(rail.uAtDistance(distance), f);
         const offset = (t < 2 ? VIADUCT_LAT : -VIADUCT_LAT) + (t % 2 ? LANE : -LANE);
         dummy.position.set(f.p.x + f.R.x * offset, VIADUCT_Y + (realTrain ? 0.35 : 0.1), f.p.z + f.R.z * offset);
         const isHead = slot === 0;
@@ -1151,5 +1169,7 @@ export async function buildWorld(c: WorldContext): Promise<World> {
       const inset = framed(shotOf(k).kind) ? CARD_INSET : 1;
       CORNERS.forEach(([cx, cy], i) => out[i]!.copy(corner.set(cx * inset, cy * inset, 0)).applyMatrix4(b.panel.matrixWorld));
     },
+    setCardOverlay: (k, visible) => { board(k).panel.visible = !visible; },
+    auditFootprints: () => footprints,
   };
 }

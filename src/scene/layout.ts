@@ -60,6 +60,17 @@ const KINDS: readonly ShotKind[] = ["post", "facade", "side", "roof", "curb", "p
 export const shotKind = (k: number): ShotKind => KINDS[k % KINDS.length]!;
 /** Where a side street crosses the avenue, in stops past the stop (see crossUs in world.ts). */
 export const SIDE_JUNCTION = 0.62;
+/** Centre-to-centre distance between metro cars, including clearance on curved tracks. */
+export const TRAIN_CAR_SPACING = 17;
+
+/** Evenly spaced vehicles share a lane speed, so they cannot catch one another. */
+export function trafficAt(index: number, count: number, time: number, reduced: boolean): { u: number; lateral: number; direction: 1 | -1 } {
+  const direction = index % 2 === 0 ? 1 : -1;
+  const laneCount = direction === 1 ? Math.ceil(count / 2) : Math.floor(count / 2);
+  const slot = Math.floor(index / 2);
+  const phase = slot / Math.max(1, laneCount) + (reduced ? 0 : time * 0.012 * direction);
+  return { u: ((phase % 1) + 1) % 1, lateral: direction * 4, direction };
+}
 function baseShot(k: number): Shot {
   const s = sideOf(k);
   switch (shotKind(k)) {
