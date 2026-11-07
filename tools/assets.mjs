@@ -377,6 +377,23 @@ async function cmdUrl(url) {
 async function cmdRegister(target) {
   for (const k of ['author', 'license', 'url']) if (typeof flags[k] !== 'string') die(`--${k} é obrigatório`);
   const abs = path.resolve(root, target ?? die('informe o arquivo/pasta dentro de assets/'));
+  // Promote a staged derivative without overwriting an existing asset or ledger entry.
+  if (typeof flags.from === 'string') {
+    const rel = posix(path.relative(root, abs));
+    if (!rel.startsWith('assets/game/') || !rel.endsWith('.glb')) die('--from requires an assets/game/*.glb destination');
+    if (await fs.stat(abs).catch(() => null)) die('destination already exists; use a new derivative name');
+    const meta = { source: 'manual', ...resolveLicense(flags.license, { author: flags.author, title: path.basename(abs), url: flags.url }) };
+    const source = await fs.realpath(path.resolve(root, flags.from));
+    const stage = await fs.realpath(path.join(root, '.cache'));
+    if (!source.startsWith(stage + path.sep)) die('--from must resolve inside project .cache');
+    const data = await fs.readFile(source);
+    if (data.toString('ascii', 0, 4) !== 'glTF') die('--from requires a GLB');
+    if ((await loadLedger()).assets.some(a => a.path === rel)) die('destination already registered');
+    await fs.mkdir(path.dirname(abs), { recursive: true });
+    await fs.writeFile(abs, data, { flag: 'wx' });
+    console.log(`registrados ${await registerFiles([abs], meta)} novos arquivos.`);
+    return;
+  }
   const st = await fs.stat(abs).catch(() => die(`não existe: ${target}`));
   const files = st.isDirectory() ? await walk(abs) : [abs];
   const meta = { source: 'manual', ...resolveLicense(flags.license, { author: flags.author, title: path.basename(abs), url: flags.url }) };

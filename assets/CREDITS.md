@@ -8,6 +8,7 @@ _Gerado por tools/assets.mjs a partir de assets/ledger.json. Não edite à mão.
 
 ## Sem licença verificável (decisão do dono; termos não verificados)
 
+- `assets/game/models/building-sample-013.glb` — Unknown author; Blender cleanup (local pack: Free Sample.zip). No licence file in the pack. Owner decision: Owner authorized optimization on 2026-11-07 retaining existing exception. Terms unverified.
 - `assets/game/models/building-sample.glb` — Unknown author (Free Sample.zip, Building_06.fbx); converted by scripts/fbx_to_glb.mjs, simplified (local pack: Free Sample.zip (no licence file)). No licence file in the pack. Owner decision: owner stated on 2026-11-01 that the pack was free to download and use. Terms unverified.
 
 ## CC0 (sem atribuição obrigatória; crédito é cortesia)

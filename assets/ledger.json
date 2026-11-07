@@ -19,6 +19,16 @@
       "fetchedAt": "2026-11-01T18:42:52.910Z"
     },
     {
+      "path": "assets/game/models/building-sample-013.glb",
+      "author": "Unknown author; Blender cleanup",
+      "license": "OWNER-DECLARED",
+      "url": "local pack: Free Sample.zip",
+      "attribution": "Unknown author; Blender cleanup (local pack: Free Sample.zip). No licence file in the pack. Owner decision: Owner authorized optimization on 2026-11-07 retaining existing exception. Terms unverified.",
+      "source": "manual",
+      "sha256": "3fef52592e60bf72fd66be8f12b85d7c93b22e5e40d14f050c389d8388def79c",
+      "fetchedAt": "2026-11-07T04:57:54.083Z"
+    },
+    {
       "path": "assets/game/models/building-sample.glb",
       "author": "Unknown author (Free Sample.zip, Building_06.fbx); converted by scripts/fbx_to_glb.mjs, simplified",
       "license": "OWNER-DECLARED",

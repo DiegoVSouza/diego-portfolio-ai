@@ -11,7 +11,7 @@ import truckUrl from "../../assets/game/models/truck.glb?url";
 import buildingLarge from "../../assets/game/models/building-large.glb?url";
 import buildingMedium from "../../assets/game/models/building-medium.glb?url";
 import buildingSmall from "../../assets/game/models/building-small.glb?url";
-import buildingSample from "../../assets/game/models/building-sample.glb?url";
+import buildingSample from "../../assets/game/models/building-sample-013.glb?url";
 import metroStation from "../../assets/game/models/metro-station.glb?url";
 import trainA from "../../assets/game/models/train-subway-a.glb?url";
 import trainB from "../../assets/game/models/train-subway-b.glb?url";

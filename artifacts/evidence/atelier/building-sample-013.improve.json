@@ -1,0 +1,62 @@
+{
+  "in": "building-sample.glb",
+  "out": "building-sample-013.glb",
+  "before": {
+    "triangles": 23366,
+    "size": [
+      549.985,
+      1119.9988,
+      1280.009
+    ]
+  },
+  "after": {
+    "triangles": 7799,
+    "size": [
+      5.4998,
+      11.2,
+      12.8
+    ]
+  },
+  "blender": "5.2.1 LTS",
+  "inspect": {
+    "file": "C:\\estudo\\Golpe\\lab\\projects\\p07\\.cache\\atelier-out\\building-sample-013.glb",
+    "bytes": 549456,
+    "triangles": 7799,
+    "vertices": 20902,
+    "meshes": 1,
+    "nodes": 1,
+    "materials": 1,
+    "textures": 0,
+    "images": 0,
+    "animations": [],
+    "skins": 0,
+    "attributes": [
+      "NORMAL",
+      "POSITION"
+    ],
+    "extensionsUsed": [],
+    "bounds": {
+      "min": [
+        -2.7498862743377686,
+        0,
+        -5.599977970123291
+      ],
+      "max": [
+        2.7498862743377686,
+        12.799999237060547,
+        5.599977970123291
+      ],
+      "size": [
+        5.499772548675537,
+        12.799999237060547,
+        11.199955940246582
+      ]
+    },
+    "originOffset": {
+      "x": 0,
+      "y": 0,
+      "z": 0
+    }
+  },
+  "problems": []
+}

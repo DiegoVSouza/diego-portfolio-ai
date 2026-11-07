@@ -200,6 +200,8 @@ export async function buildWorld(c: WorldContext): Promise<World> {
   const protos = (await Promise.all((c.models.buildings ?? []).map((url) => loadModel(url))))
     .filter((g): g is THREE.BufferGeometry => g !== null)
     .map((g) => {
+      // Old exports omit normals; Blender exports include them. Keep merged attributes consistent.
+      if (!g.hasAttribute("normal")) g.computeVertexNormals();
       g.computeBoundingBox();
       const bb = g.boundingBox!;
       g.translate(-(bb.min.x + bb.max.x) / 2, -bb.min.y, -(bb.min.z + bb.max.z) / 2);
@@ -211,7 +213,7 @@ export async function buildWorld(c: WorldContext): Promise<World> {
   const landmark = (d: number, x: number, z: number, towardsX: number, towardsZ: number, height: number): boolean => {
     if (!protos.length) return false;
     const i = landmarkCount % protos.length;
-    // The heavy sample model (23k triangles) is used at most twice.
+    // Keep the sample landmark at most twice to preserve the skyline composition.
     if (i === protos.length - 1 && protos.length > 3 && heavyUsed >= 2) return false;
     const proto = protos[i]!;
     const s = height / proto.height;
