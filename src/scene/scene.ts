@@ -67,14 +67,26 @@ export async function start(canvas: HTMLCanvasElement, options: SceneOptions): P
   scene.background = p.ink;
   scene.fog = new THREE.Fog(p.ink, 70, 300);
   const camera = new THREE.PerspectiveCamera(58, 1, 0.5, 420);
+  const trafficCanvas = document.createElement("canvas");
+  trafficCanvas.className = "scene-traffic";
+  trafficCanvas.setAttribute("aria-hidden", "true");
+  canvas.insertAdjacentElement("afterend", trafficCanvas);
+  const trafficRenderer = new THREE.WebGLRenderer({ canvas: trafficCanvas, alpha: true, antialias: false });
+  trafficRenderer.setClearColor(0x000000, 0);
+  const trafficPlane = new THREE.Plane();
+  trafficRenderer.clippingPlanes = [trafficPlane];
   const rail = createRail(count);
 
   // Three lights at most: a flat fill, one key, and a red point that travels with the camera.
-  scene.add(new THREE.AmbientLight(new THREE.Color().setScalar(1), 0.4));
+  const ambient = new THREE.AmbientLight(new THREE.Color().setScalar(1), 0.4);
+  ambient.layers.enable(1);
+  scene.add(ambient);
   const key = new THREE.DirectionalLight(new THREE.Color().setScalar(1), 2.2);
   key.position.set(-30, 60, 40);
+  key.layers.enable(1);
   scene.add(key);
   const redLight = new THREE.PointLight(p.red, 400, 90, 2);
+  redLight.layers.enable(1);
   scene.add(redLight);
 
   const rnd = rng(11);
@@ -181,6 +193,8 @@ export async function start(canvas: HTMLCanvasElement, options: SceneOptions): P
     const dpr = Math.min(window.devicePixelRatio || 1, 1.25) * quality.scale;
     renderer.setPixelRatio(dpr);
     renderer.setSize(width, height, false);
+    trafficRenderer.setPixelRatio(dpr);
+    trafficRenderer.setSize(width, height, false);
     post.composer.setPixelRatio(dpr);
     post.composer.setSize(width, height);
     post.halftone.uniforms.res!.value.set(width * dpr, height * dpr);
@@ -378,6 +392,7 @@ export async function start(canvas: HTMLCanvasElement, options: SceneOptions): P
   };
   const updateCards = () => {
     camera.updateMatrixWorld();
+    trafficCanvas.style.visibility = "hidden";
     let shown = 0;
     for (let k = 0; k < cards.length; k += 1) {
       const el = cards[k];
@@ -411,6 +426,12 @@ export async function start(canvas: HTMLCanvasElement, options: SceneOptions): P
         continue;
       }
       const near = ad < 0.22;
+      if (near) {
+        trafficPlane.setFromCoplanarPoints(corners[0]!, corners[1]!, corners[2]!);
+        if (trafficPlane.distanceToPoint(camera.position) < 0) trafficPlane.negate();
+        trafficCanvas.style.clipPath = `polygon(${Array.from({ length: 4 }, (_, i) => `${quad[i * 2]}px ${quad[i * 2 + 1]}px`).join(", ")})`;
+        trafficCanvas.style.visibility = "visible";
+      }
       // Previews fade in from the distance; the card at its stop is fully there.
       const o = near ? 1 : Math.max(0, 0.9 * (1 - (ad - 0.22) / 0.9));
       put(el, "--m", homography(cardWidth[k]!, cardHeight[k]!));
@@ -458,8 +479,18 @@ export async function start(canvas: HTMLCanvasElement, options: SceneOptions): P
     updateCards();
     renderer.info.reset();
     post.composer.render();
+    let trafficDraws = 0;
+    if (trafficCanvas.style.visibility === "visible") {
+      const background = scene.background;
+      scene.background = null;
+      camera.layers.set(1);
+      trafficRenderer.render(scene, camera);
+      trafficDraws = trafficRenderer.info.render.calls;
+      camera.layers.set(0);
+      scene.background = background;
+    }
     if (firstDraw) {
-      canvas.dataset.draws = String(renderer.info.render.calls);
+      canvas.dataset.draws = String(renderer.info.render.calls + trafficDraws);
       firstDraw = false;
     }
     dirty = false;
@@ -545,6 +576,8 @@ export async function start(canvas: HTMLCanvasElement, options: SceneOptions): P
       else if (m) free(m);
     });
     post.composer.dispose();
+    trafficRenderer.dispose();
+    trafficCanvas.remove();
     renderer.dispose();
   }
 

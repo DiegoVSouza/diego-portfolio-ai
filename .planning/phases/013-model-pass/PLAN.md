@@ -27,3 +27,5 @@ Preserve unrelated dirty files and prior evidence. If asset CLI lacks a safe pro
 Owner requested improvements to the remaining generated models and the world overall. Refine procedural tower silhouettes with setbacks, plinths and roof service volumes; refine street lamps with tapered shafts and broad luminaires. Keep merged district geometry and instancing so these details do not introduce additional draw calls. Preserve board clearances and seeded placement. Validate with the existing scene suite and new phase-specific screenshots.
 
 Follow-up: add a faint non-interactive light wash above the projected HTML card, which otherwise covers the WebGL billboard lights. Restrict it to the 3D stage and retain the projected card transform.
+
+Follow-up: render traffic in a transparent foreground layer, clipped to the camera-facing side of the active billboard plane, while keeping card controls clickable. Preserve renderer cleanup, resizing and first-frame budget; test crossing and scene lifecycle.

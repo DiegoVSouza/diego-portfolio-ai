@@ -1004,6 +1004,7 @@ export async function buildWorld(c: WorldContext): Promise<World> {
     let base = 0;
     fleet = kinds.slice(0, 4).map((k) => {
       const mesh = new THREE.InstancedMesh(fit(k.g.clone(), k.size), new THREE.MeshStandardMaterial({ flatShading: true, roughness: 0.6, metalness: 0.2 }), k.n);
+      mesh.layers.enable(1);
       mesh.frustumCulled = false;
       const tones = [p.red, p.paper, grey(0.17), p.red];
       for (let i = 0; i < k.n; i += 1) mesh.setColorAt(i, col.copy(tones[(i + base) % 4]!));
