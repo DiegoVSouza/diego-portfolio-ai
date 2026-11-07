@@ -43,6 +43,16 @@ export function fit(g: THREE.BufferGeometry, size: number): THREE.BufferGeometry
   return g;
 }
 
+/** How far to lift geometry placed at y = 0 so that its lowest point (over all `parts`) rests on `surface`. */
+export function groundLift(parts: readonly THREE.BufferGeometry[], surface: number): number {
+  let lowest = Infinity;
+  for (const part of parts) {
+    part.computeBoundingBox();
+    lowest = Math.min(lowest, part.boundingBox!.min.y);
+  }
+  return surface - lowest;
+}
+
 const UP = V3(0, 1, 0);
 
 /** A square bar from a to b. */

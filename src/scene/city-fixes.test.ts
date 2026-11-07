@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import * as THREE from "three";
 import { OBB } from "three/examples/jsm/math/OBB.js";
 import { BOARD_PANEL_Z, BOARD_WIDTH, ROAD_EXTRA, TRAIN_CAR_SPACING, boardMid, frameFront, patchShot, shotKind, shotOf, trafficAt, trainLead } from "./layout";
+import { fit, groundLift } from "./geometry";
 import { createRail } from "./rail";
 
 describe("shuttle train", () => {
@@ -145,5 +146,16 @@ describe("shot patches (the atelier's camera tuner)", () => {
     expect(curb.aim).toBeDefined();
     expect(patchShot(curb, { aim: null }, 1).aim).toBeUndefined();
     expect(patchShot(curb, undefined, 1)).toBe(curb);
+  });
+});
+
+describe("vehicle ground contact", () => {
+  it("lifts a fitted model so its lowest point rests on the road, whatever its origin", () => {
+    const body = fit(new THREE.BoxGeometry(2, 1.5, 7), 7.4);
+    const lift = groundLift([body], 0.05);
+    expect(lift).toBeCloseTo(0.05 + (1.5 / 2) * (7.4 / 7), 5);
+    const wheels = new THREE.CylinderGeometry(0.5, 0.5, 0.3, 8).translate(0, -1.2, 0);
+    // Wheels hang lower than the body: they set the lift.
+    expect(groundLift([body, wheels], 0.05)).toBeCloseTo(0.05 + 1.2 + 0.15, 5);
   });
 });

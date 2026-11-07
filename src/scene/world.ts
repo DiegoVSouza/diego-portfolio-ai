@@ -1,5 +1,6 @@
 import * as THREE from "three";
-import { V3, bar, fit, mergeGeometries, tick, tint } from "./geometry";
+import { V3, bar, fit, groundLift, mergeGeometries, tick, tint } from "./geometry";
+import { VIADUCT_OFFSET, clearRun, obbOverlap, viaductSegments } from "./corridor";
 import { loadModel } from "./loaders";
 import { BOARD_BEAM_DEPTH, BOARD_BEAM_Z, BOARD_POST_DEPTH, BOARD_POST_Z, BOARD_WIDTH, ROAD_EXTRA, TRAIN_CAR_SPACING, shotOf, trafficAt, trainLead } from "./layout";
 import { cardSide, type Frame, type Rail } from "./rail";
@@ -48,6 +49,21 @@ export interface World {
   setCardOverlay(k: number, visible: boolean): void;
   /** Placement reservations for the development-only spatial audit. */
   auditFootprints(): readonly { x: number; z: number; r: number; kind: string; district: number; height: number }[];
+  /** Oriented boxes of generated solids (towers, board buildings, viaduct), for the development-only audit. `approx` marks imported or merged shapes. */
+  auditBoxes(): readonly AuditBox[];
+}
+
+/** An oriented box on the ground plane: centre (x, z), size w across and d along its yaw `ry`, from y0 to y1. */
+export interface AuditBox {
+  kind: string;
+  x: number;
+  z: number;
+  w: number;
+  d: number;
+  ry: number;
+  y0: number;
+  y1: number;
+  approx?: boolean;
 }
 
 /** World width of a board, in units, before it is fitted to its card; the board is never taller than BOARD_MAX_HEIGHT. */
@@ -89,6 +105,7 @@ export async function buildWorld(c: WorldContext): Promise<World> {
   const shotYaw: number[] = [];
   /** Where something already stands (a circle on the ground): a tower is not placed on top of another, or on a board's building. */
   const footprints: { x: number; z: number; r: number; kind: string; district: number; height: number }[] = [];
+  const auditBoxes: AuditBox[] = [];
   const collides = (x: number, z: number, r: number): boolean => footprints.some((q) => Math.hypot(q.x - x, q.z - z) < q.r + r);
   /**
    * The building a board hangs on (none for a post board). It is a whole building, not a slab: as wide as the board plus a margin,
@@ -123,9 +140,24 @@ export async function buildWorld(c: WorldContext): Promise<World> {
     const back = roof ? depth / 2 - ROOF_APRON : 1 + depth / 2;
     const block = { x: at.x - Math.sin(ry) * back, z: at.z - Math.cos(ry) * back, ry, width, depth, height, bottom: shot.board.bottom, roof, boardH };
     footprints.push({ x: block.x, z: block.z, r: Math.hypot(width, depth) / 2 + 3, kind: "board-building", district: stops[k]!.district, height });
+    auditBoxes.push({ kind: `board-building-${k}`, x: block.x, z: block.z, w: width, d: depth, ry, y0: 0, y1: height });
     return block;
   });
   const last = Array.from({ length: D }, (_, d) => stops.map((s) => s.district).lastIndexOf(d));
+
+  /**
+   * The metro viaduct runs on each side of the avenue, past the boards. It cannot go through a building: each side keeps the longest
+   * stretch that stays clear of the buildings the boards hang on, and no tower is placed on that stretch (see `lane`).
+   */
+  const VIADUCT_CLEARANCE = 4;
+  const [vu0, vu1] = [rail.u(first[3]!, -1.2), rail.u(last[3]!, 1.2)];
+  const boardBlockers = blocks.flatMap((b) => (b ? [{ x: b.x, z: b.z, w: b.width, d: b.depth, ry: b.ry }] : []));
+  const viaducts = ([-1, 1] as const).map((side) => {
+    const segments = viaductSegments(rail, vu0, vu1, side);
+    const run = clearRun(segments, boardBlockers, VIADUCT_CLEARANCE) ?? ([0, segments.length - 1] as [number, number]);
+    return { side, segments, run, drawn: segments.slice(run[0], run[1] + 1) };
+  });
+  const onViaduct = (x: number, z: number, w: number, dd: number, ry: number): boolean => viaducts.some((v) => v.drawn.some((seg) => obbOverlap(seg, { x, z, w, d: dd, ry }, 3)));
 
   /* ---------- window texture and materials ---------- */
   const winTex = (() => {
@@ -225,6 +257,7 @@ export async function buildWorld(c: WorldContext): Promise<World> {
     if (collides(x, z, (s * proto.span) / 2)) return false;
     if (i === protos.length - 1 && protos.length > 3) heavyUsed += 1;
     footprints.push({ x, z, r: (s * proto.span) / 2, kind: `landmark-${i}`, district: d, height: s * proto.height });
+    auditBoxes.push({ kind: `landmark-${i}`, x, z, w: s * proto.span, d: s * proto.span, ry: 0, y0: 0, y1: s * proto.height, approx: true });
     const g = proto.g.clone().scale(s, s, s);
     g.rotateY(face(towardsX, towardsZ));
     g.translate(x, 0, z);
@@ -286,6 +319,7 @@ export async function buildWorld(c: WorldContext): Promise<World> {
       const ry = yaw(f.T);
       // Nothing stands on top of another tower or on the building a board hangs on: overlapping boxes flicker where their faces meet.
       if (collides(x, z, Math.hypot(w + 0.45, dd + 0.45) / 2 + 1)) continue;
+      if (onViaduct(x, z, w + 0.45, dd + 0.45, ry)) continue;
       if (o.clear !== false && crossUs.some((cu) => Math.abs(uPick - cu) * rail.length < CROSS_HALF + SIDEWALK + Math.max(dd, 9) / 2 + 3)) continue;
       n += 1;
       const reservation = Math.hypot(w + 0.45, dd + 0.45) / 2 + 1;
@@ -306,6 +340,7 @@ export async function buildWorld(c: WorldContext): Promise<World> {
       // Roof plant is deliberately large enough to read from the distant camera.
       if (n % 3 === 0) solid(d, w * 0.28, 1.2, dd * 0.4, x, h, z, ry, grey(0.36), false);
       footprints.push({ x, z, r: Math.hypot(w + 0.45, dd + 0.45) / 2 + 1, kind: "generated-building", district: d, height: h });
+      auditBoxes.push({ kind: "generated-building", x, z, w: w + 0.45, d: dd + 0.45, ry, y0: 0, y1: h });
       if (rnd() < 0.5) beacon(x + (rnd() - 0.5) * w * 0.6, h + 0.3, z);
       if (signsLeft > 0 && h > 24) {
         signSpots.push({ x: f.p.x + f.R.x * s * (lat - w / 2 - 0.12), y: h * (0.4 + rnd() * 0.3), z: f.p.z + f.R.z * s * (lat - w / 2 - 0.12), ry: face(-f.R.x * s, -f.R.z * s) });
@@ -528,31 +563,43 @@ export async function buildWorld(c: WorldContext): Promise<World> {
    * A viaduct on each side of the avenue, past the boards, at about eye height: from the street the trains cross the view at an angle
    * instead of coming end-on, so they read. The boards alternate sides, so the viaduct opposite the active board is the one in the clear.
    */
-  const VIADUCT_LAT = -42;
+  const VIADUCT_LAT = -VIADUCT_OFFSET;
   const VIADUCT_Y = 14;
   /** Each of the two tracks runs this far from the viaduct's middle. */
   const LANE = 3.7;
   // The viaduct runs a stop and a bit beyond each end of the district, so a train is nearly always in view ahead of the camera there.
-  const [vu0, vu1] = [rail.u(first[3]!, -1.2), rail.u(last[3]!, 1.2)];
-  const viaductStartDistance = rail.distanceAt(vu0);
-  const viaductLength = rail.distanceAt(vu1) - viaductStartDistance;
-  for (const side of [-1, 1]) {
-    const segments = Math.ceil(viaductLength / 7);
-    for (let i = 0; i < segments; i += 1) {
-      rail.frameAt(vu0 + ((i + 0.5) / segments) * (vu1 - vu0), f);
-      const x = f.p.x + f.R.x * side * 42;
-      const z = f.p.z + f.R.z * side * 42;
-      const ry = yaw(f.T);
+  /** Each side's trains use only the drawn stretch, less half a car at each end so a nose never hangs over the edge. */
+  const trackRange = viaducts.map((v) => {
+    const n = v.segments.length;
+    const uA = vu0 + (v.run[0] / n) * (vu1 - vu0);
+    const uB = vu0 + ((v.run[1] + 1) / n) * (vu1 - vu0);
+    return { start: rail.distanceAt(uA) + TRAIN_CAR_SPACING / 2, length: rail.distanceAt(uB) - rail.distanceAt(uA) - TRAIN_CAR_SPACING, uA, uB };
+  });
+  for (const [index, v] of viaducts.entries()) {
+    const side = v.side;
+    v.drawn.forEach((seg, i) => {
+      rail.frameAt(seg.u, f);
+      const { x, z, ry } = seg;
       solid(3, 14, 1.4, 7.6, x, VIADUCT_Y - 1.4, z, ry, grey(0.24), false);
+      auditBoxes.push({ kind: "viaduct-deck", x, z, w: 14, d: 7.6, ry, y0: VIADUCT_Y - 1.4, y1: VIADUCT_Y });
       // Two tracks, two rails each.
       for (const lane of [-LANE, LANE]) for (const s of [-1, 1]) solid(3, 0.3, 0.3, 7.6, x + f.R.x * (lane + s * 1.8), VIADUCT_Y, z + f.R.z * (lane + s * 1.8), ry, grey(0.5), false);
       // The pillar is left out where a board stands under the deck (it would stand in the board).
-      const uSeg = vu0 + ((i + 0.5) / segments) * (vu1 - vu0);
       const blocked = stops.some((_, k) => {
         const shot = shotOf(k);
-        return shot.kind === "under" && Math.sign(shot.board.lat) === side && Math.abs(uSeg - rail.u(k, shot.board.ahead)) * rail.length < 12;
+        return shot.kind === "under" && Math.sign(shot.board.lat) === side && Math.abs(seg.u - rail.u(k, shot.board.ahead)) * rail.length < 12;
       });
-      if (i % 2 === 0 && !blocked) solid(3, 3, VIADUCT_Y - 1.4, 2.4, x, 0, z, ry, grey(0.18), false);
+      if ((i + v.run[0]) % 2 === 0 && !blocked) {
+        solid(3, 3, VIADUCT_Y - 1.4, 2.4, x, 0, z, ry, grey(0.18), false);
+        auditBoxes.push({ kind: "viaduct-pillar", x, z, w: 3, d: 2.4, ry, y0: 0, y1: VIADUCT_Y - 1.4 });
+      }
+    });
+    // A buffer stop on each track at both ends of the stretch: the line ends there, it does not hang in the air.
+    for (const [edge, toward] of [[trackRange[index]!.uA, 1], [trackRange[index]!.uB, -1]] as const) {
+      rail.frameAt(edge, f);
+      for (const lane of [-LANE, LANE]) {
+        solid(3, 1.8, 1.2, 0.7, f.p.x + f.R.x * (side * VIADUCT_OFFSET + lane) + f.T.x * toward * 1.2, VIADUCT_Y, f.p.z + f.R.z * (side * VIADUCT_OFFSET + lane) + f.T.z * toward * 1.2, yaw(f.T), p.red, false);
+      }
     }
   }
   let stationCount = 0;
@@ -1015,37 +1062,46 @@ export async function buildWorld(c: WorldContext): Promise<World> {
   let fleet: Fleet[] | null = null;
   let kindsLoaded = 0;
   const VEHICLES = 13;
+  /** Top of the avenue's surface: the road ribbon is at 0.03 and the lane marks at 0.07. */
+  const ROAD_TOP = 0.05;
   const carFront = (g: THREE.BufferGeometry | null) => g?.rotateY(-Math.PI / 2) ?? null; // the cars' front is +X; vehicles drive along +Z
   void Promise.all([loadModel(c.models.truck), loadModel(c.models.moto), ...(c.models.cars ?? []).map((url) => loadModel(url).then(carFront))]).then(([truck, moto, ...cars]) => {
     // Sizes are the longest side in world units: a car reads as a car next to towers forty units tall.
     const kinds = [
-      { g: truck ?? truckFallback(), n: 3, size: 9, lift: 2.1 },
-      { g: moto ?? truckFallback(), n: 3, size: 5.2, lift: 1.4 },
-      ...cars.map((g, i) => ({ g, n: i ? 3 : 4, size: 7.4, lift: 1.5 })).filter((k): k is { g: THREE.BufferGeometry; n: number; size: number; lift: number } => k.g !== null),
+      { g: truck ?? truckFallback(), n: 3, size: 9 },
+      { g: moto ?? truckFallback(), n: 3, size: 5.2 },
+      ...cars.map((g, i) => ({ g, n: i ? 3 : 4, size: 7.4 })).filter((k): k is { g: THREE.BufferGeometry; n: number; size: number } => k.g !== null),
     ];
     let base = 0;
     fleet = kinds.slice(0, 4).map((k) => {
-      const mesh = new THREE.InstancedMesh(fit(k.g.clone(), k.size), new THREE.MeshStandardMaterial({ flatShading: true, roughness: 0.6, metalness: 0.2 }), k.n);
+      const body = fit(k.g.clone(), k.size);
+      // The S64 source contains a body shell only. Fill its four wheel arches with dark wheels.
+      let wheelGeometry: THREE.BufferGeometry | undefined;
+      if (cars[1] && k.g === cars[1]) {
+        const wheelParts: THREE.BufferGeometry[] = [];
+        for (const x of [-1.36, 1.36]) for (const z of [-2.47, 2.52]) {
+          wheelParts.push(new THREE.CylinderGeometry(0.53, 0.53, 0.35, 12).rotateZ(Math.PI / 2).translate(x, -0.72, z));
+        }
+        wheelGeometry = mergeGeometries(wheelParts)!;
+      }
+      // Each kind stands on the road by its own lowest point (body or wheels), whatever the model's origin is.
+      const lift = groundLift(wheelGeometry ? [body, wheelGeometry] : [body], ROAD_TOP);
+      const mesh = new THREE.InstancedMesh(body, new THREE.MeshStandardMaterial({ flatShading: true, roughness: 0.6, metalness: 0.2 }), k.n);
       mesh.name = `fleet-${base}`;
       mesh.layers.enable(1);
       mesh.frustumCulled = false;
       const tones = [p.red, p.paper, grey(0.17), p.red];
       for (let i = 0; i < k.n; i += 1) mesh.setColorAt(i, col.copy(tones[(i + base) % 4]!));
       scene.add(mesh);
-      // The S64 source contains a body shell only. Fill its four wheel arches with dark wheels.
       let wheels: THREE.InstancedMesh | undefined;
-      if (cars[1] && k.g === cars[1]) {
-        const wheelParts: THREE.BufferGeometry[] = [];
-        for (const x of [-1.36, 1.36]) for (const z of [-2.47, 2.52]) {
-          wheelParts.push(new THREE.CylinderGeometry(0.53, 0.53, 0.35, 12).rotateZ(Math.PI / 2).translate(x, -0.72, z));
-        }
-        wheels = new THREE.InstancedMesh(mergeGeometries(wheelParts)!, new THREE.MeshStandardMaterial({ color: p.ink, flatShading: true, roughness: 0.9 }), k.n);
+      if (wheelGeometry) {
+        wheels = new THREE.InstancedMesh(wheelGeometry, new THREE.MeshStandardMaterial({ color: p.ink, flatShading: true, roughness: 0.9 }), k.n);
         wheels.name = "s64-wheels";
         wheels.frustumCulled = false;
         wheels.layers.enable(1);
         scene.add(wheels);
       }
-      const entry: Fleet = { mesh, wheels, n: k.n, base, lift: k.lift };
+      const entry: Fleet = { mesh, wheels, n: k.n, base, lift };
       base += k.n;
       return entry;
     });
@@ -1126,14 +1182,16 @@ export async function buildWorld(c: WorldContext): Promise<World> {
     // Give the 13.52-unit cars clearance on both the inside and outside of curved tracks.
     const length = TRAIN_CAR_SPACING;
     const cars = MIDS + 2;
-    const room = ((cars - 1) * length) / viaductLength;
     for (let t = 0; t < TRAINS; t += 1) {
+      // Trains 0 and 1 run on the left viaduct, 2 and 3 on the right one; each uses the stretch that was drawn on its side.
+      const range = trackRange[t < 2 ? 0 : 1]!;
+      const room = ((cars - 1) * length) / range.length;
       const q = reduce ? 0.25 + (t % 2) * 0.2 : (((time / TRAIN_CYCLE + t * 0.37) % 1) + 1) % 1;
       // The leading car's place on the viaduct, kept inside it so the whole train stays on the deck (and does not jump at the turnaround).
       const { lead, forward } = trainLead(q, room);
       const dir = forward ? 1 : -1;
       for (let slot = 0; slot < cars; slot += 1) {
-        const distance = viaductStartDistance + lead * viaductLength - dir * slot * length;
+        const distance = range.start + lead * range.length - dir * slot * length;
         rail.frameAt(rail.uAtDistance(distance), f);
         const offset = (t < 2 ? VIADUCT_LAT : -VIADUCT_LAT) + (t % 2 ? LANE : -LANE);
         dummy.position.set(f.p.x + f.R.x * offset, VIADUCT_Y + (realTrain ? 0.35 : 0.1), f.p.z + f.R.z * offset);
@@ -1171,5 +1229,6 @@ export async function buildWorld(c: WorldContext): Promise<World> {
     },
     setCardOverlay: (k, visible) => { board(k).panel.visible = !visible; },
     auditFootprints: () => footprints,
+    auditBoxes: () => auditBoxes,
   };
 }
