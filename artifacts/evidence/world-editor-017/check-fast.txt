@@ -1,0 +1,23 @@
+catalog: PASS
+evidence: PASS (23 records)
+flows: PASS (9 flows, paths checked at the pins)
+
+ RUN  v5.0.5 C:/estudo/Golpe/lab/projects/p07
+
+
+ Test Files  19 passed (19)
+      Tests  129 passed (129)
+   Start at  07:32:22
+   Duration  7.57s (environment 77%, setup 13%, tests 4%, transform 3%, import 2%, worker 1%)
+
+Environment  jsdom was created 19 times · 64.83s total, 77% of tracked time
+             create it once per worker with pool: 'vmThreads' (keeps per-file isolation) or isolate: false (shares it across files)
+             learn more: https://vitest.dev/guide/improving-performance#test-environments
+
+lint: exit 0
+typecheck: exit 0
+catalog:check: exit 0
+evidence:check: exit 0
+flow:check: exit 0
+test: exit 0
+check-fast: OK

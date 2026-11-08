@@ -1,0 +1,18 @@
+import { chromium } from "playwright";
+const browser = await chromium.launch({ channel: "msedge", args: ["--use-angle=swiftshader", "--enable-unsafe-swiftshader", "--ignore-gpu-blocklist"] });
+const page = await browser.newPage({ viewport: { width: 1280, height: 800 } });
+const logs = [];
+page.on("console", (m) => /world-edits/.test(m.text()) && logs.push(m.text()));
+const open = async () => { await page.goto("http://localhost:5199/?edit=1"); await page.waitForFunction(() => window.__worldEditor, null, { timeout: 90000 }); await page.waitForTimeout(1500); };
+await open();
+const shot = (n) => page.screenshot({ path: `artifacts/evidence/world-editor-017/${n}.png` });
+await page.evaluate(() => { const e = window.__worldEditor; e.select("tower", "t0.3"); e.focus(); });
+await page.waitForTimeout(1200); await shot("save-before");
+await page.evaluate(async () => { const e = window.__worldEditor; e.toggleHide(); e.select("lamp", e.list().lamps[0].id); e.patch({ dx: 6 }); e.select("tower", "t0.4"); e.patch({ dx: -8, hs: 0.5 }); await e.addProp("truck.glb"); return e.save(); });
+await page.waitForTimeout(4000);
+await open();
+await page.evaluate(() => { const e = window.__worldEditor; e.select("tower", "t0.3"); e.focus(); });
+await page.waitForTimeout(1200); await shot("save-after");
+console.log(JSON.stringify(await page.evaluate(() => { const l = window.__worldEditor.list(); return { props: l.props.length, edited: l.towers.filter((t) => t.edited).map((t) => t.id), lampsEdited: l.lamps.filter((t) => t.edited).map((t) => t.id) }; })));
+console.log(logs.join("\n") || "no skip warnings");
+await browser.close();
