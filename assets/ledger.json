@@ -2,20 +2,20 @@
   "assets": [
     {
       "path": "assets/game/models/building-large.glb",
-      "author": "Quaternius (Downtown City MegaKit, Standard); no normals, simplified, no textures (gltf-transform 4.5.1)",
+      "author": "Quaternius (Downtown City MegaKit, Standard); Building_Large_2 re-exported 2026-11-08 with Blender (planar dissolve, welded), no normals, no textures (gltf-transform 4.5.1 weld, quantize)",
       "license": "CC0",
       "url": "https://quaternius.com",
       "source": "manual",
-      "sha256": "1eab7d9376fce48cede0e289e76d5a464825db5633fa4af6836922848a2c48fb",
+      "sha256": "51985a3ac3528ff7e922b0413244cb6e4ed1129c27bddb57ad2bcd814dd609de",
       "fetchedAt": "2026-11-01T18:42:52.820Z"
     },
     {
       "path": "assets/game/models/building-medium.glb",
-      "author": "Quaternius (Downtown City MegaKit, Standard); no normals, simplified, no textures (gltf-transform 4.5.1)",
+      "author": "Quaternius (Downtown City MegaKit, Standard); Building_Medium_2_001 re-exported 2026-11-08 with Blender (planar dissolve, welded), no normals, no textures (gltf-transform 4.5.1 weld, quantize)",
       "license": "CC0",
       "url": "https://quaternius.com",
       "source": "manual",
-      "sha256": "4867615984dd3dd1a1be1d142d43c88c8673e8751615d9be842a1e411fb622ee",
+      "sha256": "7d8a8761917ce74afc119067e42b8e1b45871925b79dfcd1a90a884be21a6876",
       "fetchedAt": "2026-11-01T18:42:52.910Z"
     },
     {
@@ -40,11 +40,11 @@
     },
     {
       "path": "assets/game/models/building-small.glb",
-      "author": "Quaternius (Downtown City MegaKit, Standard); no normals, simplified, no textures (gltf-transform 4.5.1)",
+      "author": "Quaternius (Downtown City MegaKit, Standard); Building_Small_1 re-exported 2026-11-08 with Blender (planar dissolve, welded), no normals, no textures (gltf-transform 4.5.1 weld, quantize)",
       "license": "CC0",
       "url": "https://quaternius.com",
       "source": "manual",
-      "sha256": "649792d041f02a1efa802fd7a3c1e24d2aa71af243b42fdf28626ad4300bc810",
+      "sha256": "1ccd864b117efed4c007693608b1bcc55dde227bf16e348e3355426db36e3978",
       "fetchedAt": "2026-11-01T18:42:53.010Z"
     },
     {
