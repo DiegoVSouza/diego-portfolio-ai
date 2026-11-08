@@ -7,8 +7,10 @@ import { loadModel } from "./loaders";
 import { createSky } from "./sky";
 import { BOARD_BEAM_DEPTH, BOARD_BEAM_Z, BOARD_POST_DEPTH, BOARD_POST_Z, BOARD_WIDTH, ROAD_EXTRA, SURROUNDINGS, TRAIN_CAR_SPACING, shotOf, trafficAt, trainLead } from "./layout";
 import { cardSide, type Frame, type Rail } from "./rail";
+import { propUrl } from "./props";
 import { truckFallback } from "./symbols";
 import type { Palette } from "./tokens";
+import { editMatches, editMatrix, editPoint, worldEdits, type PropEdit } from "./world-edits";
 
 export interface WorldStop {
   id: string;
@@ -54,6 +56,29 @@ export interface World {
   auditFootprints(): readonly { x: number; z: number; r: number; kind: string; district: number; height: number }[];
   /** Oriented boxes of generated solids (towers, board buildings, viaduct), for the development-only audit. `approx` marks imported or merged shapes. */
   auditBoxes(): readonly AuditBox[];
+  /** Towers and lamps as the generator placed them (before any edit), for the atelier's World tab. */
+  editables(): { towers: EditableTower[]; lamps: EditableLamp[] };
+  /** Hand-placed props: the editor adds, finds and removes them while the page is open. */
+  props: { add(spec: PropEdit): Promise<THREE.Object3D | null>; get(id: string): THREE.Object3D | undefined; remove(id: string): void };
+}
+
+/** A generated tower, with the id its edits are filed under (`t<district>.<n>`). Position and size are the generator's own. */
+export interface EditableTower {
+  id: string;
+  district: number;
+  x: number;
+  z: number;
+  w: number;
+  d: number;
+  h: number;
+  ry: number;
+  imported: boolean;
+}
+export interface EditableLamp {
+  id: string;
+  x: number;
+  z: number;
+  ry: number;
 }
 
 /** An oriented box on the ground plane: centre (x, z), size w across and d along its yaw `ry`, from y0 to y1. */
@@ -226,9 +251,9 @@ export async function buildWorld(c: WorldContext): Promise<World> {
   const parts: Part[][] = Array.from({ length: D }, () => []);
   const realParts: Part[][] = Array.from({ length: D }, () => []);
   const beacons: Part[] = [];
-  const signSpots: { x: number; y: number; z: number; ry: number }[] = [];
+  const signSpots: { x: number; y: number; z: number; ry: number; hidden?: boolean }[] = [];
   /** Horizontal signs on the avenue-facing wall of a building, at street height. */
-  const wallSpots: { x: number; y: number; z: number; ry: number }[] = [];
+  const wallSpots: { x: number; y: number; z: number; ry: number; hidden?: boolean }[] = [];
 
   /** A box with the window texture mapped to its sides (the top and bottom sample the dark corner), tinted, turned and placed. */
   const solid = (d: number, w: number, h: number, dd: number, x: number, y0: number, z: number, ry: number, tone: THREE.Color, windows = true) => {
@@ -293,6 +318,36 @@ export async function buildWorld(c: WorldContext): Promise<World> {
   /** District d covers the path from half a stop before its first stop to half a stop after its last (the first reaches the start, the last the end). */
   const span = (d: number): [number, number] => [d === 0 ? 0 : rail.u(first[d]!, -0.5), d === D - 1 ? 1 : rail.u(last[d]!, 0.5)];
 
+  /* ---------- hand edits (phase 017): applied after the generator has drawn and reserved everything, so the random stream does not move ---------- */
+  const towerSeq: number[] = Array.from({ length: D }, () => 0);
+  const towerList: EditableTower[] = [];
+  const settleTower = (id: string, d: number, x: number, z: number, snap: { parts: number; real: number; beacons: number; signs: number; walls: number }) => {
+    const edit = worldEdits.towers[id];
+    if (!edit) return;
+    if (!editMatches(edit, x, z)) {
+      console.warn(`world-edits: ${id} is not at ${edit.at.join(", ")} any more (it is at ${x.toFixed(1)}, ${z.toFixed(1)}); edit skipped`);
+      return;
+    }
+    if (edit.hide) {
+      parts[d]!.length = snap.parts;
+      realParts[d]!.length = snap.real;
+      beacons.length = snap.beacons;
+      for (let i = snap.signs; i < signSpots.length; i += 1) signSpots[i]!.hidden = true;
+      for (let i = snap.walls; i < wallSpots.length; i += 1) wallSpots[i]!.hidden = true;
+      return;
+    }
+    const m = editMatrix(edit, x, z);
+    for (let i = snap.parts; i < parts[d]!.length; i += 1) parts[d]![i]!.applyMatrix4(m);
+    for (let i = snap.real; i < realParts[d]!.length; i += 1) realParts[d]![i]!.applyMatrix4(m);
+    for (let i = snap.beacons; i < beacons.length; i += 1) beacons[i]!.applyMatrix4(m);
+    for (const list of [signSpots.slice(snap.signs), wallSpots.slice(snap.walls)]) {
+      for (const spot of list) {
+        [spot.x, spot.y, spot.z] = editPoint(edit, x, z, spot.x, spot.y, spot.z);
+        spot.ry += edit.dry ?? 0;
+      }
+    }
+  };
+
   interface Lane {
     count: number;
     latMin: number;
@@ -345,9 +400,14 @@ export async function buildWorld(c: WorldContext): Promise<World> {
       if (onViaduct(x, z, w + 0.45, dd + 0.45, ry)) continue;
       if (o.clear !== false && crossUs.some((cu) => Math.abs(uPick - cu) * rail.length < CROSS_HALF + SIDEWALK + Math.max(dd, 9) / 2 + 3)) continue;
       n += 1;
+      const id = `t${d}.${towerSeq[d]!++}`;
+      const snap = { parts: parts[d]!.length, real: realParts[d]!.length, beacons: beacons.length, signs: signSpots.length, walls: wallSpots.length };
       const reservation = Math.hypot(w + 0.45, dd + 0.45) / 2 + 1;
       if (o.realEvery && (n - 1) % o.realEvery === 0 && landmark(d, x, z, -f.R.x * s, -f.R.z * s, h, reservation)) {
         if (rnd() < 0.5) beacon(x, footprints.at(-1)!.height + 0.3, z);
+        const fp = footprints.at(-1)!;
+        towerList.push({ id, district: d, x, z, w: fp.r * 1.4, d: fp.r * 1.4, h: fp.height, ry: face(-f.R.x * s, -f.R.z * s), imported: true });
+        settleTower(id, d, x, z, snap);
         placed.push({ x, z, w, dd, h, ry, s });
         continue;
       }
@@ -373,6 +433,8 @@ export async function buildWorld(c: WorldContext): Promise<World> {
         wallSpots.push({ x: f.p.x + f.R.x * s * (lat - w / 2 - 0.12), y: 5 + rnd() * Math.min(10, h - 9), z: f.p.z + f.R.z * s * (lat - w / 2 - 0.12) + (rnd() - 0.5) * 2, ry: face(-f.R.x * s, -f.R.z * s) });
         wallsLeft -= 1;
       }
+      towerList.push({ id, district: d, x, z, w, d: dd, h, ry, imported: false });
+      settleTower(id, d, x, z, snap);
       placed.push({ x, z, w, dd, h, ry, s });
     }
     return placed;
@@ -522,11 +584,19 @@ export async function buildWorld(c: WorldContext): Promise<World> {
   const lamps = new THREE.InstancedMesh(lampGeo, new THREE.MeshStandardMaterial({ flatShading: true, roughness: 0.7, metalness: 0.2 }), lampList.length);
   lamps.name = "avenue-lamps";
   lamps.frustumCulled = false;
+  const lampEdits: EditableLamp[] = [];
   lampList.forEach(({ u, s, i }, n) => {
     rail.frameAt(u, f);
-    dummy.position.set(f.p.x + f.R.x * s * 11.5, 0, f.p.z + f.R.z * s * 11.5);
-    dummy.rotation.set(0, Math.atan2(f.R.z * s, -f.R.x * s), 0);
-    dummy.scale.setScalar(1);
+    const lx = f.p.x + f.R.x * s * 11.5;
+    const lz = f.p.z + f.R.z * s * 11.5;
+    const lry = Math.atan2(f.R.z * s, -f.R.x * s);
+    lampEdits.push({ id: `l${i}`, x: lx, z: lz, ry: lry });
+    const lampEdit = worldEdits.lamps[`l${i}`];
+    const lampOk = lampEdit && editMatches(lampEdit, lx, lz);
+    if (lampEdit && !lampOk) console.warn(`world-edits: l${i} is not at ${lampEdit.at.join(", ")} any more; edit skipped`);
+    dummy.position.set(lx + (lampOk ? lampEdit.dx ?? 0 : 0), 0, lz + (lampOk ? lampEdit.dz ?? 0 : 0));
+    dummy.rotation.set(0, lry + (lampOk ? lampEdit.dry ?? 0 : 0), 0);
+    dummy.scale.setScalar(lampOk && lampEdit.hide ? 0 : 1);
     dummy.updateMatrix();
     lamps.setMatrixAt(n, dummy.matrix);
     lamps.setColorAt(n, col.copy(i % 6 < 2 ? p.red : grey(0.3)));
@@ -1051,6 +1121,7 @@ export async function buildWorld(c: WorldContext): Promise<World> {
   /* ---------- vertical neon signs on tall towers, headline over the gate, rooftop signs ---------- */
   const words = [...stops.filter((s) => s.id !== "arrival" && s.id !== "terminal").map((s) => s.title), "LIVE", "AI", "EVIDENCE"];
   signSpots.slice(0, 16).forEach((s, i) => {
+    if (s.hidden) return;
     const [bg, fg] = signPairs[i % signPairs.length]!;
     const m = makeSign(words[i % words.length]!, 2.2, 8.8, bg, fg, true);
     m.position.set(s.x, s.y, s.z);
@@ -1060,6 +1131,7 @@ export async function buildWorld(c: WorldContext): Promise<World> {
   // Horizontal signs on walls facing the avenue, so the city has lettering at street height and not only on the road and the roofs.
   const wallWords = [...words, "OPEN", "24H", "TRACE", "EVAL", "AGENTS", "RAG", "MCP"];
   wallSpots.forEach((s, i) => {
+    if (s.hidden) return;
     const [bg, fg] = signPairs[(i * 5 + 1) % signPairs.length]!;
     const m = makeSign(wallWords[(i * 3) % wallWords.length]!, 9, 2.25, bg, fg, false);
     m.position.set(s.x, s.y, s.z);
@@ -1253,6 +1325,36 @@ export async function buildWorld(c: WorldContext): Promise<World> {
     if (tails) tails.instanceMatrix.needsUpdate = true;
   };
 
+  /* ---------- hand-placed props (world-edits.json): loose objects, loaded after the first frame like the other models ---------- */
+  const propGroup = new THREE.Group();
+  propGroup.name = "edit-props";
+  scene.add(propGroup);
+  const propMat = new THREE.MeshStandardMaterial({ vertexColors: true, flatShading: true, roughness: 0.6, metalness: 0.2 });
+  const propPalette = paletteMat();
+  const propObjects = new Map<string, THREE.Mesh>();
+  const addProp = async (spec: PropEdit): Promise<THREE.Object3D | null> => {
+    const url = propUrl(spec.model);
+    if (!url) {
+      console.warn(`world-edits: prop ${spec.id} uses ${spec.model}, which is not in assets/game/models`);
+      return null;
+    }
+    const g = await loadModel(url, ["color"]);
+    if (!g) return null;
+    if (!g.hasAttribute("normal")) g.computeVertexNormals();
+    const mesh = new THREE.Mesh(g, g.hasAttribute("color") ? propPalette : propMat);
+    mesh.name = `edit-prop:${spec.id}`;
+    mesh.userData.propId = spec.id;
+    mesh.position.set(spec.x, spec.y, spec.z);
+    mesh.rotation.y = spec.ry;
+    mesh.scale.setScalar(spec.scale);
+    propGroup.add(mesh);
+    propObjects.set(spec.id, mesh);
+    return mesh;
+  };
+  void Promise.all(worldEdits.props.map(addProp)).then(() => {
+    if (worldEdits.props.length) c.onModels();
+  });
+
   return {
     place,
     get landmarks() {
@@ -1270,5 +1372,15 @@ export async function buildWorld(c: WorldContext): Promise<World> {
     setCardOverlay: (k, visible) => { board(k).panel.visible = !visible; },
     auditFootprints: () => footprints,
     auditBoxes: () => auditBoxes,
+    editables: () => ({ towers: towerList, lamps: lampEdits }),
+    props: {
+      add: addProp,
+      get: (id) => propObjects.get(id),
+      remove: (id) => {
+        const mesh = propObjects.get(id);
+        if (mesh) propGroup.remove(mesh);
+        propObjects.delete(id);
+      },
+    },
   };
 }

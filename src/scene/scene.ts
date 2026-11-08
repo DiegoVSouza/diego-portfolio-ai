@@ -748,6 +748,10 @@ export async function start(canvas: HTMLCanvasElement, options: SceneOptions): P
   refreshOrigin();
   ready = true;
   if (modelsWaiting) modelsLoaded();
+  // Development only (phase 017): `/?edit=1` hands the camera and the generated items to the world editor. Vite removes this branch from the build.
+  if (import.meta.env.DEV && new URLSearchParams(window.location.search).has("edit")) {
+    void import("./editor").then((m) => m.startEditor({ scene, camera, canvas, world }));
+  }
   frameLoop(performance.now());
 
   function dispose() {
