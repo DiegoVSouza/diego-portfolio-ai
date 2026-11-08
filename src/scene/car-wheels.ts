@@ -22,12 +22,12 @@ function wheel(tyreColor: THREE.Color, hubColor: THREE.Color, r: number, w: numb
 /** S64: the source is a body shell only. Four wheels fill its arches (centres measured on the fitted model). */
 export function s64Wheels(tyre: THREE.Color, hub: THREE.Color): THREE.BufferGeometry {
   const parts: THREE.BufferGeometry[] = [];
-  for (const x of [-1.36, 1.36]) for (const z of [-2.47, 2.52]) parts.push(...wheel(tyre, hub, 0.53, 0.35, x, -0.72, z, 0.3, 0.06));
+  for (const x of [-1.36, 1.36]) for (const z of [-2.47, 2.52]) parts.push(...wheel(tyre, hub, 0.53, 0.35, x, -0.92, z, 0.3, 0.06));
   return mergeGeometries(parts)!;
 }
 
 /**
- * R7: also a body shell (its arches are empty too). Axles at 88 and -114.5 along the length, wheel centres 20.5 up, in the source's units;
+ * R7: also a body shell (its arches are empty too). Axles at 88 and -114.5 along the length, wheel centres 14.5 up (the tyre dips below the sill so the car stands on its wheels), in the source's units;
  * `box` is the rotated, unscaled body's bounds, so the numbers map through the same centring and scale as `fit()`.
  */
 export function r7Wheels(box: THREE.Box3, tyre: THREE.Color, hub: THREE.Color): THREE.BufferGeometry {
@@ -36,7 +36,7 @@ export function r7Wheels(box: THREE.Box3, tyre: THREE.Color, hub: THREE.Color): 
   const k = CAR_SIZE / Math.max(e.x, e.y, e.z);
   const parts: THREE.BufferGeometry[] = [];
   for (const side of [-1, 1]) for (const along of [88, -114.5]) {
-    parts.push(...wheel(tyre, hub, 20.5 * k, 24 * k, (side * 62 - c.x) * k, (20.5 - c.y) * k, (along - c.z) * k, 13 * k, 3 * k));
+    parts.push(...wheel(tyre, hub, 20.5 * k, 24 * k, (side * 62 - c.x) * k, (14.5 - c.y) * k, (along - c.z) * k, 13 * k, 3 * k));
   }
   return mergeGeometries(parts)!;
 }
