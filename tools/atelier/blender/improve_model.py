@@ -4,6 +4,7 @@ Run:  blender --background --python tools/atelier/blender/improve_model.py -- <i
 
 Options
   --planar DEG      dissolve coplanar faces first (angle limit in degrees; keeps flat buildings intact)
+  --keep-winding    do not recalculate normals outward (kit pieces are open shells: the recalculation turns some inside out)
   --budget N        decimate (collapse) until the model has at most N triangles (default: no decimation)
   --height H        scale so the model is H units tall (default: keep the pack's scale)
   --rotate-y DEG    spin around the vertical axis before export, to make the model face +Z (default 0)
@@ -76,21 +77,26 @@ def world_bounds(objs):
     return lo, hi
 
 
-# Keep meshes only; unparent them so the transforms can be applied.
-for o in [o for o in bpy.data.objects if o.type != "MESH"]:
-    bpy.data.objects.remove(o, do_unlink=True)
+# Keep meshes only. Each piece's world matrix is baked into its own copy of the mesh (kit files hang pieces under empties that carry the
+# unit scale, and repeated pieces share one mesh, so Blender's transform_apply collapses them). Mirrored pieces get their faces flipped back.
 meshes = [o for o in bpy.data.objects if o.type == "MESH"]
 if not meshes:
     raise SystemExit("no mesh objects in the input")
+worlds = {o: o.matrix_world.copy() for o in meshes}
 for o in meshes:
-    mw = o.matrix_world.copy()
+    o.data = o.data.copy()
+    o.data.transform(worlds[o])
+    if worlds[o].determinant() < 0:
+        o.data.flip_normals()
+for o in [o for o in bpy.data.objects if o.type != "MESH"]:
+    bpy.data.objects.remove(o, do_unlink=True)
+for o in meshes:
     o.parent = None
-    o.matrix_world = mw
+    o.matrix_world.identity()
 bpy.ops.object.select_all(action="DESELECT")
 for o in meshes:
     o.select_set(True)
 bpy.context.view_layer.objects.active = meshes[0]
-bpy.ops.object.transform_apply(location=True, rotation=True, scale=True)
 
 before = {"triangles": triangles(meshes), "size": [round(v, 4) for v in (world_bounds(meshes)[1] - world_bounds(meshes)[0])]}
 
@@ -99,7 +105,8 @@ for o in meshes:
     bm = bmesh.new()
     bm.from_mesh(o.data)
     bmesh.ops.remove_doubles(bm, verts=bm.verts, dist=1e-5)
-    bmesh.ops.recalc_face_normals(bm, faces=bm.faces)
+    if "--keep-winding" not in argv:
+        bmesh.ops.recalc_face_normals(bm, faces=bm.faces)
     bm.to_mesh(o.data)
     bm.free()
 

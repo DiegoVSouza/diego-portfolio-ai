@@ -125,7 +125,15 @@ async function show(name: string, bytes: ArrayBuffer): Promise<void> {
   }
   const originals = new Map<THREE.Mesh, THREE.Material | THREE.Material[]>();
   root.traverse((o) => {
-    if ((o as THREE.Mesh).isMesh) originals.set(o as THREE.Mesh, (o as THREE.Mesh).material);
+    const mesh = o as THREE.Mesh;
+    if (!mesh.isMesh) return;
+    originals.set(mesh, mesh.material);
+    // The site's building files carry no normals (the scene shades flat and computes them): do the same here, or the viewer lights them wrongly.
+    if (!mesh.geometry.getAttribute("normal")) {
+      mesh.geometry = mesh.geometry.index ? mesh.geometry.toNonIndexed() : mesh.geometry;
+      mesh.geometry.computeVertexNormals();
+      for (const m of Array.isArray(mesh.material) ? mesh.material : [mesh.material]) (m as THREE.MeshStandardMaterial).flatShading = true;
+    }
   });
   root.userData.originals = originals;
   // The scene scales every model to a target size (cars 7.4, trucks 9...): show it at the same size to judge it in context.

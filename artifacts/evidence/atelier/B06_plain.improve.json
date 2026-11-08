@@ -1,0 +1,66 @@
+{
+  "in": "Building_06.fbx",
+  "out": "B06_plain.glb",
+  "before": {
+    "triangles": 45318,
+    "size": [
+      5.1784,
+      11.2,
+      11.8968
+    ]
+  },
+  "after": {
+    "triangles": 43005,
+    "size": [
+      5.1784,
+      11.2,
+      11.8968
+    ]
+  },
+  "blender": "5.2.1 LTS",
+  "inspect": {
+    "file": "C:\\estudo\\Golpe\\lab\\projects\\p07\\.cache\\atelier-out\\B06_plain.glb",
+    "bytes": 3245664,
+    "triangles": 43005,
+    "vertices": 86729,
+    "meshes": 1,
+    "nodes": 1,
+    "materials": 2,
+    "textures": 0,
+    "images": 0,
+    "animations": [],
+    "skins": 0,
+    "attributes": [
+      "NORMAL",
+      "POSITION",
+      "TEXCOORD_0"
+    ],
+    "extensionsUsed": [],
+    "bounds": {
+      "min": [
+        -2.5361804962158203,
+        -6.092535495758057,
+        -5.265517711639404
+      ],
+      "max": [
+        2.642242670059204,
+        5.804309368133545,
+        5.934483528137207
+      ],
+      "size": [
+        5.178423166275024,
+        11.896844863891602,
+        11.200001239776611
+      ]
+    },
+    "originOffset": {
+      "x": 0.053031086921691895,
+      "y": -6.092535495758057,
+      "z": 0.33448290824890137
+    }
+  },
+  "problems": [
+    "43005 triangles is over the budget of 8000",
+    "origin is not at the base (the base is -6.09 from the origin)"
+  ]
+}

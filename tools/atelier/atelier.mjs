@@ -149,6 +149,7 @@ const COMMANDS = {
     const passthrough = [];
     for (const key of ["budget", "height", "rotate-y", "origin", "planar"]) if (flags[key] !== undefined) passthrough.push(`--${key}`, String(flags[key]));
     if (flags["keep-textures"]) passthrough.push("--keep-textures");
+    if (flags["keep-winding"]) passthrough.push("--keep-winding");
     const run = spawnSync(exe, ["--background", "--python", path.join(here, "blender", "improve_model.py"), "--", source, path.resolve(output), ...passthrough], { encoding: "utf8" });
     const line = run.stdout.split("\n").find((l) => l.startsWith("ATELIER_IMPROVE "));
     if (run.status !== 0 || !line) {

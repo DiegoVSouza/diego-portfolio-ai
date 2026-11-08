@@ -6,7 +6,7 @@
       "license": "CC0",
       "url": "https://quaternius.com",
       "source": "manual",
-      "sha256": "51985a3ac3528ff7e922b0413244cb6e4ed1129c27bddb57ad2bcd814dd609de",
+      "sha256": "f93b0be8fbee46ea56e8f6576f889a1ba2df34e6fe481f106f90150c48a8a668",
       "fetchedAt": "2026-11-01T18:42:52.820Z"
     },
     {
@@ -15,17 +15,17 @@
       "license": "CC0",
       "url": "https://quaternius.com",
       "source": "manual",
-      "sha256": "7d8a8761917ce74afc119067e42b8e1b45871925b79dfcd1a90a884be21a6876",
+      "sha256": "6929127dc6da3bfce7e6d4c752b50bf29de94b1ee16f4392eeb0d1a361098789",
       "fetchedAt": "2026-11-01T18:42:52.910Z"
     },
     {
       "path": "assets/game/models/building-sample-013.glb",
-      "author": "Unknown author; Blender cleanup 2026-11-08 (planar dissolve from Building_06.fbx, welded, no normals)",
+      "author": "Unknown author; Blender cleanup 2026-11-08 (Building_06.fbx, pieces baked at their world positions, planar dissolve, no normals)",
       "license": "OWNER-DECLARED",
       "url": "local pack: Free Sample.zip",
       "attribution": "Unknown author; Blender cleanup (local pack: Free Sample.zip). No licence file in the pack. Owner decision: Owner authorized optimization on 2026-11-07 retaining existing exception. Terms unverified.",
       "source": "manual",
-      "sha256": "8806d6ec0085ff69d0fcfff33c20a01b7d95743066a20eb9bdb5a2fa9f9b2ac7",
+      "sha256": "6a89363c13e385c26cc6b267ee321bed0d689d26bc406e9ec52c28f99684a401",
       "fetchedAt": "2026-11-08T12:00:00.000Z"
     },
     {
@@ -34,7 +34,7 @@
       "license": "CC0",
       "url": "https://quaternius.com",
       "source": "manual",
-      "sha256": "1ccd864b117efed4c007693608b1bcc55dde227bf16e348e3355426db36e3978",
+      "sha256": "b5c71df7cda2784d3a1f34df0f5d8ace8096708a35362fa43aa2568b3024d0e4",
       "fetchedAt": "2026-11-01T18:42:53.010Z"
     },
     {

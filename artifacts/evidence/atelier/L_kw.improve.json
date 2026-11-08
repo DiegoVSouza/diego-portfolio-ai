@@ -1,0 +1,66 @@
+{
+  "in": "Building_Large_2.gltf",
+  "out": "L_kw.glb",
+  "before": {
+    "triangles": 45122,
+    "size": [
+      20.6441,
+      16.6446,
+      28
+    ]
+  },
+  "after": {
+    "triangles": 12000,
+    "size": [
+      20.6441,
+      16.6446,
+      28
+    ]
+  },
+  "blender": "5.2.1 LTS",
+  "inspect": {
+    "file": "C:\\estudo\\Golpe\\lab\\projects\\p07\\.cache\\atelier-out\\L_kw.glb",
+    "bytes": 1178284,
+    "triangles": 12000,
+    "vertices": 20953,
+    "meshes": 1,
+    "nodes": 1,
+    "materials": 12,
+    "textures": 0,
+    "images": 0,
+    "animations": [],
+    "skins": 0,
+    "attributes": [
+      "COLOR_0",
+      "COLOR_1",
+      "NORMAL",
+      "POSITION",
+      "TEXCOORD_0",
+      "TEXCOORD_1"
+    ],
+    "extensionsUsed": [],
+    "bounds": {
+      "min": [
+        -10.322054862976074,
+        0,
+        -8.322297096252441
+      ],
+      "max": [
+        10.322054862976074,
+        28.000038146972656,
+        8.322297096252441
+      ],
+      "size": [
+        20.64410972595215,
+        28.000038146972656,
+        16.644594192504883
+      ]
+    },
+    "originOffset": {
+      "x": 0,
+      "y": 0,
+      "z": 0
+    }
+  },
+  "problems": []
+}

@@ -1,0 +1,65 @@
+{
+  "in": "Building_06.fbx",
+  "out": "B06_fix4.glb",
+  "before": {
+    "triangles": 45318,
+    "size": [
+      5.5,
+      11.2,
+      12.8
+    ]
+  },
+  "after": {
+    "triangles": 43944,
+    "size": [
+      5.5,
+      11.2,
+      12.8
+    ]
+  },
+  "blender": "5.2.1 LTS",
+  "inspect": {
+    "file": "C:\\estudo\\Golpe\\lab\\projects\\p07\\.cache\\atelier-out\\B06_fix4.glb",
+    "bytes": 3289388,
+    "triangles": 43944,
+    "vertices": 87634,
+    "meshes": 1,
+    "nodes": 1,
+    "materials": 2,
+    "textures": 0,
+    "images": 0,
+    "animations": [],
+    "skins": 0,
+    "attributes": [
+      "NORMAL",
+      "POSITION",
+      "TEXCOORD_0"
+    ],
+    "extensionsUsed": [],
+    "bounds": {
+      "min": [
+        -2.75,
+        0,
+        -5.600000381469727
+      ],
+      "max": [
+        2.75,
+        12.800000190734863,
+        5.600000381469727
+      ],
+      "size": [
+        5.5,
+        12.800000190734863,
+        11.200000762939453
+      ]
+    },
+    "originOffset": {
+      "x": 0,
+      "y": 0,
+      "z": 0
+    }
+  },
+  "problems": [
+    "43944 triangles is over the budget of 8000"
+  ]
+}

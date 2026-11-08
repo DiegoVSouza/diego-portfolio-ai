@@ -1,0 +1,67 @@
+{
+  "in": "Building_Medium_2_001.gltf",
+  "out": "M_kw.glb",
+  "before": {
+    "triangles": 25612,
+    "size": [
+      15.0557,
+      13.0557,
+      25.0087
+    ]
+  },
+  "after": {
+    "triangles": 12000,
+    "size": [
+      15.0557,
+      13.0557,
+      25.0087
+    ]
+  },
+  "blender": "5.2.1 LTS",
+  "inspect": {
+    "file": "C:\\estudo\\Golpe\\lab\\projects\\p07\\.cache\\atelier-out\\M_kw.glb",
+    "bytes": 1404732,
+    "triangles": 12000,
+    "vertices": 21905,
+    "meshes": 1,
+    "nodes": 1,
+    "materials": 12,
+    "textures": 0,
+    "images": 0,
+    "animations": [],
+    "skins": 0,
+    "attributes": [
+      "COLOR_0",
+      "COLOR_1",
+      "NORMAL",
+      "POSITION",
+      "TEXCOORD_0",
+      "TEXCOORD_1",
+      "TEXCOORD_2"
+    ],
+    "extensionsUsed": [],
+    "bounds": {
+      "min": [
+        -7.527840614318848,
+        0,
+        -6.527840614318848
+      ],
+      "max": [
+        7.527840614318848,
+        25.00865936279297,
+        6.527841091156006
+      ],
+      "size": [
+        15.055681228637695,
+        25.00865936279297,
+        13.055681705474854
+      ]
+    },
+    "originOffset": {
+      "x": 0,
+      "y": 0,
+      "z": 2.384185791015625e-7
+    }
+  },
+  "problems": []
+}
