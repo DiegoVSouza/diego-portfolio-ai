@@ -1,0 +1,69 @@
+{
+  "in": "Building_Small_1.gltf",
+  "out": "Building_Small_1_p3.glb",
+  "before": {
+    "triangles": 18344,
+    "size": [
+      12.46,
+      14.536,
+      17.026
+    ]
+  },
+  "after": {
+    "triangles": 8141,
+    "size": [
+      12.46,
+      14.536,
+      17.026
+    ]
+  },
+  "blender": "5.2.1 LTS",
+  "inspect": {
+    "file": "C:\\estudo\\Golpe\\lab\\projects\\p07\\.cache\\atelier-out\\Building_Small_1_p3.glb",
+    "bytes": 856092,
+    "triangles": 8141,
+    "vertices": 13119,
+    "meshes": 1,
+    "nodes": 1,
+    "materials": 13,
+    "textures": 0,
+    "images": 0,
+    "animations": [],
+    "skins": 0,
+    "attributes": [
+      "COLOR_0",
+      "COLOR_1",
+      "COLOR_2",
+      "NORMAL",
+      "POSITION",
+      "TEXCOORD_0",
+      "TEXCOORD_1"
+    ],
+    "extensionsUsed": [],
+    "bounds": {
+      "min": [
+        -6.230000019073486,
+        0,
+        -7.268004417419434
+      ],
+      "max": [
+        6.230000019073486,
+        17.025970458984375,
+        7.268003940582275
+      ],
+      "size": [
+        12.460000038146973,
+        17.025970458984375,
+        14.536008358001709
+      ]
+    },
+    "originOffset": {
+      "x": 0,
+      "y": 0,
+      "z": -2.384185791015625e-7
+    }
+  },
+  "problems": [
+    "8141 triangles is over the budget of 8000"
+  ]
+}

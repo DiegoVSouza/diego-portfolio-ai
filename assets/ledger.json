@@ -20,23 +20,13 @@
     },
     {
       "path": "assets/game/models/building-sample-013.glb",
-      "author": "Unknown author; Blender cleanup",
+      "author": "Unknown author; Blender cleanup 2026-11-08 (planar dissolve from Building_06.fbx, welded, no normals)",
       "license": "OWNER-DECLARED",
       "url": "local pack: Free Sample.zip",
       "attribution": "Unknown author; Blender cleanup (local pack: Free Sample.zip). No licence file in the pack. Owner decision: Owner authorized optimization on 2026-11-07 retaining existing exception. Terms unverified.",
       "source": "manual",
-      "sha256": "3fef52592e60bf72fd66be8f12b85d7c93b22e5e40d14f050c389d8388def79c",
-      "fetchedAt": "2026-11-07T04:57:54.083Z"
-    },
-    {
-      "path": "assets/game/models/building-sample.glb",
-      "author": "Unknown author (Free Sample.zip, Building_06.fbx); converted by scripts/fbx_to_glb.mjs, simplified",
-      "license": "OWNER-DECLARED",
-      "url": "local pack: Free Sample.zip (no licence file)",
-      "attribution": "Unknown author (Free Sample.zip, Building_06.fbx); converted by scripts/fbx_to_glb.mjs, simplified (local pack: Free Sample.zip (no licence file)). No licence file in the pack. Owner decision: owner stated on 2026-11-01 that the pack was free to download and use. Terms unverified.",
-      "source": "manual",
-      "sha256": "455faea5a4b3986220922388a1a37d09725b3a57092d0dfaa0fd4e2f2ca2dc83",
-      "fetchedAt": "2026-11-01T18:42:53.106Z"
+      "sha256": "8806d6ec0085ff69d0fcfff33c20a01b7d95743066a20eb9bdb5a2fa9f9b2ac7",
+      "fetchedAt": "2026-11-08T12:00:00.000Z"
     },
     {
       "path": "assets/game/models/building-small.glb",
