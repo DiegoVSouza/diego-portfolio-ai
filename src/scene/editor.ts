@@ -65,7 +65,7 @@ export function startEditor({ scene, camera, canvas, world }: Context): WorldEdi
   const root = document.getElementById("root");
   if (root) root.style.display = "none";
   document.body.append(canvas);
-  Object.assign(canvas.style, { position: "fixed", inset: "0", width: "100%", height: "100%", display: "block", opacity: "1", zIndex: "1" });
+  Object.assign(canvas.style, { position: "fixed", inset: "0", width: "100%", height: "100%", display: "block", opacity: "1", zIndex: "1", pointerEvents: "auto", touchAction: "none" });
   document.documentElement.dataset.worldEditor = "1";
   camera.far = 1600;
   if (scene.fog) (scene.fog as THREE.Fog).far = 1400;
@@ -89,7 +89,10 @@ export function startEditor({ scene, camera, canvas, world }: Context): WorldEdi
 
   /* ---- proxies: one box per tower and lamp ---- */
   const unit = new THREE.BoxGeometry(1, 1, 1);
-  const materials = Object.fromEntries(Object.entries(TONE).map(([name, color]) => [name, new THREE.MeshBasicMaterial({ color, wireframe: true, transparent: true, opacity: 0.55 })])) as Record<keyof typeof TONE, THREE.MeshBasicMaterial>;
+  // Outline only (the 12 edges of the box, no diagonals); the box itself is invisible and only catches clicks.
+  const edgeGeometry = new THREE.EdgesGeometry(new THREE.BoxGeometry(1, 1, 1));
+  const materials = Object.fromEntries(Object.entries(TONE).map(([name, color]) => [name, new THREE.LineBasicMaterial({ color, transparent: true, opacity: 0.8 })])) as Record<keyof typeof TONE, THREE.LineBasicMaterial>;
+  const hitMaterial = new THREE.MeshBasicMaterial({ visible: false });
   const group = new THREE.Group();
   group.name = "editor-proxies";
   scene.add(group);
@@ -110,12 +113,13 @@ export function startEditor({ scene, camera, canvas, world }: Context): WorldEdi
     mesh.position.set(base.x + (edit?.dx ?? 0), height / 2, base.z + (edit?.dz ?? 0));
     mesh.rotation.y = base.ry + (edit?.dry ?? 0);
     const selected = selection?.kind === kind && selection.id === id;
-    mesh.material = selected ? materials.selected : edit?.hide ? materials.hidden : edit ? materials.edited : materials.plain;
+    (mesh.children[0] as THREE.LineSegments).material = selected ? materials.selected : edit?.hide ? materials.hidden : edit ? materials.edited : materials.plain;
   };
   for (const t of towers) addProxy("tower", t.id);
   for (const l of lamps) addProxy("lamp", l.id);
   function addProxy(kind: Kind, id: string): void {
-    const mesh = new THREE.Mesh(unit, materials.plain);
+    const mesh = new THREE.Mesh(unit, hitMaterial);
+    mesh.add(new THREE.LineSegments(edgeGeometry, materials.plain));
     mesh.userData = { kind, id };
     group.add(mesh);
     proxyOf.set(keyOf(kind, id), mesh);
