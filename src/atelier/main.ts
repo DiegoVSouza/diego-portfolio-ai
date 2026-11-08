@@ -9,6 +9,7 @@ import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 import { inspect, judge, parseGlb } from "../../tools/atelier/inspect-core.mjs";
 import { stops } from "../content/districts";
+import { CAR_SIZE, carKindOf, r7Wheels, s64Wheels } from "../scene/car-wheels";
 import { type Shot, type ShotPatch, patchShot, shippedShot, sideOf } from "../scene/layout";
 
 const $ = <T extends HTMLElement>(id: string): T => document.getElementById(id) as T;
@@ -95,14 +96,35 @@ async function show(name: string, bytes: ArrayBuffer): Promise<void> {
   if (state.root) stage.remove(state.root);
   if (state.box) scene.remove(state.box);
   const gltf = await new GLTFLoader().parseAsync(bytes, "");
-  const root = gltf.scene;
+  let root: THREE.Object3D = gltf.scene;
+  const kind = carKindOf(name);
+  if (kind) {
+    // The car GLBs are bodies with empty arches. Show them the way the scene does: front +Z, centred, 7.4 long, with the scene's wheels.
+    const body = gltf.scene;
+    body.rotation.y = -Math.PI / 2;
+    const car = new THREE.Group();
+    car.add(body);
+    car.updateMatrixWorld(true);
+    const box = new THREE.Box3().setFromObject(car);
+    const centre = box.getCenter(new THREE.Vector3());
+    const extent = box.getSize(new THREE.Vector3());
+    const k = CAR_SIZE / Math.max(extent.x, extent.y, extent.z);
+    car.scale.setScalar(k);
+    car.position.copy(centre).multiplyScalar(-k);
+    const tyre = new THREE.Color(0x2e2e2e);
+    const hub = new THREE.Color(0xa0a0a0);
+    const wheels = new THREE.Mesh(kind === "s64" ? s64Wheels(tyre, hub) : r7Wheels(box, tyre, hub), new THREE.MeshStandardMaterial({ vertexColors: true, flatShading: true, roughness: 0.9 }));
+    const group = new THREE.Group();
+    group.add(car, wheels);
+    root = group;
+  }
   const originals = new Map<THREE.Mesh, THREE.Material | THREE.Material[]>();
   root.traverse((o) => {
     if ((o as THREE.Mesh).isMesh) originals.set(o as THREE.Mesh, (o as THREE.Mesh).material);
   });
   root.userData.originals = originals;
   // The scene scales every model to a target size (cars 7.4, trucks 9...): show it at the same size to judge it in context.
-  if (state.fit > 0) {
+  if (state.fit > 0 && !kind) {
     const size = new THREE.Box3().setFromObject(root).getSize(new THREE.Vector3());
     root.scale.multiplyScalar(state.fit / Math.max(size.x, size.y, size.z, 1e-6));
   }
