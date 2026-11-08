@@ -1,6 +1,7 @@
 /**
  * Pure layout rules of the city that need a test without WebGL.
  */
+import { worldEdits } from "./world-edits";
 
 /**
  * Where a shuttle train's leading car stands on the viaduct, as a fraction of its length, for the cycle position q in [0, 1).
@@ -113,7 +114,7 @@ export interface ShotPatch {
   scale?: number;
   aim?: number | null;
 }
-let patches: Record<string, ShotPatch> = {};
+let patches: Record<string, ShotPatch> = { ...worldEdits.shots };
 export const setShotPatches = (next: Record<string, ShotPatch>): void => {
   patches = next;
 };
@@ -134,7 +135,7 @@ export function patchShot(shot: Shot, patch: ShotPatch | undefined, side: 1 | -1
 // Dev only: the atelier page saves patches in localStorage and the scene picks them up when it starts. Production builds drop this.
 if (import.meta.env.DEV && typeof localStorage !== "undefined") {
   try {
-    setShotPatches(JSON.parse(localStorage.getItem("atelier-shots") ?? "{}") as Record<string, ShotPatch>);
+    setShotPatches({ ...worldEdits.shots, ...(JSON.parse(localStorage.getItem("atelier-shots") ?? "{}") as Record<string, ShotPatch>) });
   } catch {
     // no storage or a bad value: the shipped shots stay
   }

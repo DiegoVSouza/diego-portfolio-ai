@@ -28,6 +28,11 @@ function showTab(which: keyof typeof tabs): void {
   $("world").hidden = which !== "world";
   if (which === "camera") openPreview();
   if (which === "world") openWorld();
+  try {
+    sessionStorage.setItem("atelier-tab", which);
+  } catch {
+    // no storage: the page opens on Models
+  }
 }
 tabs.models.onclick = () => showTab("models");
 tabs.camera.onclick = () => showTab("camera");
@@ -343,9 +348,9 @@ async function goto(k: number): Promise<void> {
 interface WorldRow { id: string; x: number; z: number; h: number; edited: boolean; hidden: boolean }
 interface WorldProp { id: string; model: string; x: number; y: number; z: number; ry: number; scale: number }
 interface WorldEditorApi {
-  list(): { towers: WorldRow[]; lamps: WorldRow[]; props: WorldProp[] };
-  selected(): { kind: "tower" | "lamp" | "prop"; id: string; item?: { hide?: boolean; dx?: number; dz?: number; dry?: number; hs?: number }; prop?: WorldProp } | null;
-  select(kind: "tower" | "lamp" | "prop", id: string | null): void;
+  list(): { towers: WorldRow[]; lamps: WorldRow[]; props: WorldProp[]; boards: { id: string; k: number; label: string; edited: boolean }[] };
+  selected(): { kind: "tower" | "lamp" | "prop" | "board"; id: string; item?: { hide?: boolean; dx?: number; dz?: number; dry?: number; hs?: number }; prop?: WorldProp; shot?: { ahead: number; lat: number; bottom: number; scale: number; edited: boolean } } | null;
+  select(kind: "tower" | "lamp" | "prop" | "board", id: string | null): void;
   focus(): void;
   mode(mode: "translate" | "rotate"): void;
   proxies(visible: boolean): void;
@@ -358,7 +363,7 @@ interface WorldEditorApi {
   json(): string;
   save(): Promise<string>;
 }
-let worldKind: "tower" | "lamp" | "prop" = "tower";
+let worldKind: "tower" | "lamp" | "prop" | "board" = "tower";
 let worldFilter = "";
 const editorOf = (): WorldEditorApi | null => ($<HTMLIFrameElement>("world").contentWindow as unknown as { __worldEditor?: WorldEditorApi } | null)?.__worldEditor ?? null;
 const DEG = 180 / Math.PI;
@@ -384,7 +389,7 @@ async function attachWorld(): Promise<void> {
 function buildWorldTab(): void {
   $("world-panel").innerHTML = `
     <fieldset><legend>Pick</legend>
-      <div class="row"><button data-wk="tower" class="on">towers</button><button data-wk="lamp">lamps</button><button data-wk="prop">props</button></div>
+      <div class="row"><button data-wk="tower" class="on">towers</button><button data-wk="lamp">lamps</button><button data-wk="board">boards</button><button data-wk="prop">props</button></div>
       <input id="world-filter" type="text" placeholder="filter by id, e.g. t2. or l14" />
       <div id="world-list"></div>
     </fieldset>
@@ -461,7 +466,9 @@ function drawWorld(): void {
   const rows: { id: string; text: string; cls: string }[] =
     worldKind === "prop"
       ? data.props.map((p) => ({ id: p.id, text: `${p.id}  ${p.model}`, cls: "edited" }))
-      : (worldKind === "tower" ? data.towers : data.lamps).map((r) => ({ id: r.id, text: `${r.id}  (${r.x}, ${r.z}) h ${r.h}`, cls: r.hidden ? "hidden" : r.edited ? "edited" : "" }));
+      : worldKind === "board"
+        ? data.boards.map((b) => ({ id: b.id, text: `${b.id}  ${b.label}`, cls: b.edited ? "edited" : "" }))
+        : (worldKind === "tower" ? data.towers : data.lamps).map((r) => ({ id: r.id, text: `${r.id}  (${r.x}, ${r.z}) h ${r.h}`, cls: r.hidden ? "hidden" : r.edited ? "edited" : "" }));
   $("world-list").innerHTML = rows
     .filter((r) => r.id.includes(worldFilter))
     .slice(0, 400)
@@ -475,7 +482,7 @@ function drawWorld(): void {
   });
   if (!$("w-model").children.length) $("w-model").innerHTML = api.models().map((m) => `<option>${m}</option>`).join("");
   $("w-del").hidden = sel?.kind !== "prop";
-  $("w-hide").hidden = !sel || sel.kind === "prop";
+  $("w-hide").hidden = !sel || sel.kind === "prop" || sel.kind === "board";
   $("w-reset").hidden = !sel || sel.kind === "prop";
   if (!sel) {
     $("world-sel").textContent = "nothing";
@@ -485,7 +492,9 @@ function drawWorld(): void {
   $("world-sel").textContent = `${sel.kind} ${sel.id}${sel.item?.hide ? " (hidden)" : ""}`;
   if (document.activeElement?.matches("#world-fields input")) return;
   const fields =
-    sel.kind === "prop" && sel.prop
+    sel.kind === "board" && sel.shot
+      ? [numberField("ahead", "board ahead (stops)", sel.shot.ahead, 0.01), numberField("lat", "board lateral (right side)", sel.shot.lat, 0.5), numberField("bottom", "board bottom", sel.shot.bottom, 0.5), numberField("scale", "board scale", sel.shot.scale, 0.01)]
+      : sel.kind === "prop" && sel.prop
       ? [numberField("x", "x", sel.prop.x, 0.5), numberField("y", "y (height)", sel.prop.y, 0.1), numberField("z", "z", sel.prop.z, 0.5), numberField("ry", "turn (deg)", Math.round(sel.prop.ry * DEG), 1), numberField("scale", "scale", sel.prop.scale, 0.05)]
       : [numberField("dx", "shift x", sel.item?.dx ?? 0, 0.5), numberField("dz", "shift z", sel.item?.dz ?? 0, 0.5), numberField("dry", "extra turn (deg)", Math.round((sel.item?.dry ?? 0) * DEG), 1), ...(sel.kind === "tower" ? [numberField("hs", "height x", sel.item?.hs ?? 1, 0.05)] : [])];
   $("world-fields").innerHTML = fields.join("");
@@ -505,3 +514,10 @@ buildModelsTab();
 buildCameraTab();
 buildWorldTab();
 resize();
+// Saving a world edit rewrites a file this page imports, so Vite reloads the atelier too: come back to the same tab.
+try {
+  const saved = sessionStorage.getItem("atelier-tab");
+  if (saved === "camera" || saved === "world") showTab(saved);
+} catch {
+  // no storage
+}

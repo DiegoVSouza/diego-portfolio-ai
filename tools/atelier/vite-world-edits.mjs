@@ -17,6 +17,7 @@ export function validate(value) {
     if (typeof p?.id !== "string" || !/^[\w.-]+\.glb$/.test(String(p.model))) return `bad prop ${JSON.stringify(p)?.slice(0, 80)}`;
     if (![p.x, p.y, p.z, p.ry, p.scale].every(Number.isFinite) || p.scale <= 0) return `bad numbers in prop ${p.id}`;
   }
+  if (value.shots !== undefined && (!value.shots || typeof value.shots !== "object" || Array.isArray(value.shots))) return "shots must be an object";
   for (const key of ["towers", "lamps"]) {
     const map = value[key];
     if (!map || typeof map !== "object" || Array.isArray(map)) return `${key} must be an object`;

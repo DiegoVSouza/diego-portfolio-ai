@@ -44,4 +44,9 @@ describe("world edits", () => {
     const top = new THREE.Vector3(1, 10, 1).applyMatrix4(m);
     expect(top.toArray()).toEqual([1, 20, 1]);
   });
+
+  it("keeps valid shot patches (boards and cameras) by stop index", () => {
+    const out = parseEdits({ version: 1, shots: { "2": { board: { bottom: 7, junk: "x" }, scale: 1.2 }, x: { scale: 2 }, "3": { scale: -1 } } });
+    expect(out.shots).toEqual({ "2": { board: { bottom: 7 }, scale: 1.2 } });
+  });
 });

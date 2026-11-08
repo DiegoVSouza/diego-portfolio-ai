@@ -58,7 +58,7 @@ export interface World {
   /** Oriented boxes of generated solids (towers, board buildings, viaduct), for the development-only audit. `approx` marks imported or merged shapes. */
   auditBoxes(): readonly AuditBox[];
   /** Towers and lamps as the generator placed them (before any edit), for the atelier's World tab. */
-  editables(): { towers: EditableTower[]; lamps: EditableLamp[] };
+  editables(): { towers: EditableTower[]; lamps: EditableLamp[]; boards: { k: number; id: string }[] };
   /** Hand-placed props: the editor adds, finds and removes them while the page is open. */
   props: { add(spec: PropEdit): Promise<THREE.Object3D | null>; get(id: string): THREE.Object3D | undefined; remove(id: string): void };
 }
@@ -1348,7 +1348,7 @@ export async function buildWorld(c: WorldContext): Promise<World> {
     setCardOverlay: (k, visible) => { board(k).panel.visible = !visible; },
     auditFootprints: () => footprints,
     auditBoxes: () => auditBoxes,
-    editables: () => ({ towers: towerList, lamps: lampEdits }),
+    editables: () => ({ towers: towerList, lamps: lampEdits, boards: stops.map((s, k) => ({ k, id: s.id })) }),
     props: {
       add: addProp,
       get: (id) => propObjects.get(id),

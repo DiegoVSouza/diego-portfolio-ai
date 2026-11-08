@@ -10,11 +10,12 @@
 import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 import { TransformControls } from "three/examples/jsm/controls/TransformControls.js";
+import { type Shot, type ShotPatch, patchShot, shippedShot, sideOf } from "./layout";
 import { propNames } from "./props";
 import type { World } from "./world";
 import { type ItemEdit, type PropEdit, type WorldEdits, worldEdits } from "./world-edits";
 
-export type Kind = "tower" | "lamp" | "prop";
+export type Kind = "tower" | "lamp" | "prop" | "board";
 export interface Row {
   id: string;
   x: number;
@@ -31,9 +32,11 @@ export interface Selection {
   base?: { x: number; z: number; h: number; ry: number };
   /** The prop, for props. */
   prop?: PropEdit;
+  /** Board numbers, for boards (lateral values as for a stop on the right of the avenue). */
+  shot?: { ahead: number; lat: number; bottom: number; scale: number; edited: boolean };
 }
 export interface WorldEditor {
-  list(): { towers: Row[]; lamps: Row[]; props: PropEdit[] };
+  list(): { towers: Row[]; lamps: Row[]; props: PropEdit[]; boards: { id: string; k: number; label: string; edited: boolean }[] };
   selected(): Selection | null;
   select(kind: Kind, id: string | null): void;
   focus(): void;
@@ -72,7 +75,7 @@ export function startEditor({ scene, camera, canvas, world }: Context): WorldEdi
   camera.updateProjectionMatrix();
 
   const edits: WorldEdits = structuredClone(worldEdits);
-  const { towers, lamps } = world.editables();
+  const { towers, lamps, boards } = world.editables();
   const baseOf = (kind: Kind, id: string) => (kind === "tower" ? towers.find((t) => t.id === id) : lamps.find((l) => l.id === id));
   const map = (kind: Kind): Record<string, ItemEdit> => (kind === "tower" ? edits.towers : edits.lamps);
   const notify = (): void => void window.dispatchEvent(new CustomEvent("editor-change"));
@@ -100,7 +103,23 @@ export function startEditor({ scene, camera, canvas, world }: Context): WorldEdi
   const keyOf = (kind: Kind, id: string) => `${kind}:${id}`;
   let selection: { kind: Kind; id: string } | null = null;
 
+  /** A board's box follows its four corners in the world as the scene was built (a change shows after save and reload). */
+  const corners = [0, 1, 2, 3].map(() => new THREE.Vector3());
+  const syncBoardProxy = (id: string): void => {
+    const mesh = proxyOf.get(keyOf("board", id));
+    const k = Number(id.slice(1));
+    if (!mesh) return;
+    world.boardCorners(k, corners);
+    const centre = corners.reduce((sum, c) => sum.add(c), new THREE.Vector3()).multiplyScalar(0.25);
+    const across = corners[1]!.clone().sub(corners[0]!);
+    mesh.scale.set(across.length(), corners[0]!.distanceTo(corners[3]!), 3);
+    mesh.position.copy(centre);
+    mesh.rotation.set(0, Math.atan2(-across.z, across.x), 0);
+    const selected = selection?.kind === "board" && selection.id === id;
+    (mesh.children[0] as THREE.LineSegments).material = selected ? materials.selected : edits.shots[String(k)] ? materials.edited : materials.plain;
+  };
   const syncProxy = (kind: Kind, id: string): void => {
+    if (kind === "board") return syncBoardProxy(id);
     const mesh = proxyOf.get(keyOf(kind, id));
     const base = baseOf(kind, id);
     if (!mesh || !base) return;
@@ -117,6 +136,7 @@ export function startEditor({ scene, camera, canvas, world }: Context): WorldEdi
   };
   for (const t of towers) addProxy("tower", t.id);
   for (const l of lamps) addProxy("lamp", l.id);
+  for (const b of boards) addProxy("board", `b${b.k}`);
   function addProxy(kind: Kind, id: string): void {
     const mesh = new THREE.Mesh(unit, hitMaterial);
     mesh.add(new THREE.LineSegments(edgeGeometry, materials.plain));
@@ -210,8 +230,9 @@ export function startEditor({ scene, camera, canvas, world }: Context): WorldEdi
       if (before.kind === "prop") syncPropHelper(before.id);
       else syncProxy(before.kind, before.id);
     }
-    if (!selection) {
+    if (!selection || selection.kind === "board") {
       gizmo.detach();
+      if (selection) syncBoardProxy(selection.id);
     } else if (selection.kind === "prop") {
       const mesh = propMesh(selection.id);
       if (mesh) gizmo.attach(mesh);
@@ -275,11 +296,22 @@ export function startEditor({ scene, camera, canvas, world }: Context): WorldEdi
     return { id, x: round(base.x + (edit?.dx ?? 0), 1), z: round(base.z + (edit?.dz ?? 0), 1), h: round(heightOf(base) * (edit?.hs ?? 1), 1), edited: !!edit, hidden: !!edit?.hide };
   };
   const api: WorldEditor = {
-    list: () => ({ towers: towers.map((t) => row("tower", t.id)), lamps: lamps.map((l) => row("lamp", l.id)), props: edits.props }),
+    list: () => ({
+      towers: towers.map((t) => row("tower", t.id)),
+      lamps: lamps.map((l) => row("lamp", l.id)),
+      props: edits.props,
+      boards: boards.map((b) => ({ id: `b${b.k}`, k: b.k, label: `${b.k + 1}. ${b.id}`, edited: !!edits.shots[String(b.k)] })),
+    }),
     selected: () => {
       if (!selection) return null;
       const { kind, id } = selection;
       if (kind === "prop") return { kind, id, prop: propSpec(id) };
+      if (kind === "board") {
+        const k = Number(id.slice(1));
+        const side = sideOf(k);
+        const shot: Shot = patchShot(shippedShot(k), edits.shots[String(k)], side);
+        return { kind, id, shot: { ahead: shot.board.ahead, lat: shot.board.lat * side, bottom: shot.board.bottom, scale: shot.scale, edited: !!edits.shots[String(k)] } };
+      }
       const base = baseOf(kind, id)!;
       return { kind, id, item: map(kind)[id], base: { x: base.x, z: base.z, h: heightOf(base), ry: base.ry } };
     },
@@ -301,7 +333,13 @@ export function startEditor({ scene, camera, canvas, world }: Context): WorldEdi
     patch: (values) => {
       if (!selection) return;
       const { kind, id } = selection;
-      if (kind === "prop") {
+      if (kind === "board") {
+        const k = String(Number(id.slice(1)));
+        const patch: ShotPatch = (edits.shots[k] ??= {});
+        for (const key of ["ahead", "lat", "bottom"] as const) if (key in values && Number.isFinite(values[key])) patch.board = { ...patch.board, [key]: values[key] };
+        if ("scale" in values && Number.isFinite(values.scale) && values.scale! > 0) patch.scale = values.scale;
+        syncBoardProxy(id);
+      } else if (kind === "prop") {
         const spec = propSpec(id);
         const mesh = propMesh(id);
         if (!spec || !mesh) return;
@@ -319,7 +357,7 @@ export function startEditor({ scene, camera, canvas, world }: Context): WorldEdi
       notify();
     },
     toggleHide: () => {
-      if (!selection || selection.kind === "prop") return;
+      if (!selection || selection.kind === "prop" || selection.kind === "board") return;
       const { kind, id } = selection;
       const edit = itemEdit(kind, id);
       if (edit.hide) delete edit.hide;
@@ -330,6 +368,11 @@ export function startEditor({ scene, camera, canvas, world }: Context): WorldEdi
     },
     reset: () => {
       if (!selection || selection.kind === "prop") return;
+      if (selection.kind === "board") {
+        delete edits.shots[String(Number(selection.id.slice(1)))];
+        syncBoardProxy(selection.id);
+        return notify();
+      }
       delete map(selection.kind)[selection.id];
       select(selection.kind, selection.id);
     },
