@@ -1,5 +1,6 @@
 import react from "@vitejs/plugin-react";
 import { defineConfig } from "vitest/config";
+import worldEditsEndpoint from "./tools/atelier/vite-world-edits.mjs";
 
 // The shipped build runs on Preact's compatibility layer. With React 19 the home page hydration was one 1.3 s task under
 // a 4x CPU slowdown and the first-load JavaScript was 96 KB gzip; with Preact it is 38 KB (docs/harness/decisions.md).
@@ -17,7 +18,7 @@ const preactAlias: Record<string, string> = {
 export default defineConfig(({ command }) => {
   const swap = command === "build" && !process.env.VITEST && process.env.REACT_BUILD !== "1";
   return {
-    plugins: [react()],
+    plugins: [react(), worldEditsEndpoint()],
     resolve: { alias: swap ? preactAlias : {} },
     ssr: { noExternal: swap ? ["colagem-ui"] : [] },
     build: { sourcemap: false, manifest: true, target: "es2022" },

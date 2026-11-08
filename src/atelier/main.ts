@@ -15,18 +15,22 @@ const $ = <T extends HTMLElement>(id: string): T => document.getElementById(id) 
 const STORE = "atelier-shots";
 
 /* ------------------------------------------------------------------ tabs */
-const tabs = { models: $("tab-models"), camera: $("tab-camera") };
-function showTab(which: "models" | "camera"): void {
+const tabs = { models: $("tab-models"), camera: $("tab-camera"), world: $("tab-world") };
+const panels: Record<keyof typeof tabs, string> = { models: "models", camera: "camera", world: "world-panel" };
+function showTab(which: keyof typeof tabs): void {
   for (const [name, button] of Object.entries(tabs)) {
     button.classList.toggle("on", name === which);
-    $(name).hidden = name !== which;
+    $(panels[name as keyof typeof tabs]).hidden = name !== which;
   }
   $("view").hidden = which !== "models";
   $("preview").hidden = which !== "camera";
+  $("world").hidden = which !== "world";
   if (which === "camera") openPreview();
+  if (which === "world") openWorld();
 }
 tabs.models.onclick = () => showTab("models");
 tabs.camera.onclick = () => showTab("camera");
+tabs.world.onclick = () => showTab("world");
 
 /* ---------------------------------------------------------------- models */
 const modelUrls = import.meta.glob("../../assets/game/models/*.glb", { query: "?url", import: "default", eager: true }) as Record<string, string>;
@@ -312,6 +316,170 @@ async function goto(k: number): Promise<void> {
   win.dispatchEvent(new Event("scene-cut"));
 }
 
+/* ----------------------------------------------------------------- world */
+/** What the editor inside the scene iframe offers (src/scene/editor.ts). Plain data only. */
+interface WorldRow { id: string; x: number; z: number; h: number; edited: boolean; hidden: boolean }
+interface WorldProp { id: string; model: string; x: number; y: number; z: number; ry: number; scale: number }
+interface WorldEditorApi {
+  list(): { towers: WorldRow[]; lamps: WorldRow[]; props: WorldProp[] };
+  selected(): { kind: "tower" | "lamp" | "prop"; id: string; item?: { hide?: boolean; dx?: number; dz?: number; dry?: number; hs?: number }; prop?: WorldProp } | null;
+  select(kind: "tower" | "lamp" | "prop", id: string | null): void;
+  focus(): void;
+  mode(mode: "translate" | "rotate"): void;
+  proxies(visible: boolean): void;
+  patch(values: Record<string, number>): void;
+  toggleHide(): void;
+  reset(): void;
+  addProp(model: string): Promise<void>;
+  removeProp(): void;
+  models(): string[];
+  json(): string;
+  save(): Promise<string>;
+}
+let worldKind: "tower" | "lamp" | "prop" = "tower";
+let worldFilter = "";
+const editorOf = (): WorldEditorApi | null => ($<HTMLIFrameElement>("world").contentWindow as unknown as { __worldEditor?: WorldEditorApi } | null)?.__worldEditor ?? null;
+const DEG = 180 / Math.PI;
+
+function openWorld(): void {
+  const frameEl = $<HTMLIFrameElement>("world");
+  if (frameEl.src) return;
+  frameEl.onload = () => void attachWorld();
+  frameEl.src = "/?edit=1";
+}
+async function attachWorld(): Promise<void> {
+  for (let tries = 0; tries < 300 && !editorOf(); tries += 1) await new Promise((r) => setTimeout(r, 100));
+  const win = $<HTMLIFrameElement>("world").contentWindow;
+  if (!win || !editorOf()) {
+    $("world-status").textContent = "the editor did not start (is this the dev server?)";
+    return;
+  }
+  win.addEventListener("editor-change", drawWorld);
+  $("world-status").textContent = "ready: click a box in the scene, or pick one in the list";
+  drawWorld();
+}
+
+function buildWorldTab(): void {
+  $("world-panel").innerHTML = `
+    <fieldset><legend>Pick</legend>
+      <div class="row"><button data-wk="tower" class="on">towers</button><button data-wk="lamp">lamps</button><button data-wk="prop">props</button></div>
+      <input id="world-filter" type="text" placeholder="filter by id, e.g. t2. or l14" />
+      <div id="world-list"></div>
+    </fieldset>
+    <fieldset><legend>Selected</legend>
+      <div id="world-sel" style="color:var(--dim)">nothing</div>
+      <div class="row"><button id="w-move" class="on">move (w)</button><button id="w-turn">turn (e)</button><button id="w-fly">fly to</button></div>
+      <div id="world-fields"></div>
+      <div class="row"><button id="w-hide">hide / show</button><button id="w-reset">reset</button><button id="w-del">delete prop</button></div>
+    </fieldset>
+    <fieldset><legend>Add a prop</legend>
+      <select id="w-model"></select>
+      <button id="w-add">add at the camera target</button>
+    </fieldset>
+    <fieldset><legend>File</legend>
+      <div class="row"><button id="w-boxes" class="on">boxes</button><button id="w-save">save to world-edits.json</button><button id="w-copy">copy JSON</button></div>
+      <div id="world-status" style="color:var(--dim)">starting the editor...</div>
+      <div style="color:var(--dim)">Save writes src/scene/world-edits.json and reloads the scene so the real towers move. The file is versioned and ships in the build. Walkthrough: docs/atelier/GUIA-MUNDO.pt-BR.md.</div>
+    </fieldset>`;
+  document.querySelectorAll<HTMLButtonElement>("[data-wk]").forEach((b) => {
+    b.onclick = () => {
+      worldKind = b.dataset.wk as typeof worldKind;
+      document.querySelectorAll("[data-wk]").forEach((x) => x.classList.toggle("on", x === b));
+      drawWorld();
+    };
+  });
+  $<HTMLInputElement>("world-filter").oninput = (e) => {
+    worldFilter = (e.target as HTMLInputElement).value.trim();
+    drawWorld();
+  };
+  const withEditor = (fn: (api: WorldEditorApi) => unknown) => async () => {
+    const api = editorOf();
+    if (!api) return;
+    try {
+      await fn(api);
+    } catch (error) {
+      $("world-status").textContent = String(error);
+    }
+    drawWorld();
+  };
+  $("w-move").onclick = withEditor((api) => {
+    api.mode("translate");
+    $("w-move").classList.add("on");
+    $("w-turn").classList.remove("on");
+  });
+  $("w-turn").onclick = withEditor((api) => {
+    api.mode("rotate");
+    $("w-turn").classList.add("on");
+    $("w-move").classList.remove("on");
+  });
+  $("w-fly").onclick = withEditor((api) => api.focus());
+  $("w-hide").onclick = withEditor((api) => api.toggleHide());
+  $("w-reset").onclick = withEditor((api) => api.reset());
+  $("w-del").onclick = withEditor((api) => api.removeProp());
+  $("w-add").onclick = withEditor((api) => api.addProp($<HTMLSelectElement>("w-model").value));
+  $("w-boxes").onclick = withEditor((api) => {
+    $("w-boxes").classList.toggle("on");
+    api.proxies($("w-boxes").classList.contains("on"));
+  });
+  $("w-save").onclick = withEditor(async (api) => {
+    await api.save();
+    $("world-status").textContent = "saved; the scene reloads";
+  });
+  $("w-copy").onclick = withEditor((api) => navigator.clipboard.writeText(api.json()));
+}
+
+const numberField = (key: string, label: string, value: number, step: number): string =>
+  `<label>${label}<output>${value}</output><input type="range" data-wf="${key}" min="${value - 100 * step}" max="${value + 100 * step}" step="${step}" value="${value}" /></label>`;
+
+function drawWorld(): void {
+  const api = editorOf();
+  if (!api) return;
+  const data = api.list();
+  const sel = api.selected();
+  const rows: { id: string; text: string; cls: string }[] =
+    worldKind === "prop"
+      ? data.props.map((p) => ({ id: p.id, text: `${p.id}  ${p.model}`, cls: "edited" }))
+      : (worldKind === "tower" ? data.towers : data.lamps).map((r) => ({ id: r.id, text: `${r.id}  (${r.x}, ${r.z}) h ${r.h}`, cls: r.hidden ? "hidden" : r.edited ? "edited" : "" }));
+  $("world-list").innerHTML = rows
+    .filter((r) => r.id.includes(worldFilter))
+    .slice(0, 400)
+    .map((r) => `<button data-id="${r.id}" class="${r.cls} ${sel?.kind === worldKind && sel.id === r.id ? "sel" : ""}">${r.text}</button>`)
+    .join("");
+  document.querySelectorAll<HTMLButtonElement>("#world-list button").forEach((b) => {
+    b.onclick = () => {
+      api.select(worldKind, b.dataset.id!);
+      api.focus();
+    };
+  });
+  if (!$("w-model").children.length) $("w-model").innerHTML = api.models().map((m) => `<option>${m}</option>`).join("");
+  $("w-del").hidden = sel?.kind !== "prop";
+  $("w-hide").hidden = !sel || sel.kind === "prop";
+  $("w-reset").hidden = !sel || sel.kind === "prop";
+  if (!sel) {
+    $("world-sel").textContent = "nothing";
+    $("world-fields").innerHTML = "";
+    return;
+  }
+  $("world-sel").textContent = `${sel.kind} ${sel.id}${sel.item?.hide ? " (hidden)" : ""}`;
+  if (document.activeElement?.matches("#world-fields input")) return;
+  const fields =
+    sel.kind === "prop" && sel.prop
+      ? [numberField("x", "x", sel.prop.x, 0.5), numberField("y", "y (height)", sel.prop.y, 0.1), numberField("z", "z", sel.prop.z, 0.5), numberField("ry", "turn (deg)", Math.round(sel.prop.ry * DEG), 1), numberField("scale", "scale", sel.prop.scale, 0.05)]
+      : [numberField("dx", "shift x", sel.item?.dx ?? 0, 0.5), numberField("dz", "shift z", sel.item?.dz ?? 0, 0.5), numberField("dry", "extra turn (deg)", Math.round((sel.item?.dry ?? 0) * DEG), 1), ...(sel.kind === "tower" ? [numberField("hs", "height x", sel.item?.hs ?? 1, 0.05)] : [])];
+  $("world-fields").innerHTML = fields.join("");
+  document.querySelectorAll<HTMLInputElement>("#world-fields input").forEach((input) => {
+    input.oninput = () => {
+      const key = input.dataset.wf!;
+      const value = Number(input.value);
+      input.previousElementSibling!.textContent = input.value;
+      api.patch({ [key]: key === "ry" || key === "dry" ? value / DEG : value });
+    };
+    // Redrawing on every input would rebuild the slider under the pointer: redraw when the pointer is released.
+    input.onchange = drawWorld;
+  });
+}
+
 buildModelsTab();
 buildCameraTab();
+buildWorldTab();
 resize();
