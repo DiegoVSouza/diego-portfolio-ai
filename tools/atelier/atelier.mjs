@@ -4,7 +4,7 @@
 //   node tools/atelier/atelier.mjs status
 //   node tools/atelier/atelier.mjs candidates [--packs <dir>]
 //   node tools/atelier/atelier.mjs inspect <model.glb|dir> [--budget N] [--json]
-//   node tools/atelier/atelier.mjs improve <in | pack.zip::member> <out.glb> [--budget N] [--height H] [--rotate-y DEG] [--keep-textures]
+//   node tools/atelier/atelier.mjs improve <in | pack.zip::member> <out.glb> [--budget N] [--planar DEG] [--height H] [--rotate-y DEG] [--keep-textures]
 //   node tools/atelier/atelier.mjs palette <textured.glb> <out.glb>   (bake the palette into vertex colours, drop the texture bytes)
 //   node tools/atelier/atelier.mjs axis
 import { execFileSync, spawnSync } from "node:child_process";
@@ -147,7 +147,7 @@ const COMMANDS = {
       source = extractMember(zipPath, member, path.join(root, ".cache", "atelier", path.basename(member).replace(/\W+/g, "-")));
     }
     const passthrough = [];
-    for (const key of ["budget", "height", "rotate-y", "origin"]) if (flags[key] !== undefined) passthrough.push(`--${key}`, String(flags[key]));
+    for (const key of ["budget", "height", "rotate-y", "origin", "planar"]) if (flags[key] !== undefined) passthrough.push(`--${key}`, String(flags[key]));
     if (flags["keep-textures"]) passthrough.push("--keep-textures");
     const run = spawnSync(exe, ["--background", "--python", path.join(here, "blender", "improve_model.py"), "--", source, path.resolve(output), ...passthrough], { encoding: "utf8" });
     const line = run.stdout.split("\n").find((l) => l.startsWith("ATELIER_IMPROVE "));

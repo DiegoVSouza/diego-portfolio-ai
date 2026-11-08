@@ -3,6 +3,7 @@
 Run:  blender --background --python tools/atelier/blender/improve_model.py -- <in.fbx|in.gltf|in.glb> <out.glb> [options]
 
 Options
+  --planar DEG      dissolve coplanar faces first (angle limit in degrees; keeps flat buildings intact)
   --budget N        decimate (collapse) until the model has at most N triangles (default: no decimation)
   --height H        scale so the model is H units tall (default: keep the pack's scale)
   --rotate-y DEG    spin around the vertical axis before export, to make the model face +Z (default 0)
@@ -110,6 +111,16 @@ bpy.context.view_layer.objects.active = meshes[0]
 if len(meshes) > 1:
     bpy.ops.object.join()
 meshes = [o for o in bpy.data.objects if o.type == "MESH"]
+
+planar = option("--planar", None)
+if planar:
+    # Flat architecture keeps its shape under a planar dissolve (coplanar faces merge, nothing else moves); collapse below does not.
+    for o in meshes:
+        mod = o.modifiers.new("atelier-planar", "DECIMATE")
+        mod.decimate_type = "DISSOLVE"
+        mod.angle_limit = math.radians(planar)
+        bpy.context.view_layer.objects.active = o
+        bpy.ops.object.modifier_apply(modifier=mod.name)
 
 if budget:
     now = triangles(meshes)
