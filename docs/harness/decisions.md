@@ -53,3 +53,13 @@ A card seal used to be hand-written text, which let it drift from the feature re
 ## 2026-11-02: the public suite tolerates the Turnstile script, nothing else
 
 Once the Turnstile widget was enabled on the deployed site, two public tests failed for reasons that are the third party's behaviour: its script probes the page with a fetch of `data:,` (our strict CSP refuses it on purpose, `connect-src` has no `data:`), logs transparent console lines, and loads a worker from a `blob:` URL of `challenges.cloudflare.com`. Against the deployed site only (`PUBLIC_URL` set) the suite now ignores those exact console messages and allows that one origin, with no POST allowed; local runs with the stubbed API stay strict, and any other console error or third-party request still fails. The CSP was not loosened. Reverse this by deleting `TURNSTILE_NOISE` and the `allowed` branch in `e2e/site.spec.ts` if the owner prefers to allow `data:` in the CSP instead.
+
+## 2026-11-06: AI accessibility reader replaces the human reviewer, with a claim boundary
+
+No human screen-reader tester is available, so `scripts/a11y-reader.mjs` runs an automated pass in Edge via Playwright (accessibility tree, headings, landmarks, tab order, axe). It is reported as automated review only; human screen-reader evidence stays PENDING. The owner also approved the CV text; site copy follows the CV at the lab root. Evidence: `artifacts/evidence/a11y-reader/`.
+
+## 2026-11-09: the owner's mark goes live (quick mode)
+
+- **Decision:** the four SVGs the owner placed in `public/` are wired in. `04-favicon.svg` is the favicon (`index.html` and the prerendered head), `01-logo-simbolo-transparente.svg` sits beside the brand text in the header (decorative `alt=""`, the text stays the accessible name), and `public/og.png` is regenerated with the mark by `scripts/og.mjs`. The credits line no longer says "no logo or brand asset". The `05` and `06` lockups are kept for README and case covers, not placed yet.
+- **Cleanup:** the C2PA `<metadata>` block (about 8 KB per file, a tool provenance manifest) was removed from all four SVGs. No visible geometry changed.
+- **Why quick mode:** a small presentation change with no new dependency; the CSP already allows `img-src 'self'`.

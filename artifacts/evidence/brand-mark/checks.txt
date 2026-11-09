@@ -1,0 +1,95 @@
+
+> lab-portfolio@0.1.0 typecheck
+> tsc --noEmit
+
+
+> lab-portfolio@0.1.0 lint
+> eslint src e2e scripts functions
+
+
+ RUN  v5.0.5 C:/estudo/Golpe/lab/projects/p07
+
+ ❯ src/scene/world-edits.test.ts (7 tests | 1 failed) 84ms
+   ❯ world edits (7)
+     × ships an empty file, so the city is the generated one 43ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/scene/world-edits.test.ts > world edits > ships an empty file, so the city is the generated one
+AssertionError: expected { version: 1, props: [], …(3) } to deeply equal { version: 1, props: [], …(3) }
+
+- Expected
++ Received
+
+  {
+-   "lamps": {},
++   "lamps": {
++     "l12": {
++       "at": [
++         13.96,
++         -115.4,
++       ],
++       "dx": -3.107,
++       "dz": 43.031,
++     },
++     "l13": {
++       "at": [
++         36.94,
++         -114.26,
++       ],
++       "dx": -23.067,
++       "dz": 23.264,
++     },
++     "l4": {
++       "at": [
++         2.23,
++         -30.79,
++       ],
++       "dx": 5.546,
++       "dz": -18.787,
++     },
++     "l5": {
++       "at": [
++         24.62,
++         -25.54,
++       ],
++       "dx": -11.175,
++       "dz": 14.785,
++     },
++   },
+    "props": [],
+    "shots": {},
+-   "towers": {},
++   "towers": {
++     "t3.2": {
++       "at": [
++         -91.26,
++         -389.91,
++       ],
++       "dx": 0.01,
++       "dz": -0.146,
++     },
++   },
+    "version": 1,
+  }
+
+ ❯ src/scene/world-edits.test.ts:7:24
+      5| describe("world edits", () => {
+      6|   it("ships an empty file, so the city is the generated one", () => {
+      7|     expect(worldEdits).toEqual(EMPTY_EDITS);
+       |                        ^
+      8|   });
+      9|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed | 18 passed (19)
+      Tests  1 failed | 129 passed (130)
+   Start at  08:48:45
+   Duration  16.83s (environment 74%, setup 15%, tests 5%, import 3%, transform 2%, worker 1%)
+
+Environment  jsdom was created 19 times · 122.57s total, 74% of tracked time
+             create it once per worker with pool: 'vmThreads' (keeps per-file isolation) or isolate: false (shares it across files)
+             learn more: https://vitest.dev/guide/improving-performance#test-environments
+

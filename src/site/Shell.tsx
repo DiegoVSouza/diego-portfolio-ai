@@ -38,7 +38,7 @@ function Header() {
   const { lang, t } = useLang();
   return (
     <AppHeader
-      brand={t.brand}
+      brand={<><img className="brand-mark" src="/01-logo-simbolo-transparente.svg" alt="" width="32" height="32" />{t.brand}</>}
       brandHref={hrefFor({ page: "home" }, lang)}
       navLabel={t.nav}
       nav={<Link to={hrefFor({ page: "case", slug: caseCards[0]!.slug }, lang)} aria-current={route.page === "case" || route.page === "demo" ? "page" : undefined}>{t.navTour}</Link>}

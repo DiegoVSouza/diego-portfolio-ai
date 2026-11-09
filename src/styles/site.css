@@ -48,6 +48,8 @@
 .langs { display: flex; gap: var(--space-2); }
 .langs a.tg { display: inline-flex; align-items: center; justify-content: center; text-decoration: none; }
 .tg[aria-current="true"] { background: var(--red); border-color: var(--red); color: var(--on-red); }
+.brand { display: inline-flex; align-items: center; gap: var(--space-2); }
+.brand-mark { width: 32px; height: 32px; flex: none; }
 .top-links a[aria-current="page"] { color: var(--red-text); text-decoration: underline; text-underline-offset: 6px; }
 @media (min-width: 1200px) { .wrap { margin-left: max(220px, calc((100vw - 1100px) / 2)); } }
 

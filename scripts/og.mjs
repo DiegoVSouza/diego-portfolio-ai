@@ -10,14 +10,19 @@ const token = (name) => new RegExp(`--${name}:\\s*(#[0-9a-fA-F]{6})`).exec(token
 const [ink, paper, red, mut] = ["ink", "paper", "red", "mut"].map(token);
 const font = pathToFileURL(join(root, "node_modules/@fontsource/anton/files/anton-latin-400-normal.woff2")).href;
 
+const mark = readFileSync(join(root, "public/01-logo-simbolo-transparente.svg"), "utf8");
+
 const html = `<!doctype html><style>
 @font-face { font-family: Anton; src: url("${font}"); }
 body { margin: 0; width: 1200px; height: 630px; background: ${ink}; color: ${paper}; font-family: Anton, Impact, sans-serif; position: relative; overflow: hidden; }
 .bar { position: absolute; left: 0; top: 0; bottom: 0; width: 28px; background: ${red}; }
+.mark { position: absolute; right: 70px; top: 70px; width: 260px; height: 260px; }
+.mark svg { width: 100%; height: 100%; }
 .slab { position: absolute; left: 60px; top: 150px; width: 520px; height: 230px; background: ${red}; transform: skewX(-18deg) rotate(-2deg); }
 h1 { position: absolute; left: 84px; top: 96px; margin: 0; font-weight: 400; font-size: 118px; line-height: 1.02; text-transform: uppercase; max-width: 1040px; }
+h1 { max-width: 760px; font-size: 104px; }
 p { position: absolute; left: 88px; bottom: 70px; margin: 0; font-size: 36px; letter-spacing: .06em; text-transform: uppercase; color: ${mut}; }
-</style><div class="bar"></div><div class="slab"></div><h1>AI Engineer building agents you can verify</h1><p>Diego Souza · live demo · evidence · code</p>`;
+</style><div class="bar"></div><div class="slab"></div><div class="mark">${mark}</div><h1>AI Engineer building agents you can verify</h1><p>Diego Souza · live demo · evidence · code</p>`;
 
 const browser = await chromium.launch({ channel: "chrome" });
 const page = await browser.newPage({ viewport: { width: 1200, height: 630 } });
