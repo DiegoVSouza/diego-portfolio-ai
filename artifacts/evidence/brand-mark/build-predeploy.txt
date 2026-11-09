@@ -1,0 +1,150 @@
+
+> lab-portfolio@0.1.0 build
+> tsc --noEmit && vite build && vite build --ssr src/entry-server.tsx --outDir dist-ssr && node scripts/prerender.mjs
+
+[36mvite v8.3.5 [32mbuilding client environment for production...[36m[39m
+transforming...
+✓ 128 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/index.html                                                      0.65 kB │ gzip:   0.35 kB
+dist/assets/playfair-display-vietnamese-900-normal-wtaM1xIw.woff2    5.71 kB
+dist/assets/anton-vietnamese-400-normal-2FfR1wHA.woff                6.82 kB
+dist/assets/playfair-display-vietnamese-900-normal-dpsjWZtQ.woff     7.13 kB
+dist/assets/anton-vietnamese-400-normal-CkBxLiRJ.woff2               8.68 kB
+dist/assets/courier-prime-latin-ext-400-normal-CKOCNFvK.woff         9.04 kB
+dist/assets/courier-prime-latin-ext-700-normal-BIFoAzHx.woff         9.28 kB
+dist/assets/playfair-display-cyrillic-900-normal-C8kZZFQC.woff2     11.86 kB
+dist/assets/playfair-display-latin-ext-900-normal-wdRhZY-D.woff2    12.65 kB
+dist/assets/courier-prime-latin-ext-400-normal-B-EsvyE4.woff2       12.73 kB
+dist/assets/courier-prime-latin-ext-700-normal-ByMJlNdM.woff2       12.92 kB
+dist/assets/playfair-display-cyrillic-900-normal-sDNg_-Xm.woff      14.20 kB
+dist/assets/courier-prime-latin-400-normal-BAlbUm6l.woff            14.38 kB
+dist/assets/courier-prime-latin-700-normal-CVvp4Sof.woff            14.67 kB
+dist/assets/anton-latin-400-normal-AUNGEG_V.woff                    15.63 kB
+dist/assets/playfair-display-latin-ext-900-normal-Dl6M2jFN.woff     16.23 kB
+dist/assets/anton-latin-400-normal-Byf51wtH.woff2                   18.61 kB
+dist/assets/courier-prime-latin-400-normal-BbyBr73r.woff2           18.64 kB
+dist/assets/courier-prime-latin-700-normal-D1YCjmaD.woff2           19.34 kB
+dist/.vite/manifest.json                                            21.00 kB │ gzip:   2.59 kB
+dist/assets/playfair-display-latin-900-normal-oSb7_CWx.woff2        22.37 kB
+dist/assets/special-elite-latin-ext-400-normal-ChcxYnmu.woff2       25.19 kB
+dist/assets/playfair-display-latin-900-normal-DypQvTWf.woff         27.39 kB
+dist/assets/anton-latin-ext-400-normal-BMODBQc6.woff                28.07 kB
+dist/assets/metro-station-DySmoK7A.glb                              29.43 kB
+dist/assets/special-elite-latin-ext-400-normal-CaJZjSVf.woff        29.99 kB
+dist/assets/anton-latin-ext-400-normal-SyiqE2Jt.woff2               31.35 kB
+dist/assets/car-s64-D6rtMGtE.glb                                    35.04 kB
+dist/assets/special-elite-latin-400-normal-YjDd9tmf.woff2           53.29 kB
+dist/assets/special-elite-latin-400-normal-BtSRmyJ6.woff            63.41 kB
+dist/assets/train-subway-b-BcKpBuVb.glb                             68.96 kB
+dist/assets/train-subway-a-HpwfrjTR.glb                             79.93 kB
+dist/assets/train-subway-c-rigm-WAk.glb                             80.79 kB
+dist/assets/car-r7-pG6LYFg6.glb                                     82.62 kB
+dist/assets/truck-DgzODktx.glb                                      92.12 kB
+dist/assets/moto-BIrxoA5F.glb                                       96.87 kB
+dist/assets/building-small-D04lKyGk.glb                            118.92 kB
+dist/assets/building-large-DMQvYrEG.glb                            173.33 kB
+dist/assets/building-medium-UWerGeF8.glb                           178.55 kB
+dist/assets/building-sample-013-DlLOG94K.glb                       605.78 kB
+dist/assets/index-BoaoyvdQ.css                                      54.42 kB │ gzip:  11.37 kB
+dist/assets/t-C8w94HjU.js                                            0.04 kB │ gzip:   0.06 kB
+dist/assets/Demo-JGxoCqK9.js                                         0.04 kB │ gzip:   0.06 kB
+dist/assets/NotFound-CEQgyXtZ.js                                     0.05 kB │ gzip:   0.06 kB
+dist/assets/NotFound-BqdJP3CP.js                                     0.24 kB │ gzip:   0.19 kB
+dist/assets/DesignSystem-DgGog1Ht.js                                 0.53 kB │ gzip:   0.33 kB
+dist/assets/car-s64-_hg6gzbn.js                                      0.54 kB │ gzip:   0.30 kB
+dist/assets/FlowStage-K8iBfpAh.js                                    0.67 kB │ gzip:   0.41 kB
+dist/assets/Method-R2wv8csb.js                                       0.81 kB │ gzip:   0.44 kB
+dist/assets/design-system-TxEewK0R.js                                0.87 kB │ gzip:   0.34 kB
+dist/assets/observability-Bfhzod8g.js                                0.90 kB │ gzip:   0.35 kB
+dist/assets/toolkit-B5kkPj5E.js                                      0.90 kB │ gzip:   0.35 kB
+dist/assets/harness-BjiooYum.js                                      1.05 kB │ gzip:   0.37 kB
+dist/assets/async-vDD5e4tv.js                                        1.35 kB │ gzip:   0.46 kB
+dist/assets/agents-DAl6_6g4.js                                       1.36 kB │ gzip:   0.45 kB
+dist/assets/foundation-Dz_dCOjD.js                                   1.37 kB │ gzip:   0.46 kB
+dist/assets/supportops-wd6pG5ED.js                                   1.41 kB │ gzip:   0.48 kB
+dist/assets/index-NaJyaAhq.js                                        1.54 kB │ gzip:   0.81 kB
+dist/assets/system-0qNWRxWp.js                                       1.66 kB │ gzip:   0.56 kB
+dist/assets/harness-6Q7rWlld.js                                      2.01 kB │ gzip:   0.85 kB
+dist/assets/observability-DkGWs8cb.js                                2.03 kB │ gzip:   0.88 kB
+dist/assets/toolkit-BckkHv60.js                                      2.07 kB │ gzip:   0.87 kB
+dist/assets/design-system-7bJ1lmZS.js                                2.08 kB │ gzip:   0.92 kB
+dist/assets/Experience-CWFzkN0u.js                                   2.14 kB │ gzip:   0.74 kB
+dist/assets/async-YALiho6M.js                                        2.53 kB │ gzip:   0.95 kB
+dist/assets/Palette-CJNXvBTT.js                                      2.63 kB │ gzip:   1.29 kB
+dist/assets/foundation-B4lMOnxz.js                                   2.73 kB │ gzip:   1.11 kB
+dist/assets/agents-D6V2XCmy.js                                       2.95 kB │ gzip:   1.09 kB
+dist/assets/Home-Cq0GMe4p.js                                         3.33 kB │ gzip:   1.13 kB
+dist/assets/async-NeZ1-Nq7.js                                        3.35 kB │ gzip:   1.69 kB
+dist/assets/observability-fL1BdbfB.js                                3.62 kB │ gzip:   1.71 kB
+dist/assets/system-BoCwJTrE.js                                       4.05 kB │ gzip:   1.59 kB
+dist/assets/toolkit-auVf7BOm.js                                      4.06 kB │ gzip:   1.93 kB
+dist/assets/harness-wgxeQie2.js                                      4.27 kB │ gzip:   2.05 kB
+dist/assets/agents-DPnHFCwv.js                                       4.53 kB │ gzip:   2.12 kB
+dist/assets/supportops-BtGreiaV.js                                   4.67 kB │ gzip:   1.76 kB
+dist/assets/design-system-B0gSYjs6.js                                4.76 kB │ gzip:   2.31 kB
+dist/assets/supportops-DsJoTuc3.js                                   7.23 kB │ gzip:   3.31 kB
+dist/assets/Demo-B1b95VrH.js                                         7.83 kB │ gzip:   3.28 kB
+dist/assets/Evidence-3F1NK-zb.js                                     8.51 kB │ gzip:   3.78 kB
+dist/assets/Case-C7OI6pSs.js                                        10.13 kB │ gzip:   3.37 kB
+dist/assets/foundation-DXXSvk8b.js                                  10.84 kB │ gzip:   4.52 kB
+dist/assets/evidence-CF9kbdvV.js                                    15.97 kB │ gzip:   5.25 kB
+dist/assets/gsap-CQ4Bke8s.js                                        69.56 kB │ gzip:  27.29 kB
+dist/assets/Shell-z1rOR1eq.js                                      143.55 kB │ gzip:  49.99 kB
+dist/assets/scene-IPk3jflt.js                                      684.91 kB │ gzip: 179.14 kB
+
+[32m✓ built in 663ms[39m
+[33m[plugin builtin:vite-reporter] 
+(!) Some chunks are larger than 500 kB after minification. Consider:
+- Using dynamic import() to code-split the application
+- Use build.rolldownOptions.output.codeSplitting to improve chunking: https://rolldown.rs/reference/OutputOptions.codeSplitting
+- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.[39m
+[36mvite v8.3.5 [32mbuilding ssr environment for production...[36m[39m
+transforming...
+✓ 102 modules transformed.
+rendering chunks...
+computing gzip size...
+dist-ssr/.vite/manifest.json                 9.85 kB │ gzip:  1.43 kB
+dist-ssr/assets/t-_BYjPMN0.js                0.07 kB │ gzip:  0.08 kB
+dist-ssr/assets/NotFound-BoaJyldJ.js         0.48 kB │ gzip:  0.30 kB
+dist-ssr/assets/DesignSystem-DIujZ0Hf.js     0.98 kB │ gzip:  0.49 kB
+dist-ssr/assets/FlowStage-BuU2bn2Z.js        1.40 kB │ gzip:  0.74 kB
+dist-ssr/assets/Method-Cf2eaYY4.js           1.54 kB │ gzip:  0.64 kB
+dist-ssr/assets/design-system-BZvy_B6Z.js    1.63 kB │ gzip:  0.44 kB
+dist-ssr/assets/toolkit-C0vjMIjE.js          1.64 kB │ gzip:  0.44 kB
+dist-ssr/assets/observability-M4v2C_Bd.js    1.65 kB │ gzip:  0.46 kB
+dist-ssr/assets/harness-Ehb1LuMn.js          1.92 kB │ gzip:  0.47 kB
+dist-ssr/assets/agents-CLJxQOXl.js           2.36 kB │ gzip:  0.55 kB
+dist-ssr/assets/async-B6_JCZRE.js            2.43 kB │ gzip:  0.58 kB
+dist-ssr/assets/foundation-XcF2BRfI.js       2.47 kB │ gzip:  0.58 kB
+dist-ssr/assets/supportops-DqsQVfgj.js       2.55 kB │ gzip:  0.58 kB
+dist-ssr/assets/observability-YX19SS9-.js    2.70 kB │ gzip:  0.98 kB
+dist-ssr/assets/toolkit-CNFx6EuC.js          2.71 kB │ gzip:  0.98 kB
+dist-ssr/assets/design-system-DIrHaYZ4.js    2.75 kB │ gzip:  1.03 kB
+dist-ssr/assets/harness-UyoyEKVF.js          2.76 kB │ gzip:  0.96 kB
+dist-ssr/assets/system-BIK043ds.js           2.96 kB │ gzip:  0.68 kB
+dist-ssr/assets/async-29vuFoHb.js            3.43 kB │ gzip:  1.06 kB
+dist-ssr/assets/async-Cm2jFTP_.js            3.53 kB │ gzip:  1.74 kB
+dist-ssr/assets/foundation-CimStH6R.js       3.60 kB │ gzip:  1.23 kB
+dist-ssr/assets/Experience-CxqSXhyb.js       3.82 kB │ gzip:  1.00 kB
+dist-ssr/assets/observability-Dpof7PVw.js    3.82 kB │ gzip:  1.77 kB
+dist-ssr/assets/agents-DYQ_J93X.js           3.90 kB │ gzip:  1.20 kB
+dist-ssr/assets/toolkit-C0bYpbhY.js          4.27 kB │ gzip:  1.99 kB
+dist-ssr/assets/harness-CdaPRHOo.js          4.46 kB │ gzip:  2.11 kB
+dist-ssr/assets/agents-BHwlnfrL.js           4.74 kB │ gzip:  2.17 kB
+dist-ssr/assets/Palette-iRUnTGuc.js          4.78 kB │ gzip:  1.83 kB
+dist-ssr/assets/design-system-Cnd3viFD.js    4.98 kB │ gzip:  2.37 kB
+dist-ssr/assets/system-Z5MVetc6.js           5.32 kB │ gzip:  1.71 kB
+dist-ssr/assets/supportops-BenYu4P9.js       6.00 kB │ gzip:  1.92 kB
+dist-ssr/assets/Home-xrBH6RjM.js             7.29 kB │ gzip:  2.05 kB
+dist-ssr/assets/supportops-DqVwomFe.js       7.58 kB │ gzip:  3.39 kB
+dist-ssr/assets/Evidence-AvfALg9P.js        11.03 kB │ gzip:  4.21 kB
+dist-ssr/assets/foundation-DP6ACBZp.js      11.29 kB │ gzip:  4.62 kB
+dist-ssr/assets/Demo-DOhLqGAc.js            15.29 kB │ gzip:  4.77 kB
+dist-ssr/assets/Case-DaNpBZaT.js            20.39 kB │ gzip:  5.05 kB
+dist-ssr/assets/scene-kKrCtHny.js          106.97 kB │ gzip: 35.09 kB
+dist-ssr/entry-server.js                   184.55 kB │ gzip: 55.38 kB
+
+[32m✓ built in 143ms[39m
+prerender: 29 pages written
