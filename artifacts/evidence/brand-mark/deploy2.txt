@@ -1,0 +1,15 @@
+
+ ⛅️ wrangler 4.105.0 (update available 4.158.0)
+───────────────────────────────────────────────
+✨ Compiled Worker successfully
+Uploading... (78/123)
+Uploading... (93/123)
+Uploading... (108/123)
+Uploading... (123/123)
+✨ Success! Uploaded 45 files (78 already uploaded) (2.71 sec)
+
+✨ Uploading _headers
+✨ Uploading Functions bundle
+✨ Uploading _routes.json
+🌎 Deploying...
+✨ Deployment complete! Take a peek over at https://1f94427f.diego-portfolio-ai.pages.dev
