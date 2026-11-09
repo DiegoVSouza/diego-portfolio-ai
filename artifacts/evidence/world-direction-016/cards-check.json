@@ -2,7 +2,7 @@
  {
   "stop": 0,
   "conesOnCardLayer": 0,
-  "cones": 4,
+  "cones": 0,
   "paintedFaceVisible": false,
   "nearCards": 1,
   "controls": [
@@ -23,7 +23,7 @@
  {
   "stop": 1,
   "conesOnCardLayer": 0,
-  "cones": 4,
+  "cones": 0,
   "paintedFaceVisible": false,
   "nearCards": 1,
   "controls": [
@@ -49,7 +49,7 @@
  {
   "stop": 2,
   "conesOnCardLayer": 0,
-  "cones": 4,
+  "cones": 0,
   "paintedFaceVisible": false,
   "nearCards": 1,
   "controls": [
@@ -70,7 +70,7 @@
  {
   "stop": 3,
   "conesOnCardLayer": 0,
-  "cones": 4,
+  "cones": 0,
   "paintedFaceVisible": false,
   "nearCards": 1,
   "controls": [
@@ -91,7 +91,7 @@
  {
   "stop": 4,
   "conesOnCardLayer": 0,
-  "cones": 4,
+  "cones": 0,
   "paintedFaceVisible": false,
   "nearCards": 1,
   "controls": [
@@ -112,7 +112,7 @@
  {
   "stop": 5,
   "conesOnCardLayer": 0,
-  "cones": 4,
+  "cones": 0,
   "paintedFaceVisible": false,
   "nearCards": 1,
   "controls": [
@@ -133,7 +133,7 @@
  {
   "stop": 6,
   "conesOnCardLayer": 0,
-  "cones": 4,
+  "cones": 0,
   "paintedFaceVisible": false,
   "nearCards": 1,
   "controls": [
@@ -154,7 +154,7 @@
  {
   "stop": 7,
   "conesOnCardLayer": 0,
-  "cones": 4,
+  "cones": 0,
   "paintedFaceVisible": false,
   "nearCards": 1,
   "controls": [
@@ -175,7 +175,7 @@
  {
   "stop": 8,
   "conesOnCardLayer": 0,
-  "cones": 4,
+  "cones": 0,
   "paintedFaceVisible": false,
   "nearCards": 1,
   "controls": [
@@ -196,7 +196,7 @@
  {
   "stop": 9,
   "conesOnCardLayer": 0,
-  "cones": 4,
+  "cones": 0,
   "paintedFaceVisible": false,
   "nearCards": 1,
   "controls": [
